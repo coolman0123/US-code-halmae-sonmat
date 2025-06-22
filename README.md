@@ -19,7 +19,7 @@ If you are developing a production application, we recommend using TypeScript wi
 | 최시원 | 백엔드 | https://github.com/coolman0123 |
 | 손영관 | 백엔드 | https://github.com/son9806 |
 | 양유진 | 프론트 | https://github.com/skysunm |
-| 김희연 | 프론트 |  |
+| 김희연 | 프론트 | https://github.com/joyfulond |
 
 
 ---
