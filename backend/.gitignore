@@ -30,3 +30,9 @@ swagger-output.json
 .idea/
 .vscode/
 *.swp
+
+
+env/
+*.json
+
+.env
