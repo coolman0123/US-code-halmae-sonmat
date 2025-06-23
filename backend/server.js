@@ -1,19 +1,23 @@
 const express = require('express');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
-const specs = require('./swagger/swagger');
+const specs = require('./config/swagger/swagger');
 const userRoutes = require('./routes/userRoutes');
+
+const hostRoutes = require('./domains/host/routes/hostRoutes');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// 사용자 라우트
 app.use('/api/users', userRoutes);
+app.use('/api/hosts', hostRoutes);
 
-// Swagger 문서 UI 라우트 (정적 파일 서빙 X)
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
+app.use((err, req, res, next) => {
+  res.status(500).json({ success: false, message: err.message });
+});
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
