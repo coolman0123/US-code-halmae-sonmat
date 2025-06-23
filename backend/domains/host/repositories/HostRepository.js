@@ -1,0 +1,27 @@
+const FirebaseRepository = require('../../../firebase/FirebaseRepository.js'); 
+const admin = require('../../../firebase/admin.js'); 
+const Host = require('../entities/Host.js'); 
+
+class HostRepository extends FirebaseRepository {
+  constructor() {
+    super('hosts');
+  }
+
+async create(hostData) {
+  const host = new Host(hostData); // createdAt/updatedAt 자동 처리
+  const obj = host.toJSON();
+  delete obj.id; // Firestore에 저장 시 id 제거
+  const docRef = await this.collection.add(obj);
+  return { id: docRef.id, ...obj }; // 응답에는 id 포함
+}
+
+
+  async findAll() {
+  const snapshot = await this.collection.get();
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
+}
+
+module.exports = HostRepository;
+
