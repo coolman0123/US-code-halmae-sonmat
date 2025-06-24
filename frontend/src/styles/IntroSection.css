@@ -1,0 +1,34 @@
+.intro-section {
+  text-align: center;
+  margin: 3rem 0;
+}
+
+.intro-logo {
+  width: 60px;
+  height: 60px;
+}
+
+.intro-text-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.intro-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.intro-subtitle {
+  color: #888;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.intro-description {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+} 
