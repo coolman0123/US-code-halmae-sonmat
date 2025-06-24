@@ -1,10 +1,12 @@
-const path = require('path');
+require('dotenv').config();
 const admin = require('firebase-admin');
 
-const serviceAccount = require(path.join(
-  __dirname,
-  '../env/gm-hand-firebase-adminsdk-fbsvc-28b711dc63.json'
-));
+const serviceAccount = {
+  type: "service_account",
+  project_id: process.env.FIREBASE_PROJECT_ID,
+  private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+  client_email: process.env.FIREBASE_CLIENT_EMAIL,
+};
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -12,6 +14,5 @@ if (!admin.apps.length) {
     storageBucket: process.env.FIREBASE_STORAGE_BUCKET
   });
 }
-
 
 module.exports = admin;
