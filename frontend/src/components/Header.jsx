@@ -1,5 +1,5 @@
 import React from 'react';
-import './Header.css';
+import '../styles/Header.css';
 import logo from '../assets/할머니로고.png';
 
 const Header = () => {
