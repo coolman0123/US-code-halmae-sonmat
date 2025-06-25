@@ -7,21 +7,21 @@
 }
 
 .footer-title {
-  font-size: 1.5rem;
+  font-size: 1rem;
   font-weight: bold;
   margin-bottom: 1rem;
   color: #333;
 }
 
 .footer-tel {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: bold;
-  margin-bottom: 2rem;
+  margin-bottom: 1.7rem;
   color: #333;
 }
 
 .footer-text {
-  font-size: 0.9rem;
+  font-size: 0.7rem;
   color: #666;
   line-height: 1.6;
 }

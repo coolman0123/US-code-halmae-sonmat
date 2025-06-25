@@ -9,6 +9,9 @@ import Booking from './pages/Booking/Booking';
 import Experience from './pages/Experience/Experience';
 import LiveBooking from './pages/LiveReservation/LiveBooking/LiveBooking';
 import MyPage from './pages/MyPage/MyPage/MyPage';
+import MyPayment from './pages/MyPage/MyPayment/MyPayment';
+import MyReview from './pages/MyPage/MyReview/MyReview';
+import Notification from './pages/MyPage/Notification/Notification';
 import './App.css';
 
 function App() {
@@ -24,6 +27,9 @@ function App() {
           <Route path='/experiences' element={<Experience />} />
           <Route path='/live-reservation' element={<LiveBooking />} />
           <Route path='/mypage' element={<MyPage />} />
+          <Route path='/mypage/payment' element={<MyPayment />} />
+          <Route path='/mypage/review' element={<MyReview />} />
+          <Route path='/mypage/notification' element={<Notification />} />
         </Routes>
       </div>
     </Router>
