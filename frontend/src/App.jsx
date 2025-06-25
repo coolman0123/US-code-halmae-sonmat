@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainPage from './pages/MainPage/MainPage';
 import Stories from './pages/Stories/Stories';
 import Login from './pages/Auth/Login/Login';
+import Logout from './pages/Auth/Logout/Logout';
 import Booking from './pages/Booking/Booking';
 import Experience from './pages/Experience/Experience';
 import LiveBooking from './pages/LiveReservation/LiveBooking/LiveBooking';
@@ -18,6 +19,7 @@ function App() {
           <Route path='/' element={<MainPage />} />
           <Route path='/stories' element={<Stories />} />
           <Route path='/login' element={<Login />} />
+          <Route path='/logout' element={<Logout />} />
           <Route path='/booking' element={<Booking />} />
           <Route path='/experiences' element={<Experience />} />
           <Route path='/live-reservation' element={<LiveBooking />} />

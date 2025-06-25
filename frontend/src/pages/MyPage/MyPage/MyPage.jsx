@@ -17,7 +17,7 @@ const MyPage = () => {
   };
 
   const handleInquiry = () => {
-    alert('전화번호: 010-1234-5678\n통화를 원하시면 확인을 눌러주세요.');
+    alert('관리자 전화번호: 010-1234-5678');
   };
 
   return (
