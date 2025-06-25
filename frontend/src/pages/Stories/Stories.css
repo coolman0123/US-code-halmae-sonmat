@@ -11,24 +11,20 @@
 
 /* Hero Section */
 .stories-hero {
-  position: relative;
   width: 100%;
-  height: 60vh;
-  min-height: 400px;
-  overflow: hidden;
+  margin-bottom: 60px;
+}
+
+.hero-image-container {
+  width: 100%;
+  overflow: visible;
 }
 
 .hero-image {
   width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-.hero-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
+  height: auto;
+  display: block;
+  object-fit: contain;
 }
 
 /* Title Section */
@@ -174,11 +170,6 @@
     padding: 0 15px;
   }
 
-  .stories-hero {
-    height: 40vh;
-    min-height: 300px;
-  }
-
   .stories-title {
     padding: 60px 0 40px;
   }
@@ -248,10 +239,6 @@
 }
 
 @media (max-width: 480px) {
-  .stories-hero {
-    height: 35vh;
-    min-height: 250px;
-  }
 
   .title-main {
     font-size: 24px;

@@ -3,6 +3,9 @@ import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import './Stories.css';
 
+// 이미지 import
+import heroImage from '../../assets/images/상단_메인이미지.png';
+
 const Stories = () => {
   // 임시 숙박시설 데이터 (나중에 백엔드 API로 교체)
   const accommodations = [
@@ -84,8 +87,8 @@ const Stories = () => {
       
       {/* Hero Section - 메인 이미지 */}
       <section className="stories-hero">
-        <div className="hero-image">
-          <img src="/src/assets/images/상단_메인이미지.png" alt="할머니 방" />
+        <div className="hero-image-container">
+          <img src={heroImage} alt="할머니 방" className="hero-image" />
         </div>
       </section>
 
