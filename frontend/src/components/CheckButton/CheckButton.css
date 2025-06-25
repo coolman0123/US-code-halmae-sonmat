@@ -49,3 +49,17 @@
   cursor: not-allowed;
   opacity: 0.6;
 }
+
+@media (max-width: 768px) {
+  .select-btn {
+    padding: 8px 14px;
+    font-size: 14px;
+    border-radius: 6px;
+    gap: 4px;
+  }
+
+  .select-btn img.check-icon {
+    width: 16px;
+    height: 16px;
+  }
+}
