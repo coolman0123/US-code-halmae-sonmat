@@ -6,12 +6,6 @@
   box-sizing: border-box;
 }
 
-.payment-title {
-  font-size: 28px;
-  font-weight: 800;
-  margin-bottom: 32px;
-}
-
 .payment-list {
   display: flex;
   flex-direction: column;
