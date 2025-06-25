@@ -3,10 +3,9 @@
 }
 
 .review-title {
-  font-size: 32px;
-  font-weight: bold;
-  margin-bottom: 40px;
-  color: #1e293b;
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 32px;
 }
 
 .review-list {
