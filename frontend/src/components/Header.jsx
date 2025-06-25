@@ -1,6 +1,6 @@
 import React from 'react';
 import '../styles/Header.css';
-import logo from '../assets/할머니로고.png';
+import logo from '../assets/images/할머니로고.png';
 
 const Header = () => {
   return (
@@ -18,7 +18,7 @@ const Header = () => {
           <li>특별한 체험</li>
           <li>예약안내</li>
           <li>실시간예약</li>
-          <li>알림과 소통</li>
+          <li>로그인</li>
         </ul>
       </nav>
     </header>
