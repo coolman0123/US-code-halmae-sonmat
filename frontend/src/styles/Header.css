@@ -64,7 +64,7 @@ nav li a:hover {
   header {
     flex-direction: column;
     align-items: flex-start;
-    padding: 20px;
+    padding: 15px;
   }
 
   .logo-container {
@@ -80,8 +80,8 @@ nav li a:hover {
   }
 
   nav li a {
-    font-size: 14px;
-    padding: 4px 0;
+    font-size: 13px;
+    padding: 3px 0;
   }
 
   .logo-text {
@@ -91,4 +91,8 @@ nav li a:hover {
   .logo-subtitle {
     font-size: 11px;
   }
+}
+
+nav li:last-child {
+  margin-left: 35px;
 }
