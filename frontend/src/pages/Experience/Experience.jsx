@@ -23,8 +23,8 @@ const Experience = () => {
       
       {/* Hero Section */}
       <section className="experience-hero">
-        <div className="hero-image">
-          <img src={heroImage} alt="특별한 체험" />
+        <div className="hero-image-container">
+          <img src={heroImage} alt="특별한 체험" className="hero-image" />
         </div>
       </section>
 
@@ -32,7 +32,7 @@ const Experience = () => {
       <section className="experience-title">
         <div className="container">
           <p className="title-subtitle">소중한 하루를 만드는 시간</p>
-          <h1 className="title-main">특별한, 특별한 체험</h1>
+          <h1 className="title-main">특별함, 특별한 체험</h1>
         </div>
       </section>
 

@@ -1,0 +1,120 @@
+/* Reservation Info Page 전체 스타일 */
+.reservation-info-page {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.reservation-info-content {
+  width: 100%;
+  background-color: #fff;
+}
+
+/* Hero Section - 상단 이미지 */
+.reservation-hero {
+  width: 100%;
+  overflow: hidden;
+}
+
+.hero-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
+
+/* Title Section */
+.reservation-title-section {
+  padding: 50px 0;
+  text-align: center;
+  background-color: #fff;
+}
+
+.title-subtitle {
+  font-size: 14px;
+  color: #888;
+  margin: 0 0 15px 0;
+  letter-spacing: 1px;
+  font-weight: normal;
+}
+
+.title-main {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+  letter-spacing: 2px;
+}
+
+/* Detail Section - 하단 상세 이미지 */
+.reservation-detail {
+  width: 100%;
+  padding: 0;
+  background-color: #fff;
+}
+
+.detail-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
+
+/* Contact Section */
+.contact-section {
+  padding: 40px 0 60px 0;
+  text-align: center;
+  background-color: #fff;
+}
+
+.contact-label {
+  font-size: 16px;
+  color: #666;
+  margin: 0 0 10px 0;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.contact-number {
+  font-size: 24px;
+  color: #333;
+  margin: 0;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .reservation-title-section {
+    padding: 30px 0;
+  }
+
+  .title-main {
+    font-size: 24px;
+  }
+
+  .title-subtitle {
+    font-size: 12px;
+  }
+
+  .contact-section {
+    padding: 30px 0 40px 0;
+  }
+
+  .contact-number {
+    font-size: 20px;
+  }
+
+  .contact-label {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .title-main {
+    font-size: 20px;
+  }
+
+  .contact-number {
+    font-size: 18px;
+  }
+} 

@@ -22,7 +22,7 @@ const Header = () => {
             <Link to='/experiences'>특별한 체험</Link>
           </li>
           <li>
-            <Link to='/Booking'>예약안내</Link>
+            <Link to='/booking'>예약안내</Link>
           </li>
           <li>
             <Link to='/live-reservation'>실시간예약</Link>
