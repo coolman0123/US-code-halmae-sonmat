@@ -1,38 +1,30 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
-import MainPage from './pages/MainPage/MainPage';
-import Stories from './pages/Stories/Stories';
-import Login from './pages/Auth/Login/Login';
-import Logout from './pages/Auth/Logout/Logout';
-import Booking from './pages/Booking/Booking';
-import Experience from './pages/Experience/Experience';
-import LiveBooking from './pages/LiveReservation/LiveBooking/LiveBooking';
-import MyPage from './pages/MyPage/MyPage/MyPage';
-import MyPayment from './pages/MyPage/MyPayment/MyPayment';
-import MyReview from './pages/MyPage/MyReview/MyReview';
-import Notification from './pages/MyPage/Notification/Notification';
-import './App.css';
+import { useEffect, useState } from 'react';
 
 function App() {
+  const [users, setUsers] = useState([]);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetch('/api/users')
+      .then(res => {
+        if (!res.ok) throw new Error('API 요청 실패');
+        return res.json();
+      })
+      .then(data => setUsers(data))
+      .catch(err => setError(err.message));
+  }, []);
+
   return (
-    <Router>
-      <div className='App'>
-        <Routes>
-          <Route path='/' element={<MainPage />} />
-          <Route path='/stories' element={<Stories />} />
-          <Route path='/login' element={<Login />} />
-          <Route path='/logout' element={<Logout />} />
-          <Route path='/booking' element={<Booking />} />
-          <Route path='/experiences' element={<Experience />} />
-          <Route path='/live-reservation' element={<LiveBooking />} />
-          <Route path='/mypage' element={<MyPage />} />
-          <Route path='/mypage/payment' element={<MyPayment />} />
-          <Route path='/mypage/review' element={<MyReview />} />
-          <Route path='/mypage/notification' element={<Notification />} />
-        </Routes>
-      </div>
-    </Router>
+    <div>
+      <h1>유저 목록</h1>
+      {error && <p style={{color: 'red'}}>에러: {error}</p>}
+      <ul>
+        {users.map(user => <li key={user.id}>{user.name}</li>)}
+      </ul>
+      <a href="http://localhost:5001/api-docs" target="_blank" rel="noopener noreferrer">
+        Swagger API 문서 보기
+      </a>
+    </div>
   );
 }
 
