@@ -47,31 +47,31 @@ nav ul {
   padding: 0;
 }
 
-nav li {
+nav li a {
   font-size: 16px;
   color: #333;
   cursor: pointer;
   transition: color 0.3s ease;
 }
 
-nav li:hover {
-  color: #8B4513;
+nav li a:hover {
+  color: #8b4513;
 }
 
 @media (max-width: 768px) {
   header {
     padding: 10px 20px;
   }
-  
+
   nav ul {
     gap: 15px;
   }
-  
+
   nav li {
     font-size: 14px;
   }
-  
+
   .logo-text {
     font-size: 20px;
   }
-} 
+}

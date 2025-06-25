@@ -1,12 +1,30 @@
 import React from 'react';
-import MainPage from './pages/MainPage';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+import MainPage from './pages/MainPage/MainPage';
+import Stories from './pages/Stories/Stories';
+import Login from './pages/Auth/Login/Login';
+import Booking from './pages/Booking/Booking';
+import Experience from './pages/Experience/Experience';
+import LiveBooking from './pages/LiveReservation/LiveBooking/LiveBooking';
+import MyPage from './pages/MyPage/MyPage/MyPage';
 import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <MainPage />
-    </div>
+    <Router>
+      <div className='App'>
+        <Routes>
+          <Route path='/' element={<MainPage />} />
+          <Route path='/stories' element={<Stories />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/booking' element={<Booking />} />
+          <Route path='/experiences' element={<Experience />} />
+          <Route path='/live-reservation' element={<LiveBooking />} />
+          <Route path='/mypage' element={<MyPage />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
