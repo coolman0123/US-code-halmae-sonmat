@@ -1,0 +1,61 @@
+.written-review {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.written-item {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.place {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.arrow {
+  font-size: 18px;
+  margin-left: 4px;
+}
+
+.quote {
+  font-size: 14px;
+  color: #888;
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+}
+
+.stars img {
+  width: 18px;
+  height: 18px;
+}
+
+.date {
+  font-size: 13px;
+  color: #999;
+  white-space: nowrap;
+}
+
+.content {
+  font-size: 15px;
+  color: #333;
+  white-space: pre-line; /* 줄바꿈 적용 */
+}
