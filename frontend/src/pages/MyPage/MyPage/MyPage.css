@@ -1,19 +1,24 @@
 .my-page {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
   font-family: 'Noto Sans KR', sans-serif;
   background-color: #fff;
 }
 
 .my-page-content {
-  flex: 1;
+  flex: none;
   max-width: 800px;
   width: 100%;
-  margin: 60px auto 80px auto;
+  margin: 60px auto 0 auto;
   padding: 0 20px;
   display: flex;
   flex-direction: column;
+}
+
+.my-page > footer,
+.my-page > Footer {
+  margin-top: auto;
 }
 
 .profile-section {
@@ -76,4 +81,55 @@
 
 .mypage-links p:hover {
   text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .my-page-content {
+    padding: 0 24px;
+    margin: 30px auto;
+  }
+
+  .profile-section {
+    margin-bottom: 24px;
+  }
+
+  .icon-buttons {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  .icon-button {
+    width: 155px; /* 조금 줄여서 여유 있게 */
+    text-align: center;
+  }
+
+  .icon-button img {
+    width: 35px;
+    height: 35px;
+    margin-bottom: 6px;
+  }
+
+  .icon-button p {
+    font-size: 14px;
+    margin: 0;
+    text-align: center;
+  }
+
+  .mypage-links {
+    padding-left: 0;
+    margin-top: 10px;
+  }
+
+  .mypage-links p {
+    margin: 15px 0;
+  }
+
+  .welcome-message {
+    font-size: 18px;
+  }
 }
