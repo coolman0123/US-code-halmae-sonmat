@@ -6,15 +6,13 @@ import logo from '../assets/images/할머니로고.png';
 const Header = () => {
   return (
     <header>
-      <div className='logo-container'>
-        <Link to='/'>
-          <img src={logo} alt='할매의 손맛 로고' className='logo-image' />
-          <div className='logo-text-section'>
-            <span className='logo-text'>할매의 손맛</span>
-            <div className='logo-subtitle'>홈스테이 · 따뜻한밥상 · 농촌체험</div>
-          </div>
-        </Link>
-      </div>
+      <Link to='/' className='logo-container'>
+        <img src={logo} alt='할매의 손맛 로고' className='logo-image' />
+        <div className='logo-text-section'>
+          <span className='logo-text'>할매의 손맛</span>
+          <div className='logo-subtitle'>홈스테이 · 따뜻한밥상 · 농촌체험</div>
+        </div>
+      </Link>
       <nav>
         <ul>
           <li>
@@ -24,10 +22,13 @@ const Header = () => {
             <Link to='/experiences'>특별한 체험</Link>
           </li>
           <li>
-            <Link to='/reservation'>예약안내</Link>
+            <Link to='/Booking'>예약안내</Link>
           </li>
           <li>
             <Link to='/live-reservation'>실시간예약</Link>
+          </li>
+          <li>
+            <Link to='/mypage'>마이페이지</Link>
           </li>
           <li>
             <Link to='/login'>로그인</Link>
