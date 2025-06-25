@@ -95,16 +95,17 @@
 
   .icon-buttons {
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-start; /* 왼쪽 정렬 */
     align-items: center;
     flex-wrap: wrap;
     gap: 24px;
     margin-top: 20px;
     margin-bottom: 10px;
+    padding-left: 76px; /* ✅ 프로필 이미지 margin-right 16px + width 60px 맞춰줌 */
   }
 
   .icon-button {
-    width: 155px; /* 조금 줄여서 여유 있게 */
+    width: 100px;
     text-align: center;
   }
 
