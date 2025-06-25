@@ -17,6 +17,14 @@ header {
   gap: 15px;
 }
 
+.logo-container a {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  text-decoration: none;
+  color: inherit;
+}
+
 .logo-image {
   height: 50px;
   width: auto;
@@ -52,6 +60,7 @@ nav li a {
   color: #333;
   cursor: pointer;
   transition: color 0.3s ease;
+  text-decoration: none;
 }
 
 nav li a:hover {
