@@ -1,0 +1,136 @@
+.my-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  font-family: 'Noto Sans KR', sans-serif;
+  background-color: #fff;
+}
+
+.my-page-content {
+  flex: none;
+  max-width: 800px;
+  width: 100%;
+  margin: 60px auto 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.my-page > footer,
+.my-page > Footer {
+  margin-top: auto;
+}
+
+.profile-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.profile-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-right: 16px;
+}
+
+.welcome-message {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.icon-buttons {
+  display: flex;
+  justify-content: flex-start;
+  gap: 200px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.icon-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.icon-button img {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 8px;
+}
+
+.icon-button p {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.mypage-links {
+  text-align: left;
+  margin-top: 20px;
+  padding-left: 8px;
+}
+
+.mypage-links p {
+  font-size: 16px;
+  color: #555;
+  margin: 40px 0;
+  cursor: pointer;
+}
+
+.mypage-links p:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .my-page-content {
+    padding: 0 24px;
+    margin: 30px auto;
+  }
+
+  .profile-section {
+    margin-bottom: 24px;
+  }
+
+  .icon-buttons {
+    flex-direction: row;
+    justify-content: flex-start; /* 왼쪽 정렬 */
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding-left: 76px; /* ✅ 프로필 이미지 margin-right 16px + width 60px 맞춰줌 */
+  }
+
+  .icon-button {
+    width: 100px;
+    text-align: center;
+  }
+
+  .icon-button img {
+    width: 35px;
+    height: 35px;
+    margin-bottom: 6px;
+  }
+
+  .icon-button p {
+    font-size: 14px;
+    margin: 0;
+    text-align: center;
+  }
+
+  .mypage-links {
+    padding-left: 0;
+    margin-top: 10px;
+  }
+
+  .mypage-links p {
+    margin: 15px 0;
+  }
+
+  .welcome-message {
+    font-size: 18px;
+  }
+}
