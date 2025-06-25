@@ -23,3 +23,5 @@ If you are developing a production application, we recommend using TypeScript wi
 
 
 ---
+
+docs_v1.0
