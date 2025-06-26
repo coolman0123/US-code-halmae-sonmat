@@ -70,6 +70,20 @@ class TripController {
     }
   }
 
+  async deleteTrip(req, res, next) {
+    try {
+      const { id } = req.params;
+      await this.tripService.deleteTrip(id);
+      
+      res.status(200).json({
+        success: true,
+        message: '여행이 삭제되었습니다.'
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
 
 }
 
