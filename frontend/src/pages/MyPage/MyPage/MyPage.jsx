@@ -1,7 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../../../components/Header';
-import Footer from '../../../components/Footer';
 import './MyPage.css';
 
 import ProfileIcon from '../../../assets/icons/MyPage_프로필.png';
@@ -22,7 +20,6 @@ const MyPage = () => {
 
   return (
     <div className='my-page'>
-      <Header />
       <div className='my-page-content'>
         <div className='profile-section'>
           <img src={ProfileIcon} alt='프로필' className='profile-icon' />
@@ -59,12 +56,11 @@ const MyPage = () => {
           <p className='inquiry' onClick={handleInquiry}>
             1 : 1 문의
           </p>
-          <p className='logout' onClick={() => handleNavigation('/logout')}>
+          <p className='logout' onClick={() => handleNavigation('/auth/logout')}>
             로그아웃
           </p>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

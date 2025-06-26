@@ -26,8 +26,8 @@ header {
   color: inherit;
 }
 
-.logo-image {
-  height: 50px;
+header .logo-image {
+  height: 80px !important;
   width: auto;
 }
 
@@ -69,6 +69,20 @@ nav li a:hover {
   color: #8b4513;
 }
 
+.user-greeting {
+  font-size: 14px;
+  color: #8b4513;
+  font-weight: 600;
+  margin-right: 10px;
+}
+
+nav li:last-child {
+  margin-left: 35px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 @media (max-width: 900px) {
   header {
     flex-direction: column;
@@ -100,8 +114,4 @@ nav li a:hover {
   .logo-subtitle {
     font-size: 11px;
   }
-}
-
-nav li:last-child {
-  margin-left: 35px;
 }

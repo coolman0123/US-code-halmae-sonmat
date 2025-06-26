@@ -1,7 +1,5 @@
 import React from 'react';
 import './Booking.css';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 
 // 이미지 import
 import heroImage from '../../assets/images/상단_메인이미지.png';
@@ -11,8 +9,6 @@ import infoImage from '../../assets/images/예약안내_1.png';
 const Booking = () => {
   return (
     <div className="booking-page">
-      <Header />
-      
       {/* 상단 히어로 이미지 */}
       <section className="booking-hero">
         <div className="hero-image-container">
@@ -117,8 +113,6 @@ const Booking = () => {
           </div>
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 };

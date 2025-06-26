@@ -1,6 +1,4 @@
 import React from 'react';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import './MainPage.css';
 
 // 이미지 import
@@ -16,8 +14,6 @@ import grandmaLogo from '../../assets/images/할머니로고.png';
 const MainPage = () => {
   return (
     <div className='main-page'>
-      <Header />
-
       {/* Hero Section - 메인 이미지 */}
       <section className='hero-section'>
         <div className='hero-image'>
@@ -171,8 +167,6 @@ const MainPage = () => {
           <img src={warmthImage} alt='삶의 온기' />
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 };
