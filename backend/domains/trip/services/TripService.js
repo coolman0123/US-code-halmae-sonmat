@@ -57,6 +57,31 @@ class TripService {
     }
   }
 
+  async updateTrip(id, updateData) {
+    try {
+      const existingTrip = await this.tripRepository.findById(id);
+      if (!existingTrip) {
+        throw new Error('여행을 찾을 수 없습니다.');
+      }
+
+      
+      if (existingTrip.currentParticipants > 0) {
+        const allowedFields = ['description', 'included', 'excluded', 'itinerary'];
+        const filteredUpdate = {};
+        Object.keys(updateData).forEach(key => {
+          if (allowedFields.includes(key)) {
+            filteredUpdate[key] = updateData[key];
+          }
+        });
+        return await this.tripRepository.update(id, filteredUpdate);
+      }
+
+      return await this.tripRepository.update(id, updateData);
+    } catch (error) {
+      throw new Error(`여행 수정 중 오류가 발생했습니다: ${error.message}`);
+    }
+  }
+
 }
 
 module.exports = TripService;
