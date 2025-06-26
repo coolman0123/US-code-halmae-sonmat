@@ -1,6 +1,11 @@
+// App.jsx
 import React from 'react';
-import { Navigate } from 'react-router-dom';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from 'react-router-dom';
 
 import MainPage from './pages/MainPage/MainPage';
 import Stories from './pages/Stories/Stories';
@@ -8,12 +13,12 @@ import Stories from './pages/Stories/Stories';
 import Login from './pages/Auth/Login/Login';
 import Logout from './pages/Auth/Logout/Logout';
 
-import LiveBooking from './pages/LiveReservation/LiveBooking/LiveBooking'; //실시간 예약
-import BookNow from './pages/LiveReservation/BookNow/BookNow'; //예약하기
-import DetailBooking from './pages/LiveReservation/DetailBooking/DetailBooking'; //객실 상세
-import MyReservation from './pages/LiveReservation/MyReservation/MyReservation'; //예약 현황
-import Payment from './pages/LiveReservation/Payment/Payment'; //결제
-import Review from './pages/LiveReservation/Review/Review'; //객실 리뷰
+import LiveBooking from './pages/LiveReservation/LiveBooking/LiveBooking';
+import BookNow from './pages/LiveReservation/BookNow/BookNow';
+import DetailBooking from './pages/LiveReservation/DetailBooking/DetailBooking';
+import MyReservation from './pages/LiveReservation/MyReservation/MyReservation';
+import Payment from './pages/LiveReservation/Payment/Payment';
+import Review from './pages/LiveReservation/Review/Review';
 
 import Experience from './pages/Experience/Experience';
 
@@ -38,8 +43,13 @@ function App() {
           <Route path='/login' element={<Login />} />
           <Route path='/logout' element={<Logout />} />
 
-          <Route path='/live-reservation' element={<LiveBooking />} />
-          <Route path='/live-reservation/book' element={<BookNow />} />
+          {/* 실시간 예약 중첩 라우팅 */}
+          <Route path='/live-reservation' element={<LiveBooking />}>
+            <Route index element={<Navigate to='my' replace />} />
+            <Route path='my' element={<MyReservation />} />
+            <Route path='book' element={<BookNow />} />
+          </Route>
+
           <Route
             path='/live-reservation/detail/:roomId'
             element={<DetailBooking />}
@@ -48,7 +58,6 @@ function App() {
             path='/live-reservation/detail/:roomId/review'
             element={<Review />}
           />
-          <Route path='/live-reservation/my' element={<MyReservation />} />
           <Route path='/live-reservation/payment' element={<Payment />} />
 
           <Route path='/experiences' element={<Experience />} />

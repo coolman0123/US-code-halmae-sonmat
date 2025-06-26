@@ -1,49 +1,60 @@
 .live-booking-wrapper {
-  font-family: 'Noto Sans KR', sans-serif;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.top-image-container {
+  width: 100%;
+  overflow: hidden;
+}
+
+.top-image {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 .booking-container {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 40px 20px;
   text-align: center;
+  padding: 40px 16px;
 }
 
-.booking-subtitle {
+.subtitle {
   font-size: 16px;
+  color: #666;
   margin-bottom: 8px;
-  color: #555;
 }
 
-.booking-title {
+.title {
   font-size: 32px;
   font-weight: bold;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .booking-tab-menu {
   display: flex;
   justify-content: center;
-  gap: 16px;
-  margin-bottom: 32px;
-  border-bottom: 1px solid #ddd;
+  gap: 12px;
+  margin-bottom: 24px;
 }
 
-.tab-button {
-  background: none;
+.booking-tab-menu button {
+  padding: 10px 20px;
   border: none;
-  font-size: 18px;
-  padding: 8px 16px;
+  background-color: #f2f2f2;
+  font-size: 16px;
+  border-radius: 6px;
   cursor: pointer;
-  color: #888;
 }
 
-.tab-button.active {
-  border-bottom: 3px solid #2b66f6;
-  color: #2b66f6;
+.booking-tab-menu button.active {
+  background-color: #222;
+  color: #fff;
   font-weight: bold;
 }
 
 .booking-tab-content {
-  margin-top: 20px;
+  max-width: 960px;
+  margin: 0 auto;
 }

@@ -1,48 +1,35 @@
-import React, { useState } from 'react';
-import MyReservation from '../MyReservation/MyReservation';
-import BookNow from '../BookNow/BookNow';
-import { Header, Footer, Calendar, Button } from '@/components';
+import React from 'react';
+import { NavLink, Outlet } from 'react-router-dom';
+import { Header, Footer } from '@/components';
 import './LiveBooking.css';
 
 const LiveBooking = () => {
-  const [activeTab, setActiveTab] = useState('reservation');
-
   return (
     <div className='live-booking-wrapper'>
       <Header />
-
       <div className='booking-container'>
-        <p className='booking-subtitle'>정겨운 여행을 만나는 공간</p>
-        <h1 className='booking-title'>실시간예약</h1>
+        <h2 className='subtitle'>정겨운 여행을 만나는 공간</h2>
+        <h1 className='title'>실시간예약</h1>
 
         <div className='booking-tab-menu'>
-          <button
-            className={`tab-button ${
-              activeTab === 'reservation' ? 'active' : ''
-            }`}
-            onClick={() => setActiveTab('reservation')}
+          <NavLink
+            to='my'
+            className={({ isActive }) => (isActive ? 'active' : '')}
           >
             예약현황
-          </button>
-          <button
-            className={`tab-button ${activeTab === 'book' ? 'active' : ''}`}
-            onClick={() => setActiveTab('book')}
+          </NavLink>
+          <NavLink
+            to='book'
+            className={({ isActive }) => (isActive ? 'active' : '')}
           >
             예약하기
-          </button>
+          </NavLink>
         </div>
 
         <div className='booking-tab-content'>
-          {activeTab === 'reservation' && (
-            <>
-              <Calendar type='big' />
-              <MyReservation />
-            </>
-          )}
-          {activeTab === 'book' && <BookNow />}
+          <Outlet />
         </div>
       </div>
-
       <Footer />
     </div>
   );
