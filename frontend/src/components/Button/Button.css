@@ -1,0 +1,76 @@
+.select-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: 1px solid #bbb;
+  background-color: white;
+  color: #bbb;
+  cursor: not-allowed;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.select-btn:focus {
+  outline: none;
+}
+
+.select-btn img.check-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.select-btn:not(.active):not(.disabled):hover {
+  background-color: #3549ff;
+  color: white;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.select-btn:not(.active):not(.disabled):hover img.check-icon {
+  filter: brightness(0) invert(1);
+}
+
+.select-btn.active {
+  background-color: #3549ff;
+  color: white;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.select-btn.active img.check-icon {
+  filter: brightness(0) invert(1);
+}
+
+.select-btn.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.select-btn.no-icon {
+  justify-content: center;
+  gap: 0;
+}
+
+.select-btn span {
+  display: inline-block;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .select-btn {
+    padding: 8px 14px;
+    font-size: 14px;
+    border-radius: 6px;
+    gap: 4px;
+  }
+
+  .select-btn img.check-icon {
+    width: 16px;
+    height: 16px;
+  }
+}

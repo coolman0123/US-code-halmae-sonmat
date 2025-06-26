@@ -3,7 +3,7 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 15px 40px;
-  background-color: white;
+  background-color: #f8f3ec;
   border-bottom: 1px solid #eee;
   position: sticky;
   top: 0;
@@ -15,10 +15,19 @@ header {
   display: flex;
   align-items: center;
   gap: 15px;
+  text-decoration: none;
 }
 
-.logo-image {
-  height: 50px;
+.logo-container a {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  text-decoration: none;
+  color: inherit;
+}
+
+header .logo-image {
+  height: 80px !important;
   width: auto;
 }
 
@@ -47,31 +56,62 @@ nav ul {
   padding: 0;
 }
 
-nav li {
+nav li a {
   font-size: 16px;
   color: #333;
   cursor: pointer;
+  text-decoration: none;
   transition: color 0.3s ease;
+  text-decoration: none;
 }
 
-nav li:hover {
-  color: #8B4513;
+nav li a:hover {
+  color: #8b4513;
 }
 
-@media (max-width: 768px) {
+.user-greeting {
+  font-size: 14px;
+  color: #8b4513;
+  font-weight: 600;
+  margin-right: 10px;
+}
+
+nav li:last-child {
+  margin-left: 35px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+@media (max-width: 900px) {
   header {
-    padding: 10px 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 15px;
   }
-  
+
+  .logo-container {
+    width: 100%;
+    justify-content: flex-start;
+    margin-bottom: 15px;
+  }
+
   nav ul {
-    gap: 15px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 16px;
   }
-  
-  nav li {
-    font-size: 14px;
+
+  nav li a {
+    font-size: 13px;
+    padding: 3px 0;
   }
-  
+
   .logo-text {
     font-size: 20px;
   }
-} 
+
+  .logo-subtitle {
+    font-size: 11px;
+  }
+}

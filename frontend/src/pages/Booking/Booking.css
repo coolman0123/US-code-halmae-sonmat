@@ -1,0 +1,283 @@
+/* Booking Page 전체 스타일 */
+.booking-page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #fff;
+}
+
+.booking-main {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Hero Section */
+.booking-hero {
+  width: 100%;
+  margin-bottom: 60px;
+}
+
+.hero-image-container {
+  width: 100%;
+  overflow: visible;
+}
+
+.hero-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+/* Title Section */
+.booking-title {
+  padding: 80px 0 60px;
+  text-align: center;
+  background-color: #fff;
+}
+
+.title-subtitle {
+  font-size: 16px;
+  color: #666;
+  margin: 0 0 20px 0;
+  letter-spacing: 1px;
+}
+
+.title-main {
+  font-size: 42px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  letter-spacing: 2px;
+}
+
+/* Info Section */
+.booking-info-section {
+  padding: 0 20px 80px 20px;
+}
+
+.info-container {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.info-image {
+  flex: 0 0 200px;
+}
+
+.info-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.info-content {
+  flex: 1;
+}
+
+.info-title {
+  font-size: 24px;
+  color: #333;
+  margin: 0 0 25px 0;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.info-text p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.7;
+  margin: 8px 0;
+  letter-spacing: 0.3px;
+}
+
+/* Refund Section */
+.refund-section {
+  padding: 0 20px 80px 20px;
+}
+
+.refund-container {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.refund-image {
+  flex: 0 0 200px;
+}
+
+.refund-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.refund-content {
+  flex: 1;
+}
+
+.refund-title {
+  font-size: 24px;
+  color: #333;
+  margin: 0 0 25px 0;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.refund-text p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.7;
+  margin: 8px 0;
+  letter-spacing: 0.3px;
+}
+
+/* Refund Table */
+.refund-table {
+  margin: 20px 0;
+  overflow-x: auto;
+}
+
+.refund-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  border: 1px solid #ddd;
+}
+
+.refund-table th,
+.refund-table td {
+  padding: 8px 4px;
+  border: 1px solid #ddd;
+  text-align: center;
+  color: #666;
+}
+
+.refund-table th {
+  background-color: #f8f8f8;
+  font-weight: bold;
+  color: #333;
+}
+
+.refund-table td:first-child,
+.refund-table th:first-child {
+  background-color: #f0f0f0;
+  font-weight: bold;
+}
+
+/* Contact Section */
+.contact-section {
+  text-align: center;
+  padding: 40px 20px 60px 20px;
+  background-color: #fff;
+}
+
+.contact-label {
+  font-size: 18px;
+  color: #666;
+  margin: 0 0 15px 0;
+  font-weight: bold;
+  letter-spacing: 3px;
+}
+
+.contact-number {
+  font-size: 32px;
+  color: #333;
+  margin: 0 0 20px 0;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.contact-info {
+  font-size: 12px;
+  color: #888;
+  line-height: 1.6;
+}
+
+.contact-info p {
+  margin: 5px 0;
+  letter-spacing: 0.5px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .booking-main {
+    padding: 0;
+  }
+
+  .title-main {
+    font-size: 24px;
+  }
+
+  .info-container,
+  .refund-container {
+    flex-direction: column;
+    gap: 20px;
+    padding: 0 15px;
+  }
+
+  .info-image,
+  .refund-image {
+    flex: none;
+    max-width: 200px;
+    margin: 0 auto;
+  }
+
+  .info-title,
+  .refund-title {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .contact-number {
+    font-size: 24px;
+  }
+
+  .contact-label {
+    font-size: 16px;
+  }
+
+  .refund-table {
+    font-size: 10px;
+  }
+
+  .refund-table th,
+  .refund-table td {
+    padding: 6px 2px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .info-title,
+  .refund-title {
+    font-size: 18px;
+  }
+
+  .contact-number {
+    font-size: 20px;
+  }
+
+  .info-text p,
+  .refund-text p {
+    font-size: 13px;
+  }
+
+  .refund-table {
+    font-size: 9px;
+  }
+}
