@@ -1,5 +1,4 @@
 import React from 'react';
-import Header from '../../../components/Header';
 import './Notification.css';
 
 const mockNotifications = [
@@ -33,7 +32,6 @@ const mockNotifications = [
 const Notification = () => {
   return (
     <div className='my-page'>
-      <Header />
       <main className='my-page-content notification-page'>
         <div className='notification-list'>
           {mockNotifications.map((item, index) => (

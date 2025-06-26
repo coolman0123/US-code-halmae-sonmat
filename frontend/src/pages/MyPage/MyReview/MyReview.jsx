@@ -1,6 +1,4 @@
 import React from 'react';
-import Header from '../../../components/Header';
-import Footer from '../../../components/Footer';
 import './MyReview.css';
 
 import roomImg from '../../../assets/images/내 결제_숙소.png';
@@ -36,7 +34,6 @@ const mockReservations = [
 const MyReview = () => {
   return (
     <div className='my-page'>
-      <Header />
       <main className='my-page-content my-review-page'>
         <h1 className='review-title'>내 예약</h1>
         <div className='review-list'>
@@ -54,7 +51,6 @@ const MyReview = () => {
           ))}
         </div>
       </main>
-      <Footer />
     </div>
   );
 };

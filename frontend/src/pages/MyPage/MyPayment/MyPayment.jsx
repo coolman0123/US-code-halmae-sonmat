@@ -1,6 +1,4 @@
 import React from 'react';
-import Header from '../../../components/Header';
-import Footer from '../../../components/Footer';
 import './MyPayment.css';
 import paymentImage from '../../../assets/images/내 결제_숙소.png';
 
@@ -40,7 +38,6 @@ const paymentData = [
 const MyPayment = () => {
   return (
     <div className='my-page'>
-      <Header />
       <main className='my-payment-page'>
         <h1 className='payment-title'>결제 내역</h1>
         <div className='payment-list'>
@@ -57,7 +54,6 @@ const MyPayment = () => {
           ))}
         </div>
       </main>
-      <Footer />
     </div>
   );
 };
