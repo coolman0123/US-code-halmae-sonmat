@@ -21,6 +21,14 @@ async create(hostData) {
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
+  async findById(id) {
+    const doc = await this.collection.doc(id).get();
+    if (!doc.exists) {
+      throw new Error('호스트를 찾을 수 없습니다.');
+    }
+    return { id: doc.id, ...doc.data() };
+  }
+
 }
 
 module.exports = HostRepository;
