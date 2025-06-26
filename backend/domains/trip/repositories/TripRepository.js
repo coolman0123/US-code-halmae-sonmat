@@ -54,6 +54,14 @@ class TripRepository extends FirebaseRepository {
     return true;
   }
 
+   async updateParticipantCount(id, currentParticipants) {
+    await this.collection.doc(id).update({
+      currentParticipants,
+      updatedAt: new Date()
+    });
+    return this.findById(id);
+  }
+
 }
 
 module.exports = TripRepository;
