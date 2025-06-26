@@ -43,7 +43,6 @@ function App() {
           <Route path='/login' element={<Login />} />
           <Route path='/logout' element={<Logout />} />
 
-          {/* 실시간 예약 중첩 라우팅 */}
           <Route path='/live-reservation' element={<LiveBooking />}>
             <Route index element={<Navigate to='my' replace />} />
             <Route path='my' element={<MyReservation />} />

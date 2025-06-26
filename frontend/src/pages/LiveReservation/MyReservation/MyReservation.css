@@ -1,0 +1,17 @@
+.my-reservation-page {
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.calendar-toggle label {
+  margin-left: 8px;
+  font-size: 14px;
+}

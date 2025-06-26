@@ -2,6 +2,7 @@
   width: 100%;
   margin: 0;
   padding: 0;
+  background-color: #fff;
 }
 
 .top-image-container {
@@ -13,11 +14,12 @@
   width: 100%;
   height: auto;
   display: block;
+  object-fit: cover;
 }
 
 .booking-container {
   text-align: center;
-  padding: 40px 16px;
+  padding: 60px 30px 40px;
 }
 
 .subtitle {
@@ -27,34 +29,47 @@
 }
 
 .title {
-  font-size: 32px;
-  font-weight: bold;
-  margin-bottom: 24px;
+  font-size: 36px;
+  font-weight: 900;
+  margin-bottom: 38px;
+  color: #1f1f1f;
 }
 
 .booking-tab-menu {
   display: flex;
   justify-content: center;
-  gap: 12px;
-  margin-bottom: 24px;
+  align-items: center;
+  gap: 36px;
+  border-bottom: 1px solid #ddd;
+  margin: 32px auto 16px;
+  max-width: 700px;
 }
 
-.booking-tab-menu button {
-  padding: 10px 20px;
-  border: none;
-  background-color: #f2f2f2;
-  font-size: 16px;
-  border-radius: 6px;
-  cursor: pointer;
+.booking-tab-menu a {
+  font-size: 18px;
+  font-weight: 500;
+  color: #666;
+  padding: 12px 0;
+  position: relative;
+  text-decoration: none;
 }
 
-.booking-tab-menu button.active {
-  background-color: #222;
-  color: #fff;
-  font-weight: bold;
+.booking-tab-menu a.active {
+  color: #2a36aa;
+  font-weight: 700;
+}
+
+.booking-tab-menu a.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #2a36aa;
 }
 
 .booking-tab-content {
-  max-width: 960px;
-  margin: 0 auto;
+  max-width: 1100px;
+  margin: 40px auto;
 }
