@@ -121,6 +121,24 @@ class TripService {
     }
   }
 
+  async leaveTrip(tripId) {
+    try {
+      const trip = await this.tripRepository.findById(tripId);
+      if (!trip) {
+        throw new Error('여행을 찾을 수 없습니다.');
+      }
+
+      if (trip.currentParticipants <= 0) {
+        throw new Error('참가자가 없습니다.');
+      }
+
+      const newParticipantCount = trip.currentParticipants - 1;
+      return await this.tripRepository.updateParticipantCount(tripId, newParticipantCount);
+    } catch (error) {
+      throw new Error(`여행 참가 취소 중 오류가 발생했습니다: ${error.message}`);
+    }
+  }
+
 }
 
 module.exports = TripService;
