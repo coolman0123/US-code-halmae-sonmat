@@ -72,6 +72,13 @@ class Trip {
     this.currentParticipants -= 1;
     this.updatedAt = new Date();
   }
+  toJSON() {
+    const obj = { ...this };
+    Object.keys(obj).forEach(key => {
+      if (obj[key] === undefined) delete obj[key];
+    });
+    return obj;
+  }
 
 }
 
