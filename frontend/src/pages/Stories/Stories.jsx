@@ -1,6 +1,4 @@
 import React, { useEffect } from 'react';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import './Stories.css';
 
 // 이미지 import
@@ -81,10 +79,9 @@ const Stories = () => {
       }
     };
   }, []);
+  
   return (
     <div className="stories-page">
-      <Header />
-      
       {/* Hero Section - 메인 이미지 */}
       <section className="stories-hero">
         <div className="hero-image-container">
@@ -195,8 +192,6 @@ const Stories = () => {
           </div>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 };

@@ -1,6 +1,4 @@
 import React from 'react';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import './Experience.css';
 
 // 이미지 import
@@ -19,8 +17,6 @@ import garlicImage2 from '../../assets/images/특별한체험_마늘2.png';
 const Experience = () => {
   return (
     <div className="experience-page">
-      <Header />
-      
       {/* Hero Section */}
       <section className="experience-hero">
         <div className="hero-image-container">
@@ -122,10 +118,6 @@ const Experience = () => {
 
         </div>
       </section>
-
-
-
-      <Footer />
     </div>
   );
 };
