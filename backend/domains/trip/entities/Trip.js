@@ -65,6 +65,13 @@ class Trip {
     this.currentParticipants += 1;
     this.updatedAt = new Date();
   }
+  removeParticipant() {
+    if (this.currentParticipants <= 0) {
+      throw new Error('참가자가 없습니다.');
+    }
+    this.currentParticipants -= 1;
+    this.updatedAt = new Date();
+  }
 
 }
 
