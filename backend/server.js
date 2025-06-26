@@ -6,6 +6,7 @@ const userRoutes = require('./routes/userRoutes');
 
 const hostRoutes = require('./domains/host/routes/hostRoutes');
 const authRoutes = require('./domains/auth/routes/authRoutes');
+const reviewRoutes = require('./domains/review/routes/reviewRoutes');
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/hosts', hostRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
 app.use((err, req, res, next) => {

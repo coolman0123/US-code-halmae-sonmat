@@ -39,7 +39,6 @@ const MyPayment = () => {
   return (
     <div className='my-page'>
       <main className='my-payment-page'>
-        <h1 className='payment-title'>결제 내역</h1>
         <div className='payment-list'>
           {paymentData.map((item, index) => (
             <div className='payment-card' key={index}>
