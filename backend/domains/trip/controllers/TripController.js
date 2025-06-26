@@ -83,6 +83,21 @@ class TripController {
       next(error);
     }
   }
+  async joinTrip(req, res, next) {
+    try {
+      const { id } = req.params;
+      const trip = await this.tripService.joinTrip(id);
+      
+      res.status(200).json({
+        success: true,
+        message: '여행 참가 신청이 완료되었습니다.',
+        data: trip
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
 
 
 }
