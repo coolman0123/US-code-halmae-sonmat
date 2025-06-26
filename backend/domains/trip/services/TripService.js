@@ -82,6 +82,23 @@ class TripService {
     }
   }
 
+  async deleteTrip(id) {
+    try {
+      const trip = await this.tripRepository.findById(id);
+      if (!trip) {
+        throw new Error('여행을 찾을 수 없습니다.');
+      }
+
+      if (trip.currentParticipants > 0) {
+        throw new Error('참가자가 있는 여행은 삭제할 수 없습니다.');
+      }
+
+      return await this.tripRepository.delete(id);
+    } catch (error) {
+      throw new Error(`여행 삭제 중 오류가 발생했습니다: ${error.message}`);
+    }
+  }
+
 }
 
 module.exports = TripService;
