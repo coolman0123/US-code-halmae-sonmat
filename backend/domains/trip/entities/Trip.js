@@ -54,6 +54,13 @@ class Trip {
   }
 
 
+  canJoin() {
+    return this.status === 'active' && this.currentParticipants < this.maxParticipants;
+  }
+
+  
+
+
 }
 
 module.exports = Trip;
