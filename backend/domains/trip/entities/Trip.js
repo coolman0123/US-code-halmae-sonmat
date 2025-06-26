@@ -9,6 +9,7 @@ class Trip {
     endDate, 
     maxParticipants, 
     currentParticipants = 0,
+    participants = [],
     price, 
     included, 
     excluded,
@@ -26,6 +27,7 @@ class Trip {
     this.endDate = endDate;
     this.maxParticipants = maxParticipants;
     this.currentParticipants = currentParticipants;
+    this.participants = participants; // 참가자 email 배열
     this.price = price;
     this.included = included || [];
     this.excluded = excluded || [];

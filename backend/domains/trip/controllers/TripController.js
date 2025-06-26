@@ -86,7 +86,8 @@ class TripController {
   async joinTrip(req, res, next) {
     try {
       const { id } = req.params;
-      const trip = await this.tripService.joinTrip(id);
+      const { email } = req.body;
+      const trip = await this.tripService.joinTrip(id, email);
       
       res.status(200).json({
         success: true,
@@ -100,7 +101,8 @@ class TripController {
   async leaveTrip(req, res, next) {
     try {
       const { id } = req.params;
-      const trip = await this.tripService.leaveTrip(id);
+      const { email } = req.body;
+      const trip = await this.tripService.leaveTrip(id, email);
       
       res.status(200).json({
         success: true,
