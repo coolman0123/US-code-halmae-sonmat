@@ -49,6 +49,11 @@ class TripRepository extends FirebaseRepository {
     return this.findById(id);
   }
 
+  async delete(id) {
+    await this.collection.doc(id).delete();
+    return true;
+  }
+
 }
 
 module.exports = TripRepository;
