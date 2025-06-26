@@ -15,6 +15,11 @@ class TripRepository extends FirebaseRepository {
     return { id: docRef.id, ...obj };
   }
 
+   async findAll() {
+    const snapshot = await this.collection.orderBy('createdAt', 'desc').get();
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  }
+
 }
 
 module.exports = TripRepository;
