@@ -19,11 +19,13 @@ class TripRepository extends FirebaseRepository {
     const snapshot = await this.collection.orderBy('createdAt', 'desc').get();
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   }
+
   async findById(id) {
     const doc = await this.collection.doc(id).get();
     if (!doc.exists) return null;
     return { id: doc.id, ...doc.data() };
   }
+
   async findByHostId(hostId) {
     const snapshot = await this.collection
       .where('hostId', '==', hostId)
@@ -35,6 +37,14 @@ class TripRepository extends FirebaseRepository {
   async findByStatus(status) {
     const snapshot = await this.collection
       .where('status', '==', status)
+      .orderBy('createdAt', 'desc')
+      .get();
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  }
+
+  async findByLocation(region) {
+    const snapshot = await this.collection
+      .where('location.region', '==', region)
       .orderBy('createdAt', 'desc')
       .get();
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -56,6 +66,15 @@ class TripRepository extends FirebaseRepository {
 
    async updateParticipantCount(id, currentParticipants) {
     await this.collection.doc(id).update({
+      currentParticipants,
+      updatedAt: new Date()
+    });
+    return this.findById(id);
+  }
+
+  async updateParticipants(id, participants, currentParticipants) {
+    await this.collection.doc(id).update({
+      participants,
       currentParticipants,
       updatedAt: new Date()
     });

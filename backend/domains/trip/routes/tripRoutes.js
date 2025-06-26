@@ -30,7 +30,7 @@ const tripController = new TripController();
  *                 data:
  *                   $ref: '#/components/schemas/Trip'
  *       400:
- *         description: 잘못된 요청
+ *         description: 잘못된 요청 또는 존재하지 않는 호스트 ID
  */
 router.post('/', (req, res, next) => tripController.createTrip(req, res, next));
 
@@ -169,11 +169,24 @@ router.delete('/:id', (req, res, next) => tripController.deleteTrip(req, res, ne
  *         schema:
  *           type: string
  *         description: 여행 ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: 참가 신청할 사용자 이메일
+ *             required:
+ *               - email
  *     responses:
  *       200:
  *         description: 여행 참가 신청 성공
  *       400:
- *         description: 참가할 수 없는 여행 (마감, 취소됨 등)
+ *         description: 참가할 수 없는 여행 (마감, 취소됨 등) 또는 존재하지 않는 사용자 이메일
  *       404:
  *         description: 여행을 찾을 수 없음
  */
@@ -192,11 +205,24 @@ router.post('/:id/join', (req, res, next) => tripController.joinTrip(req, res, n
  *         schema:
  *           type: string
  *         description: 여행 ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: 참가 취소할 사용자 이메일
+ *             required:
+ *               - email
  *     responses:
  *       200:
  *         description: 여행 참가 취소 성공
  *       400:
- *         description: 참가자가 없음
+ *         description: 참가하지 않은 여행이거나 존재하지 않는 사용자 이메일
  *       404:
  *         description: 여행을 찾을 수 없음
  */
