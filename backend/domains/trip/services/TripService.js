@@ -139,6 +139,20 @@ class TripService {
     }
   }
 
+  async cancelTrip(id) {
+    try {
+      const trip = await this.tripRepository.findById(id);
+      if (!trip) {
+        throw new Error('여행을 찾을 수 없습니다.');
+      }
+
+      return await this.tripRepository.update(id, { status: 'cancelled' });
+    } catch (error) {
+      throw new Error(`여행 취소 중 오류가 발생했습니다: ${error.message}`);
+    }
+  }
+
+
 }
 
 module.exports = TripService;
