@@ -14,6 +14,7 @@ import MyPayment from './pages/MyPage/MyPayment/MyPayment';
 import MyReview from './pages/MyPage/MyReview/MyReview/MyReview';
 import WriteReview from './pages/MyPage/MyReview/WriteReview/WriteReview';
 import ListReview from './pages/MyPage/MyReview/ListReview/ListReview';
+import ReviewForm from './pages/MyPage/MyReview/ReviewForm/ReviewForm';
 import Notification from './pages/MyPage/Notification/Notification';
 
 import './App.css';
@@ -37,6 +38,7 @@ function App() {
             <Route path='write' element={<WriteReview />} />
             <Route path='list' element={<ListReview />} />
           </Route>
+          <Route path='/mypage/review/form/:id' element={<ReviewForm />} />
           <Route path='/mypage/notification' element={<Notification />} />
         </Routes>
       </div>

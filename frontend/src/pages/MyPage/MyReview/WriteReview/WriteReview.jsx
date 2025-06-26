@@ -1,7 +1,9 @@
-// frontend/src/pages/MyPage/MyReview/WriteReview/WriteReview.jsx
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import roomImg from '../../../../assets/images/내 결제_숙소.png';
-import SelectButton from '../../../../components/CheckButton/CheckButton';
+import SelectButton from '../../../../components/Button/Button';
+import whiteCheck from '../../../../assets/icons/흰체크.png';
+import grayCheck from '../../../../assets/icons/회색체크.png';
 import './WriteReview.css';
 
 const mockReservations = [
@@ -44,6 +46,7 @@ const mockReservations = [
 
 const WriteReview = () => {
   const [selectedId, setSelectedId] = useState(null);
+  const navigate = useNavigate();
 
   return (
     <div className='write-review'>
@@ -53,14 +56,15 @@ const WriteReview = () => {
           <div className='info'>
             <p className='place'>{item.location}</p>
             <p className='date'>{item.date}</p>
-            <p className='desc'>{item.desc}</p>
+            <p className='desc'>{item.description}</p>
           </div>
           <SelectButton
             selected={selectedId === item.id}
+            icon={selectedId === item.id ? whiteCheck : grayCheck}
+            text='선택'
             onClick={() =>
               setSelectedId(selectedId === item.id ? null : item.id)
             }
-            text='선택'
           />
         </div>
       ))}
@@ -68,13 +72,12 @@ const WriteReview = () => {
         <SelectButton
           selected={!!selectedId}
           disabled={!selectedId}
-          withCheck={false}
+          text='리뷰 작성하러 가기'
           onClick={() => {
             if (selectedId) {
-              console.log('리뷰 작성하러 가기!');
+              navigate(`/mypage/review/form/${selectedId}`);
             }
           }}
-          text='리뷰 작성하러 가기'
         />
       </div>
     </div>

@@ -12,6 +12,7 @@
   color: #bbb;
   cursor: not-allowed;
   transition: all 0.2s ease;
+  text-align: center;
 }
 
 .select-btn:focus {
@@ -48,6 +49,16 @@
 .select-btn.disabled {
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+.select-btn.no-icon {
+  justify-content: center;
+  gap: 0;
+}
+
+.select-btn span {
+  display: inline-block;
+  text-align: center;
 }
 
 @media (max-width: 768px) {
