@@ -58,8 +58,13 @@ class Trip {
     return this.status === 'active' && this.currentParticipants < this.maxParticipants;
   }
 
-  
-
+  addParticipant() {
+    if (!this.canJoin()) {
+      throw new Error('참가할 수 없는 여행입니다.');
+    }
+    this.currentParticipants += 1;
+    this.updatedAt = new Date();
+  }
 
 }
 
