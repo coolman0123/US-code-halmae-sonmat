@@ -18,6 +18,44 @@ class TripController {
     }
   }
 
+   async getAllTrips(req, res, next) {
+    try {
+      const { status, region, hostId } = req.query;
+      
+      let trips;
+      if (status) {
+        trips = await this.tripService.getActiveTrips();
+      } else if (region) {
+        trips = await this.tripService.getTripsByLocation(region);
+      } else if (hostId) {
+        trips = await this.tripService.getTripsByHostId(hostId);
+      } else {
+        trips = await this.tripService.getAllTrips();
+      }
+
+      res.status(200).json({
+        success: true,
+        data: trips
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getTripById(req, res, next) {
+    try {
+      const { id } = req.params;
+      const trip = await this.tripService.getTripById(id);
+      
+      res.status(200).json({
+        success: true,
+        data: trip
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
 module.exports = TripController;
