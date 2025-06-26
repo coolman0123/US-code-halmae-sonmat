@@ -98,7 +98,7 @@ const ReviewForm = () => {
                 <FaStar
                   className='star'
                   color={currentRating <= (hover || rating) ? '#000' : '#ddd'}
-                  size={36}
+                  size={45}
                   onMouseEnter={() => setHover(currentRating)}
                   onMouseLeave={() => setHover(null)}
                 />
