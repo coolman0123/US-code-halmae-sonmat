@@ -15,7 +15,7 @@ class TripRepository extends FirebaseRepository {
     return { id: docRef.id, ...obj };
   }
 
-   async findAll() {
+  async findAll() {
     const snapshot = await this.collection.orderBy('createdAt', 'desc').get();
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   }
@@ -23,6 +23,13 @@ class TripRepository extends FirebaseRepository {
     const doc = await this.collection.doc(id).get();
     if (!doc.exists) return null;
     return { id: doc.id, ...doc.data() };
+  }
+  async findByHostId(hostId) {
+    const snapshot = await this.collection
+      .where('hostId', '==', hostId)
+      .orderBy('createdAt', 'desc')
+      .get();
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   }
 
 }
