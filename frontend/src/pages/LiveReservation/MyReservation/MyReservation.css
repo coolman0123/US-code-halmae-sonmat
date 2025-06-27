@@ -1,0 +1,55 @@
+/* 예약 상태 컨텐츠 */
+.booking-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  margin-top: 2px;
+  width: 100%;
+}
+
+.booking-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.status-box {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.status-box.available {
+  background-color: #22C55E; /* 녹색 - 예약 가능 */
+}
+
+.status-box.unavailable {
+  background-color: #EF4444; /* 빨강색 - 예약 불가능 */
+}
+
+.house-name {
+  font-size: 10px;
+  color: #333;
+  font-weight: 500;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.price-display {
+  font-size: 9px;
+  color: #4f46e5;
+  font-weight: 600;
+  margin-left: auto;
+}
