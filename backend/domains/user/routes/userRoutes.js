@@ -6,17 +6,6 @@ const userController = new UserController();
 
 
 
-/**
- * @swagger
- * /api/users:
- *   get:
- *     summary: 모든 사용자 조회
- *     tags: [User]
- *     responses:
- *       200:
- *         description: 사용자 목록 반환
- */
-router.get('/', (req, res) => userController.getAllUsers(req, res));
 
 /**
  * @swagger
