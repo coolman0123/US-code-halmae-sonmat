@@ -19,6 +19,8 @@ class HostController {
    * - address: 주소 정보 (object, required)
    *   - zipCode: 우편번호 (string, required)
    *   - detailAddress: 상세주소 (string, required)
+   * - latitude: 위도 (number, required)
+   * - longitude: 경도 (number, required)
    * - contact: 연락처 (object, required)
    *   - phone: 전화번호 (string, required)
    * - houseNickname: HOST 집 닉네임 (string, required)
@@ -43,6 +45,8 @@ class HostController {
         
         // PAGE2
         address,
+        latitude,
+        longitude,
         contact,
         houseNickname,
         maxGuests,
@@ -61,6 +65,8 @@ class HostController {
         representativeMenu,
         personalitySummary,
         address,
+        latitude,
+        longitude,
         contact,
         houseNickname,
         maxGuests,
@@ -92,6 +98,79 @@ class HostController {
       });
     } catch (e) { 
       next(e); 
+    }
+  }
+
+  /**
+   * Host 삭제
+   * @param {string} hostId - 삭제할 호스트 ID
+   */
+  async deleteHost(req, res, next) {
+    try {
+      const { hostId } = req.params;
+      
+      if (!hostId) {
+        return res.status(400).json({
+          success: false,
+          error: '호스트 ID가 필요합니다.'
+        });
+      }
+
+      console.log('호스트 삭제 요청:', hostId);
+      
+      const deletedHost = await this.hostService.deleteHost(hostId);
+      
+      if (!deletedHost) {
+        return res.status(404).json({
+          success: false,
+          error: '삭제할 호스트를 찾을 수 없습니다.'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: '호스트가 성공적으로 삭제되었습니다.',
+        data: {
+          deletedHostId: hostId,
+          deletedHost: deletedHost
+        }
+      });
+    } catch (e) {
+      console.error('호스트 삭제 중 오류 발생:', e);
+      next(e);
+    }
+  }
+
+  /**
+   * 특정 Host 조회
+   * @param {string} hostId - 조회할 호스트 ID
+   */
+  async getHostById(req, res, next) {
+    try {
+      const { hostId } = req.params;
+      
+      if (!hostId) {
+        return res.status(400).json({
+          success: false,
+          error: '호스트 ID가 필요합니다.'
+        });
+      }
+
+      const host = await this.hostService.getHostById(hostId);
+      
+      if (!host) {
+        return res.status(404).json({
+          success: false,
+          error: '호스트를 찾을 수 없습니다.'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: host
+      });
+    } catch (e) {
+      next(e);
     }
   }
 }
