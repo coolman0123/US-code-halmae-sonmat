@@ -33,6 +33,7 @@ import Logout from './pages/Auth/Logout/Logout';
 import HostHeader from './components/HostHeader/HostHeader';
 import HostLogin from './pages/Host/Login/Login';
 import HostBooking from './pages/Host/Booking/Booking';
+import AddReservation from './pages/Host/Booking/AddReservation';
 import HostPayment from './pages/Host/Payment/Payment';
 import PaymentDetail from './pages/Host/Payment/PaymentDetail';
 import HostRegister from './pages/Host/Register/Register';
@@ -140,14 +141,15 @@ function App() {
           <Route path='/auth/logout' element={<Logout />} />
 
           {/* Host Routes */}
-          <Route path='/host/login' element={<HostLogin />} />
-          <Route path='/host' element={<HostRegister />} />
-          <Route path='/host/booking' element={<HostBooking />} />
-          <Route path='/host/payment' element={<HostPayment />} />
-          <Route path='/host/payment/:date' element={<PaymentDetail />} />
-          <Route path='/host/register' element={<HostRegister />} />
-          <Route path='/host/register/new' element={<RegisterForm />} />
-          <Route path='/host/register/detail' element={<RegisterDetail />} />
+          <Route path="/host/login" element={<HostLogin />} />
+          <Route path="/host" element={<HostRegister />} />
+          <Route path="/host/booking" element={<HostBooking />} />
+          <Route path="/host/booking/add" element={<AddReservation />} />
+          <Route path="/host/payment" element={<HostPayment />} />
+          <Route path="/host/payment/:date" element={<PaymentDetail />} />
+          <Route path="/host/register" element={<HostRegister />} />
+          <Route path="/host/register/new" element={<RegisterForm />} />
+          <Route path="/host/register/detail" element={<RegisterDetail />} />
         </Routes>
       </Layout>
     </Router>

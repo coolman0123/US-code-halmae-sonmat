@@ -25,6 +25,7 @@ const RegisterDetail = () => {
       workspace: false
     },
     photo: null,
+    photos: [], // 관련 사진들 (최대 2장)
     houseName: '', // 할머니 집 이름
     workExperience: '', // 체험 가능한 일손
     price: '' // 숙박비
@@ -116,6 +117,55 @@ const RegisterDetail = () => {
     }
   };
 
+  const handlePhotosChange = (e) => {
+    const files = Array.from(e.target.files);
+    
+    // 최대 2장까지만 선택 가능
+    if (files.length > 2) {
+      alert('최대 2장까지만 업로드할 수 있습니다.');
+      return;
+    }
+
+    // 기존 사진과 합쳐서 2장을 넘지 않도록 확인
+    if (formData.photos.length + files.length > 2) {
+      alert('최대 2장까지만 업로드할 수 있습니다.');
+      return;
+    }
+
+    const processFiles = async () => {
+      const newPhotos = [];
+      
+      for (const file of files) {
+        const reader = new FileReader();
+        const result = await new Promise((resolve) => {
+          reader.onload = (e) => resolve(e.target.result);
+          reader.readAsDataURL(file);
+        });
+        
+        newPhotos.push({
+          id: Date.now() + Math.random(),
+          url: result,
+          file: file,
+          name: file.name
+        });
+      }
+      
+      setFormData(prev => ({
+        ...prev,
+        photos: [...prev.photos, ...newPhotos]
+      }));
+    };
+
+    processFiles();
+  };
+
+  const removePhoto = (photoId) => {
+    setFormData(prev => ({
+      ...prev,
+      photos: prev.photos.filter(photo => photo.id !== photoId)
+    }));
+  };
+
   const handleCountChange = (field, increment) => {
     setFormData(prev => {
       const currentValue = prev[field];
@@ -168,6 +218,7 @@ const RegisterDetail = () => {
         workExperience: formData.workExperience,
         price: formData.price,
         photo: formData.photo,
+        photos: formData.photos,
         createdAt: new Date().toISOString()
       };
 
@@ -554,6 +605,55 @@ const RegisterDetail = () => {
                     </span>
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* 사진 업로드 섹션 */}
+            <div className="section">
+              <h3 className="section-title">관련 사진들</h3>
+              <p className="section-description">사진을 2장 업로드 해주세요.</p>
+              <div className="photo-upload">
+                <div className="upload-area">
+                  <input
+                    type="file"
+                    id="photos-upload"
+                    accept="image/*"
+                    multiple
+                    onChange={handlePhotosChange}
+                    style={{ display: 'none' }}
+                  />
+                  <label htmlFor="photos-upload" className="upload-label">
+                    <div className="upload-icon">📷</div>
+                    <span>사진 업로드 ({formData.photos.length}/2)</span>
+                  </label>
+                </div>
+                {formData.photos.map(photo => (
+                  <div key={photo.id} className="uploaded-file">
+                    <div className="image-preview">
+                      <img 
+                        src={photo.url} 
+                        alt={`업로드된 사진 - ${photo.name}`} 
+                        style={{
+                          width: '200px',
+                          height: '150px',
+                          objectFit: 'cover',
+                          borderRadius: '8px',
+                          border: '1px solid #ddd'
+                        }}
+                      />
+                    </div>
+                    <span className="file-name">
+                      📎 {photo.name}
+                    </span>
+                    <button 
+                      type="button" 
+                      className="remove-btn"
+                      onClick={() => removePhoto(photo.id)}
+                    >
+                      제거
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
 

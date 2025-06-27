@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Calendar from '../../../components/Calendar/Calendar';
 import './Payment.css';
 
 const HostPayment = () => {
@@ -80,37 +81,8 @@ const HostPayment = () => {
     setPaymentData(generatePaymentData());
   }, [currentDate]);
 
-  // 캘린더 데이터 생성
-  const generateCalendarData = () => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const startDate = new Date(firstDay);
-    startDate.setDate(startDate.getDate() - firstDay.getDay()); // 일요일부터 시작
-
-    const calendarDays = [];
-    for (let i = 0; i < 42; i++) {
-      const date = new Date(startDate);
-      date.setDate(startDate.getDate() + i);
-      calendarDays.push(date);
-    }
-
-    return calendarDays;
-  };
-
-  const formatDate = (date) => {
-    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-  };
-
   const formatCurrency = (amount) => {
     return amount?.toLocaleString('ko-KR') || '';
-  };
-
-  const navigateMonth = (direction) => {
-    const newDate = new Date(currentDate);
-    newDate.setMonth(currentDate.getMonth() + direction);
-    setCurrentDate(newDate);
   };
 
   const handleDateClick = (date, payment) => {
@@ -122,81 +94,37 @@ const HostPayment = () => {
     }
   };
 
-  const calendarDays = generateCalendarData();
-  const currentMonth = currentDate.getMonth() + 1;
-  const currentYear = currentDate.getFullYear();
+  // 날짜별 컨텐츠 렌더링 함수 (결제 금액 표시)
+  const renderDateContent = (date, data, isCurrentMonth) => {
+    if (data && isCurrentMonth) {
+      return (
+        <div className="payment-amount">
+          {formatCurrency(data)}
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="payment-management-page">
       <div className="payment-container">
         <h1 className="payment-title">결제 관리</h1>
         
-        {/* 월 네비게이션 */}
-        <div className="month-navigation">
-          <button 
-            className="nav-button prev"
-            onClick={() => navigateMonth(-1)}
-          >
-            ◀
-          </button>
-          <h2 className="current-month">
-            {currentYear}. {currentMonth.toString().padStart(2, '0')}
-          </h2>
-          <button 
-            className="nav-button next"
-            onClick={() => navigateMonth(1)}
-          >
-            ▶
-          </button>
-        </div>
-
         {/* 총 결제 금액 표시 */}
         <div className="payment-summary-text">
           ※ 총 결제 금액
         </div>
 
-        {/* 캘린더 */}
-        <div className="calendar-container">
-          {/* 요일 헤더 */}
-          <div className="calendar-header">
-            <div className="day-header sunday">일요일</div>
-            <div className="day-header">월요일</div>
-            <div className="day-header">화요일</div>
-            <div className="day-header">수요일</div>
-            <div className="day-header">목요일</div>
-            <div className="day-header">금요일</div>
-            <div className="day-header saturday">토요일</div>
-          </div>
-
-          {/* 캘린더 그리드 */}
-          <div className="calendar-grid">
-            {calendarDays.map((date, index) => {
-              const dateKey = formatDate(date);
-              const payment = paymentData[dateKey];
-              const isCurrentMonth = date.getMonth() === currentDate.getMonth();
-              const dayOfWeek = date.getDay();
-              const isSunday = dayOfWeek === 0;
-              const isSaturday = dayOfWeek === 6;
-
-              return (
-                <div 
-                  key={index}
-                  className={`calendar-day ${!isCurrentMonth ? 'other-month' : ''} ${isSunday ? 'sunday' : ''} ${isSaturday ? 'saturday' : ''} ${payment && isCurrentMonth ? 'clickable' : ''}`}
-                  onClick={() => handleDateClick(date, payment)}
-                >
-                  <div className="day-number">
-                    {date.getDate()}
-                  </div>
-                  {payment && isCurrentMonth && (
-                    <div className="payment-amount">
-                      {formatCurrency(payment)}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        {/* 캘린더 컴포넌트 사용 */}
+        <Calendar 
+          currentDate={currentDate}
+          onDateChange={setCurrentDate}
+          onDateClick={handleDateClick}
+          dateData={paymentData}
+          formatCurrency={formatCurrency}
+          renderDateContent={renderDateContent}
+        />
       </div>
     </div>
   );
