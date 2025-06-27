@@ -33,11 +33,14 @@
 
 .section-title {
   font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  margin: 0;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #f0f0f0;
+  font-weight: 700;
+  color: #2c5530;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e1e5e9;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* 주소 입력 */
@@ -50,6 +53,8 @@
 .address-input-row {
   display: flex;
   gap: 12px;
+  margin-bottom: 12px;
+  align-items: stretch;
 }
 
 .postcode-input {
@@ -65,98 +70,151 @@
 
 .address-input {
   flex: 1;
-  padding: 12px 16px;
-  border: 1px solid #ddd;
+  padding: 14px 16px;
+  border: 2px solid #e1e5e9;
   border-radius: 8px;
-  font-size: 16px;
-  background-color: #f9f9f9;
-  box-sizing: border-box;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.address-input:focus {
+  outline: none;
+  border-color: #2c5530;
+  box-shadow: 0 0 0 3px rgba(44, 85, 48, 0.1);
+}
+
+.address-input::placeholder {
+  color: #9ca3af;
+  font-style: italic;
 }
 
 .address-search-btn {
-  padding: 12px 20px;
-  background-color: #4f46e5;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #2c5530 0%, #1e3a21 100%);
   color: white;
   border: none;
   border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
   white-space: nowrap;
-  transition: background-color 0.3s ease;
+  min-width: 120px;
+  box-shadow: 0 2px 4px rgba(44, 85, 48, 0.2);
 }
 
-.address-search-btn:hover {
-  background-color: #4338ca;
+.address-search-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1e3a21 0%, #0f1d10 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(44, 85, 48, 0.3);
+}
+
+.address-search-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(44, 85, 48, 0.2);
+}
+
+.address-search-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .detail-address-input {
   width: 100%;
-  padding: 12px 16px;
-  border: 1px solid #ddd;
+  padding: 14px 16px;
+  border: 2px solid #e1e5e9;
   border-radius: 8px;
-  font-size: 16px;
-  background-color: #fafafa;
-  box-sizing: border-box;
+  font-size: 14px;
   transition: all 0.3s ease;
+  font-family: inherit;
 }
 
 .detail-address-input:focus {
   outline: none;
-  border-color: #4f46e5;
-  background-color: white;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  border-color: #2c5530;
+  box-shadow: 0 0 0 3px rgba(44, 85, 48, 0.1);
+}
+
+.detail-address-input::placeholder {
+  color: #9ca3af;
+  font-style: italic;
 }
 
 /* 지도 */
 .map-container {
   width: 100%;
-  height: 300px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  height: 350px;
+  margin-top: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
   overflow: hidden;
-  margin-top: 16px;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.map-container:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .map-placeholder {
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   height: 100%;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  color: #6c757d;
+  text-align: center;
+  padding: 20px;
+}
+
+.map-loading {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  color: #475569;
-  border: 2px dashed #cbd5e1;
-  box-sizing: border-box;
+  gap: 12px;
 }
 
-.map-placeholder span {
+.map-loading span {
   font-size: 18px;
   font-weight: 600;
-  margin-bottom: 12px;
-  color: #334155;
+  margin-bottom: 4px;
 }
 
-.map-placeholder p {
+.map-loading p {
   font-size: 14px;
   margin: 0;
-  color: #64748b;
+  opacity: 0.8;
 }
 
-/* 지도 로딩 후 스타일 */
 .map-loaded {
   width: 100%;
   height: 100%;
-  border: 2px solid #4f46e5;
-  box-sizing: border-box;
-  border-radius: 8px;
-  overflow: hidden;
+  position: relative;
 }
 
 #map {
   width: 100%;
   height: 100%;
+}
+
+.map-info {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #333;
+  font-weight: 500;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  z-index: 1000;
 }
 
 /* 폼 요소들 */
@@ -477,6 +535,43 @@
   line-height: 1.3;
 }
 
+/* 에러 메시지 스타일 */
+.error-message {
+  background: #ffebee;
+  color: #c62828;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border-left: 4px solid #e57373;
+  margin-bottom: 15px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 주소 도움말 스타일 */
+.address-help {
+  background: #f3f4f6;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin: 10px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  border: 1px solid #e5e7eb;
+}
+
+.address-help strong {
+  color: #2c5530;
+  font-weight: 600;
+}
+
+.address-help small {
+  display: block;
+  margin-top: 6px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
 /* 반응형 디자인 */
 @media (max-width: 768px) {
   .register-detail-main {
@@ -497,7 +592,7 @@
 
   .address-input-row {
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
   }
 
   .postcode-input {
@@ -505,12 +600,12 @@
   }
 
   .address-search-btn {
-    padding: 12px 20px;
-    font-size: 14px;
+    width: 100%;
+    min-width: auto;
   }
 
   .map-container {
-    height: 250px;
+    height: 280px;
   }
 
   .guest-counter-row {
@@ -563,6 +658,21 @@
   .amenity-label {
     font-size: 13px;
   }
+
+  .address-help {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .map-info {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .error-message {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -576,5 +686,113 @@
 
   .submit-button {
     max-width: 100%;
+  }
+
+  .map-container {
+    height: 250px;
+    border-radius: 8px;
+  }
+
+  .address-input, .detail-address-input {
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+
+  .address-search-btn {
+    padding: 12px 20px;
+    font-size: 13px;
+  }
+
+  .section-title {
+    font-size: 16px;
+  }
+}
+
+/* 로딩 애니메이션 */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.address-search-btn:disabled {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* API 상태 표시 스타일 */
+.api-status {
+  margin-bottom: 15px;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.status-ready {
+  color: #28a745;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.status-loading {
+  color: #6c757d;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.test-api-btn {
+  background: #e9ecef;
+  color: #495057;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.test-api-btn:hover {
+  background: #dee2e6;
+  border-color: #adb5bd;
+}
+
+.test-api-btn:active {
+  background: #ced4da;
+  transform: translateY(1px);
+}
+
+/* 반응형 디자인에 API 상태 추가 */
+@media (max-width: 768px) {
+  .api-status {
+    padding: 10px 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .status-ready, .status-loading {
+    font-size: 13px;
+  }
+  
+  .test-api-btn {
+    margin-left: 0 !important;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .api-status {
+    padding: 8px 10px;
+  }
+  
+  .status-ready, .status-loading {
+    font-size: 12px;
   }
 } 
