@@ -1,7 +1,6 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { Header, Footer } from '@/components';
-import topImage from '@/assets/images/상단_메인이미지.png';
+import topImage from '../../../assets/images/상단_메인이미지.png';
 import './LiveBooking.css';
 
 const LiveBooking = () => {
