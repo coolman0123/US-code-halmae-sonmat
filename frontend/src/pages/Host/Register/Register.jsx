@@ -9,7 +9,7 @@ const hostData = [
     id: 1,
     name: '여여',
     date: '2025.06.24 등록',
-    description: '"말보단 손이 빠른" 박봉순 할머니',
+    introduction: '"말보단 손이 빠른" 박봉순 할머니',
     image: hostImage, // 임시 이미지 (후에 실제 할매 사진으로 교체)
     status: 'active'
   },
@@ -17,7 +17,7 @@ const hostData = [
     id: 2,
     name: '모모',
     date: '2025.05.24 등록',
-    description: '"입은 좀 험하지만 속은 꿀" 김옥순 할머니',
+    introduction: '"입은 좀 험하지만 속은 꿀" 김옥순 할머니',
     image: hostImage, // 임시 이미지 (후에 실제 할매 사진으로 교체)
     status: 'active'
   },
@@ -25,7 +25,7 @@ const hostData = [
     id: 3,
     name: '소소',
     date: '2025.04.14 등록',
-    description: '"전쟁통에도 솥은 놓지 않았다" 이금자 할머니',
+    introduction: '"전쟁통에도 솥은 놓지 않았다" 이금자 할머니',
     image: hostImage, // 임시 이미지 (후에 실제 할매 사진으로 교체)
     status: 'active'
   },
@@ -33,7 +33,7 @@ const hostData = [
     id: 4,
     name: '호호',
     date: '2025.03.14 등록',
-    description: '"한 마디면 눈물 터지는" 정다감 할머니',
+    introduction: '"한 마디면 눈물 터지는" 정다감 할머니',
     image: hostImage, // 임시 이미지 (후에 실제 할매 사진으로 교체)
     status: 'active'
   },
@@ -41,7 +41,7 @@ const hostData = [
     id: 5,
     name: '패밀리',
     date: '2025.03.02 등록',
-    description: '"메뉴는 고정, 맛은 고정불변" 조말순 할머니',
+    introduction: '"메뉴는 고정, 맛은 고정불변" 조말순 할머니',
     image: hostImage, // 임시 이미지 (후에 실제 할매 사진으로 교체)
     status: 'active'
   }
@@ -160,7 +160,7 @@ const HostRegister = () => {
                     : '등록일 미상')}
                 </div>
                 <div className="host-desc">
-                  {host.description || 
+                  {host.introduction || host.description || 
                    (host.personality ? `"${host.personality}" ${host.name || '할머니'}` : '소개 없음')}
                 </div>
               </div>

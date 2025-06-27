@@ -25,7 +25,7 @@ import SignUp from './pages/Auth/SignUp/SignUp';
 import Logout from './pages/Auth/Logout/Logout';
 
 // Host Pages
-import HostHeader from './components/HostHeader';
+import HostHeader from './components/HostHeader/HostHeader';
 import HostLogin from './pages/Host/Login/Login';
 import HostBooking from './pages/Host/Booking/Booking';
 import HostPayment from './pages/Host/Payment/Payment';
