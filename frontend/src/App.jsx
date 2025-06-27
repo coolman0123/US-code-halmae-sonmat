@@ -24,6 +24,16 @@ import Login from './pages/Auth/Login/Login';
 import SignUp from './pages/Auth/SignUp/SignUp';
 import Logout from './pages/Auth/Logout/Logout';
 
+// Host Pages
+import HostHeader from './components/HostHeader';
+import HostLogin from './pages/Host/Login/Login';
+import HostBooking from './pages/Host/Booking/Booking';
+import HostPayment from './pages/Host/Payment/Payment';
+import PaymentDetail from './pages/Host/Payment/PaymentDetail';
+import HostRegister from './pages/Host/Register/Register';
+import RegisterForm from './pages/Host/Register/RegisterForm';
+import RegisterDetail from './pages/Host/Register/RegisterDetail';
+
 import './App.css';
 
 // Header와 Footer를 조건부로 표시하는 컴포넌트
@@ -31,11 +41,14 @@ const Layout = ({ children }) => {
   const location = useLocation();
   
   // 인증 페이지에서는 Header, Footer 숨기기
-  const hideHeaderFooter = ['/auth/login', '/auth/signup'].includes(location.pathname);
+  const hideHeaderFooter = ['/auth/login', '/auth/signup', '/host/login'].includes(location.pathname);
+  
+  // 관리자 페이지 확인
+  const isHostPage = location.pathname.startsWith('/host') && !location.pathname.includes('/login');
 
   return (
     <div className="App">
-      {!hideHeaderFooter && <Header />}
+      {!hideHeaderFooter && (isHostPage ? <HostHeader /> : <Header />)}
       <main>
         {children}
       </main>
@@ -97,6 +110,16 @@ function App() {
           <Route path="/auth/login" element={<Login />} />
           <Route path="/auth/signup" element={<SignUp />} />
           <Route path="/auth/logout" element={<Logout />} />
+          
+          {/* Host Routes */}
+          <Route path="/host/login" element={<HostLogin />} />
+          <Route path="/host" element={<HostRegister />} />
+          <Route path="/host/booking" element={<HostBooking />} />
+          <Route path="/host/payment" element={<HostPayment />} />
+          <Route path="/host/payment/:date" element={<PaymentDetail />} />
+          <Route path="/host/register" element={<HostRegister />} />
+          <Route path="/host/register/new" element={<RegisterForm />} />
+          <Route path="/host/register/detail" element={<RegisterDetail />} />
         </Routes>
       </Layout>
     </Router>
