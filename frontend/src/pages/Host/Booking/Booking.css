@@ -1,0 +1,176 @@
+/* 예약 관리 페이지 */
+.booking-management-page {
+  min-height: 100vh;
+  background-color: #f8fafc;
+  padding: 40px 20px;
+}
+
+.booking-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: white;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.booking-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 40px 0;
+  text-align: center;
+}
+
+.add-reservation-button {
+  background-color: #D1D5DB;
+  color: #374151;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: 20px;
+  display: block;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.add-reservation-button:hover {
+  background-color: #9CA3AF;
+}
+
+/* 예약 상태 컨텐츠 */
+.booking-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  margin-top: 2px;
+  width: 100%;
+}
+
+.booking-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.status-box {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.status-box.available {
+  background-color: #22C55E; /* 녹색 - 예약 가능 */
+}
+
+.status-box.unavailable {
+  background-color: #EF4444; /* 빨강색 - 예약 불가능 */
+}
+
+.house-name {
+  font-size: 10px;
+  color: #333;
+  font-weight: 500;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 캘린더 날짜 셀 높이 조정 */
+.booking-management-page .calendar-day {
+  min-height: 120px;
+  padding: 6px;
+  overflow: hidden;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .booking-management-page {
+    padding: 20px 10px;
+  }
+
+  .booking-container {
+    padding: 20px;
+  }
+
+  .booking-title {
+    font-size: 24px;
+    margin-bottom: 30px;
+  }
+
+  .add-reservation-button {
+    width: 100%;
+    padding: 14px 24px;
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  .booking-management-page .calendar-day {
+    min-height: 100px;
+    padding: 4px;
+  }
+
+  .status-box {
+    width: 14px;
+    height: 14px;
+    font-size: 9px;
+  }
+
+  .house-name {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 480px) {
+  .booking-container {
+    padding: 16px;
+  }
+
+  .booking-title {
+    font-size: 20px;
+  }
+
+  .add-reservation-button {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+
+  .booking-management-page .calendar-day {
+    min-height: 80px;
+    padding: 3px;
+  }
+
+  .booking-content {
+    gap: 1px;
+  }
+
+  .booking-item {
+    gap: 2px;
+  }
+
+  .status-box {
+    width: 12px;
+    height: 12px;
+    font-size: 8px;
+  }
+
+  .house-name {
+    font-size: 8px;
+    max-width: 100%;
+  }
+}

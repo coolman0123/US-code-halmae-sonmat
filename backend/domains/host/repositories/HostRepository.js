@@ -29,6 +29,29 @@ async create(hostData) {
     return { id: doc.id, ...doc.data() };
   }
 
+  async findByHouseNickname(houseNickname) {
+    const snapshot = await this.collection
+      .where('houseNickname', '==', houseNickname)
+      .get();
+    
+    if (snapshot.empty) {
+      return null;
+    }
+    
+    const doc = snapshot.docs[0];
+    return { id: doc.id, ...doc.data() };
+  }
+
+  async update(id, updateData) {
+    updateData.updatedAt = new Date();
+    await this.collection.doc(id).update(updateData);
+    return this.findById(id);
+  }
+
+  async delete(id) {
+    await this.collection.doc(id).delete();
+    return { success: true, message: '호스트가 삭제되었습니다.' };
+  }
 }
 
 module.exports = HostRepository;

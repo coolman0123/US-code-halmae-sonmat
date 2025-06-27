@@ -1,0 +1,179 @@
+/* 예약 추가 페이지 */
+.add-reservation-page {
+  min-height: 100vh;
+  background-color: #f8fafc;
+  padding: 40px 20px;
+}
+
+.add-reservation-container {
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: white;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.add-reservation-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 50px 0;
+  text-align: center;
+}
+
+/* 폼 스타일 */
+.reservation-form {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.form-input {
+  padding: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+  background-color: #fff;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.form-input::placeholder {
+  color: #9ca3af;
+}
+
+/* 날짜 입력 */
+.date-single {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.date-input-single {
+  padding: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+  background-color: #fff;
+  width: 100%;
+}
+
+.date-input-single:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.date-info {
+  font-size: 14px;
+  color: #6b7280;
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* 버튼 */
+.form-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.complete-button {
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  padding: 16px 48px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  min-width: 140px;
+}
+
+.complete-button:hover {
+  background-color: #4338ca;
+}
+
+.complete-button:active {
+  transform: translateY(1px);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .add-reservation-page {
+    padding: 20px 10px;
+  }
+
+  .add-reservation-container {
+    padding: 30px 20px;
+  }
+
+  .add-reservation-title {
+    font-size: 24px;
+    margin-bottom: 40px;
+  }
+
+  .reservation-form {
+    gap: 30px;
+  }
+
+  .form-input,
+  .date-input {
+    padding: 14px;
+    font-size: 15px;
+  }
+
+  .complete-button {
+    padding: 14px 40px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .add-reservation-container {
+    padding: 20px 16px;
+  }
+
+  .add-reservation-title {
+    font-size: 22px;
+  }
+
+  .date-range {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .date-separator {
+    display: none;
+  }
+
+  .date-input {
+    width: 100%;
+  }
+
+  .complete-button {
+    width: 100%;
+    padding: 16px;
+  }
+} 
