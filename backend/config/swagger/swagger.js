@@ -8,7 +8,7 @@ const options = {
       version: '1.0.0',
       description: 'Express + Swagger 예제',
     },
-    servers: [{ url: 'http://localhost:5001' }],
+    servers: [{ url: 'https://us-code-halmae-sonmat.onrender.com' }],
   },
   apis: ['./routes/*.js'],
   apis: [ './domains/**/routes/*.js'],
