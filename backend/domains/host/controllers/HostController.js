@@ -1,4 +1,5 @@
 const HostService = require('../services/HostService');
+const axios = require('axios');
 
 class HostController {
   constructor() { 
@@ -171,6 +172,97 @@ class HostController {
       });
     } catch (e) {
       next(e);
+    }
+  }
+
+  /**
+   * Google Maps Geocoding API Proxy
+   * @param {string} address - 지오코딩할 주소
+   */
+  async geocoding(req, res, next) {
+    try {
+      const { address } = req.query;
+      
+      if (!address) {
+        return res.status(400).json({
+          success: false,
+          message: '주소를 입력해주세요.'
+        });
+      }
+
+      const GOOGLE_MAPS_API_KEY = 'AIzaSyDCFpWL0RLVqqgnRJqVmpjec9pnw7DAHeo';
+      
+      console.log('🗺️ 지오코딩 요청:', address);
+      
+      // Google Geocoding API 호출
+      const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+        params: {
+          address: address,
+          key: GOOGLE_MAPS_API_KEY,
+          language: 'ko',
+          region: 'KR',
+          components: 'country:KR'
+        }
+      });
+
+      const { data } = response;
+      
+      console.log('🔍 Google API 응답:', data.status, data.results?.length);
+      
+      if (data.status === 'OK' && data.results && data.results.length > 0) {
+        const result = data.results[0];
+        const location = result.geometry.location;
+        
+        const geocodingResult = {
+          address: address,
+          formattedAddress: result.formatted_address,
+          latitude: location.lat,
+          longitude: location.lng,
+          placeId: result.place_id
+        };
+
+        console.log('✅ 지오코딩 성공:', geocodingResult);
+        
+        res.json({
+          success: true,
+          data: geocodingResult
+        });
+      } else {
+        let errorMessage = '주소를 찾을 수 없습니다.';
+        
+        switch (data.status) {
+          case 'ZERO_RESULTS':
+            errorMessage = '검색 결과가 없습니다. 다른 주소로 시도해보세요.';
+            break;
+          case 'OVER_QUERY_LIMIT':
+            errorMessage = 'API 사용량 한도를 초과했습니다.';
+            break;
+          case 'REQUEST_DENIED':
+            errorMessage = 'API 요청이 거부되었습니다.';
+            break;
+          case 'INVALID_REQUEST':
+            errorMessage = '잘못된 요청입니다.';
+            break;
+          case 'UNKNOWN_ERROR':
+            errorMessage = '서버 오류가 발생했습니다.';
+            break;
+        }
+        
+        console.log('❌ 지오코딩 실패:', data.status, errorMessage);
+        
+        res.status(400).json({
+          success: false,
+          message: errorMessage,
+          status: data.status
+        });
+      }
+    } catch (error) {
+      console.error('❌ 지오코딩 API 오류:', error.message);
+      res.status(500).json({
+        success: false,
+        message: '지오코딩 요청 처리 중 오류가 발생했습니다.',
+        error: error.message
+      });
     }
   }
 }
