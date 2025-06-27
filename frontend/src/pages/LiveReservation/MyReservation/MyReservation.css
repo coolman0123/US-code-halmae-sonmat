@@ -53,3 +53,59 @@
   font-weight: 600;
   margin-left: auto;
 }
+
+/* 날짜별 요금보기 체크박스 스타일 */
+.book-now-wrapper .calendar-header {
+  margin-bottom: 20px;
+}
+
+.book-now-wrapper .calendar-header label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.book-now-wrapper .calendar-header input[type="checkbox"] {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+/* MyReservation 페이지 캘린더 크기 조정 */
+.book-now-wrapper .calendar-wrapper {
+  width: 110%;
+  max-width: 1100px;
+  margin: 0 auto;
+  transform: translateX(-5%);
+}
+
+/* MyReservation 페이지 캘린더 셀 크기 조정 */
+.book-now-wrapper .calendar-day {
+  min-height: 100px !important;
+  padding: 10px !important;
+}
+
+/* 예약 아이템이 한 줄로 표시되도록 조정 */
+.book-now-wrapper .booking-item {
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.book-now-wrapper .house-name {
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.book-now-wrapper .price-display {
+  flex-shrink: 0;
+  margin-left: 4px;
+  font-size: 8px;
+  white-space: nowrap;
+}
