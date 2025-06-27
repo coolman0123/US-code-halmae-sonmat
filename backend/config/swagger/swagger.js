@@ -8,7 +8,10 @@ const options = {
       version: '1.0.0',
       description: '할매의 손맛 프로젝트 API 문서',
     },
-    servers: [{ url: 'http://localhost:5001' }],
+    servers: [
+    { url: 'https://us-code-halmae-sonmat.onrender.com', description: 'Production' },
+    { url: 'http://localhost:5001',                         description: 'Local'      }
+    ],
   },
   apis: [
     './routes/*.js',
