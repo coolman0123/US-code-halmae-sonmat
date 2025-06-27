@@ -2,8 +2,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 10px 20px;
+  padding: 14px 20px;
   font-size: 16px;
   border-radius: 8px;
   font-weight: 600;
@@ -13,6 +12,7 @@
   cursor: not-allowed;
   transition: all 0.2s ease;
   text-align: center;
+  min-height: 40px;
 }
 
 .select-btn:focus {

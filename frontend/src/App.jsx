@@ -63,7 +63,7 @@ function App() {
 
           <Route path='/mypage' element={<MyPage />} />
           <Route path='/mypage/payment' element={<MyPayment />} />
-          <Route path='/mypage/review' element={<MyReview />}>
+          <Route path='/mypage/review/*' element={<MyReview />}>
             <Route index element={<Navigate to='write' replace />} />
             <Route path='write' element={<WriteReview />} />
             <Route path='list' element={<ListReview />} />
