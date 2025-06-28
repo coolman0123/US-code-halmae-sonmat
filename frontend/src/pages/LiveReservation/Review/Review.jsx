@@ -243,7 +243,6 @@ const Review = () => {
             <div className="review-header-info">
               <div className="user-info">
                 <span className="user-name">{review.userName}</span>
-                <span className="user-code">{review.userCode}</span>
               </div>
               <span className="review-date">{review.date}</span>
             </div>

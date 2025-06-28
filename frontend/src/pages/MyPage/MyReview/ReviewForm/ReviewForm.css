@@ -66,6 +66,61 @@
   text-align: center;
 }
 
+.rural-experience-section {
+  margin-bottom: 32px;
+}
+
+.rural-experience-section h3 {
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 16px;
+  gap: 12px;
+}
+
+.checkbox-input {
+  display: none;
+}
+
+.checkbox-custom {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.checkbox-input:checked + .checkbox-custom {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.checkbox-input:checked + .checkbox-custom::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.checkbox-label:hover .checkbox-custom {
+  border-color: #007bff;
+}
+
 .experience-section {
   margin-bottom: 24px;
 }
@@ -116,12 +171,42 @@ textarea {
   flex-wrap: wrap;
 }
 
+.photo-preview-container {
+  position: relative;
+}
+
 .photo-preview {
   width: 80px;
   height: 80px;
   object-fit: cover;
   border-radius: 8px;
   border: 1px solid #ccc;
+}
+
+.photo-delete-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: transparent;
+  color: #666;
+  border: 2px solid #666;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: all 0.2s ease;
+}
+
+.photo-delete-btn:hover {
+  background-color: rgba(102,102,102,0.1);
+  color: #333;
+  border-color: #333;
 }
 
 .button-group {

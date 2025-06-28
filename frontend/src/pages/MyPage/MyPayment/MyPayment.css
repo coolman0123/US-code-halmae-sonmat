@@ -137,3 +137,14 @@
     align-self: flex-end;
   }
 }
+
+.no-payments {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.no-payments p {
+  font-size: 16px;
+  margin: 0;
+}
