@@ -1,4 +1,6 @@
 const HostService = require('../services/HostService');
+require('dotenv').config();
+
 const axios = require('axios');
 
 class HostController {
@@ -190,15 +192,15 @@ class HostController {
         });
       }
 
-      const GOOGLE_MAPS_API_KEY = 'AIzaSyDCFpWL0RLVqqgnRJqVmpjec9pnw7DAHeo';
+
       
-      console.log('🗺️ 지오코딩 요청:', address);
+      console.log('지오코딩 요청:', address);
       
       // Google Geocoding API 호출
       const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
         params: {
           address: address,
-          key: GOOGLE_MAPS_API_KEY,
+          key: process.env.GOOGLE_MAPS_API_KEY,
           language: 'ko',
           region: 'KR',
           components: 'country:KR'
@@ -221,7 +223,7 @@ class HostController {
           placeId: result.place_id
         };
 
-        console.log('✅ 지오코딩 성공:', geocodingResult);
+        console.log(' 지오코딩 성공:', geocodingResult);
         
         res.json({
           success: true,
