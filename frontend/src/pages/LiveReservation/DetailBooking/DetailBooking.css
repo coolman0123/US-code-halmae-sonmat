@@ -1,0 +1,372 @@
+.detail-booking-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* 상단 검색 영역 */
+.search-section {
+  margin-bottom: 20px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background-color: #f5f5f5;
+  padding: 12px 16px;
+  border-radius: 8px;
+  gap: 8px;
+}
+
+.search-icon {
+  font-size: 16px;
+}
+
+.search-text {
+  font-weight: 500;
+}
+
+.search-date {
+  color: #666;
+  margin-left: auto;
+}
+
+/* 숙소 이미지 영역 */
+.accommodation-images {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 8px;
+  margin-bottom: 20px;
+  height: 300px;
+}
+
+.main-image {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.main-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sub-images {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 8px;
+}
+
+.sub-images img,
+.placeholder-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+}
+
+/* 숙소 기본 정보 */
+.accommodation-info {
+  margin-bottom: 30px;
+}
+
+.room-type {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.room-name {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0 0 16px 0;
+}
+
+.host-intro {
+  margin-bottom: 20px;
+}
+
+.host-label {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.price-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.total-label {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.price {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.reserve-btn {
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.reserve-btn:hover {
+  background-color: #3367d6;
+}
+
+/* 섹션 공통 스타일 */
+.section {
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.section-content {
+  line-height: 1.6;
+  color: #555;
+}
+
+.section-content p {
+  margin-bottom: 12px;
+}
+
+.section-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+}
+
+.section-content li {
+  margin-bottom: 8px;
+  color: #666;
+}
+
+/* 후기 섹션 */
+.review-section {
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.rating {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.review-link {
+  color: #4285f4;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.review-stars {
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.review-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.review-item {
+  background-color: #f9f9f9;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.review-date {
+  font-size: 12px;
+  color: #666;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.review-item p {
+  margin: 0;
+  font-size: 14px;
+  color: #333;
+}
+
+/* 편의시설 목록 */
+.amenities-list {
+  margin-top: 16px;
+}
+
+.amenity-item {
+  margin-bottom: 8px;
+  color: #666;
+}
+
+/* 일손돕기 이벤트 */
+.event-notice {
+  background-color: #f0f8ff;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 16px;
+  border-left: 4px solid #4285f4;
+}
+
+.event-notice p {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #333;
+}
+
+/* 숙소 정보 상세 */
+.accommodation-details {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #333;
+}
+
+.detail-value {
+  color: #666;
+}
+
+/* 위치 정보 */
+.location-info p {
+  margin-bottom: 16px;
+  font-size: 16px;
+  color: #333;
+}
+
+.map-placeholder {
+  margin: 20px 0;
+}
+
+.map-container {
+  width: 100%;
+  height: 300px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.map-area {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 16px;
+}
+
+.contact-info {
+  margin-top: 20px;
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.contact-info p {
+  margin-bottom: 8px;
+}
+
+.contact-info p:last-child {
+  margin-bottom: 0;
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+}
+
+/* 로딩 상태 */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 16px;
+  color: #666;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .detail-booking-container {
+    padding: 16px;
+  }
+  
+  .accommodation-images {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  
+  .main-image {
+    height: 200px;
+  }
+  
+  .sub-images {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    height: 100px;
+  }
+  
+  .price-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .reserve-btn {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  .review-content {
+    grid-template-columns: 1fr;
+  }
+}
