@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './BookNow.css';
 import houseIcon from '../../../assets/icons/집.png';
@@ -7,53 +7,61 @@ import grayCheck from '../../../assets/icons/회색체크.png';
 import whiteCheck from '../../../assets/icons/흰체크.png';
 import Calendar from '../../../components/Calendar/Calendar';
 
-const dummyRooms = [
-  {
-    id: 1,
-    name: '여여',
-    available: true,
-    maxPeople: 4,
-    type: '원룸형',
-    size: '0평',
-    price: 340000,
-  },
-  {
-    id: 2,
-    name: '모모',
-    available: false,
-    maxPeople: 3,
-    type: '원룸형',
-    size: '0평',
-    price: 280000,
-  },
-  {
-    id: 3,
-    name: '소소',
-    available: false,
-    maxPeople: 3,
-    type: '원룸형',
-    size: '0평',
-    price: 280000,
-  },
-  {
-    id: 4,
-    name: '호호',
-    available: false,
-    maxPeople: 4,
-    type: '원룸형',
-    size: '0평',
-    price: 300000,
-  },
-  {
-    id: 5,
-    name: '패밀리',
-    available: false,
-    maxPeople: 6,
-    type: '거실+객실',
-    size: '15평',
-    price: 400000,
-  },
-];
+const getDummyRooms = (hostData) => {
+  // hostData가 있으면 실제 데이터 사용, 없으면 기본 더미 데이터 사용
+  const maxPeople = hostData?.guests || 4;
+  const bedrooms = hostData?.bedrooms || 1;
+  const beds = hostData?.beds || 1;
+  const price = hostData?.price ? parseInt(hostData.price) : 340000;
+  
+  return [
+    {
+      id: 1,
+      name: '여여',
+      available: true,
+      maxPeople: maxPeople,
+      bedrooms: bedrooms,
+      beds: beds,
+      price: price,
+    },
+    {
+      id: 2,
+      name: '모모',
+      available: false,
+      maxPeople: 3,
+      bedrooms: 1,
+      beds: 1,
+      price: 280000,
+    },
+    {
+      id: 3,
+      name: '소소',
+      available: false,
+      maxPeople: 3,
+      bedrooms: 1,
+      beds: 1,
+      price: 280000,
+    },
+    {
+      id: 4,
+      name: '호호',
+      available: false,
+      maxPeople: 4,
+      bedrooms: 1,
+      beds: 2,
+      price: 300000,
+    },
+    {
+      id: 5,
+      name: '패밀리',
+      available: false,
+      maxPeople: 6,
+      bedrooms: 2,
+      beds: 3,
+      price: 400000,
+    },
+  ];
+};
 
 const BookNow = () => {
   const [selectedRoom, setSelectedRoom] = useState(null);
@@ -69,7 +77,18 @@ const BookNow = () => {
     checkOut: new Date(2025, 5, 25)
   });
   const [currentDate, setCurrentDate] = useState(new Date(2025, 5, 1));
+  const [hostData, setHostData] = useState(null);
   const navigate = useNavigate();
+
+  // Host Register Detail에서 저장된 데이터 가져오기
+  useEffect(() => {
+    const hostsList = JSON.parse(localStorage.getItem('hostsList') || '[]');
+    if (hostsList.length > 0) {
+      // 가장 최근 등록된 할매 데이터 사용
+      const latestHost = hostsList[hostsList.length - 1];
+      setHostData(latestHost);
+    }
+  }, []);
 
   const handleSelectRoom = (room, price) => {
     setSelectedRoom(room);
@@ -120,8 +139,25 @@ const BookNow = () => {
     return `${year}-${month}-${day} ${weekday}요일`;
   };
 
+  // 모달 헤더용 날짜 포맷 함수
+  const formatModalHeaderDate = (checkInDate, checkOutDate) => {
+    const formatShort = (date) => {
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+      const weekday = weekdays[date.getDay()];
+      return `${month}.${day}(${weekday})`;
+    };
+
+    const checkInFormatted = formatShort(checkInDate);
+    const checkOutFormatted = formatShort(checkOutDate);
+    
+    return `${checkInFormatted}~${checkOutFormatted} • 1박`;
+  };
+
   const goToDetailPage = () => {
     if (selectedRoom) {
+      const dummyRooms = getDummyRooms(hostData);
       const roomInfo = dummyRooms.find((room) => room.name === selectedRoom);
       navigate(`/live-reservation/detail/${roomInfo.id}`);
     }
@@ -171,7 +207,7 @@ const BookNow = () => {
         <div className='calendar-modal'>
           <div className='calendar-modal-content'>
             <div className='modal-header'>
-              <h3>06.24(화)~06.25(수) • 1박</h3>
+              <h3>{formatModalHeaderDate(tempSelectedDates.checkIn, tempSelectedDates.checkOut)}</h3>
               <button 
                 className='close-button'
                 onClick={() => setShowCalendar(false)}
@@ -200,7 +236,7 @@ const BookNow = () => {
 
       <div className='room-selection-title'>객실선택</div>
 
-      {dummyRooms.map((room) => (
+      {getDummyRooms(hostData).map((room) => (
         <div
           key={room.name}
           className={`room-card ${
@@ -218,8 +254,8 @@ const BookNow = () => {
               </span>
             </div>
             <div className='room-desc'>
-              기준 2명, 최대 {room.maxPeople}명<br />
-              {room.type} / {room.size}
+              최대 {room.maxPeople}명<br />
+              침실{room.bedrooms} / 침대{room.beds}
             </div>
             <div className='guest-selector'>
               <div className='guest-type'>

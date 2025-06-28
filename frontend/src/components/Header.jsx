@@ -48,7 +48,7 @@ const Header = () => {
             <Link to='/stories'>할매의 손맛 이야기</Link>
           </li>
           <li>
-            <Link to='/experiences'>특별한 체험</Link>
+            <Link to='/experiences'>할매집소개</Link>
           </li>
           <li>
             <Link to='/booking'>예약안내</Link>

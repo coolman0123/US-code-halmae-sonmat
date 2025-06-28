@@ -1,123 +1,237 @@
-import React from 'react';
+//Experience.jsx
+
+import React, { useState } from 'react';
 import './Experience.css';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectCoverflow, Navigation, Autoplay } from 'swiper/modules';
+import { Modal } from '../../components';
+import 'swiper/css';
+import 'swiper/css/effect-coverflow';
+import 'swiper/css/navigation';
+import 'swiper/css/autoplay';
 
 // 이미지 import
-import heroImage from '../../assets/images/상단_메인이미지.png';
-import appleImage1 from '../../assets/images/특별한체험_사과1.png';
-import appleImage2 from '../../assets/images/특별한체험_사과2.png';
-import potatoImage1 from '../../assets/images/특별한체험_시골1.png';
-import potatoImage2 from '../../assets/images/특별한체험_시골2.png';
-import riceImage1 from '../../assets/images/특별한체험_모내기1.png';
-import riceImage2 from '../../assets/images/특별한체험_모내기2.png';
-import sesameImage1 from '../../assets/images/특별한체험_참깨1.png';
-import sesameImage2 from '../../assets/images/특별한체험_참깨2.png';
-import garlicImage1 from '../../assets/images/특별한체험_마늘1.png';
-import garlicImage2 from '../../assets/images/특별한체험_마늘2.png';
+import card1 from '../../assets/images/할매의손맛이야기_1.png';
+import card2 from '../../assets/images/할매의손맛이야기_2.png';
+import card3 from '../../assets/images/할매의손맛이야기_3.png';
+import card4 from '../../assets/images/할매의손맛이야기_4.png';
+import card5 from '../../assets/images/홈_집사진.jpg';
+
+const cards = [
+  {
+    title: '할머니의 손맛1',
+    description: '말보단 손이 빠른 박봉순 할머니의 하루',
+    image: card1,
+    details: `📸 박봉순 할머니 (연세: 82세)
+
+"말보단 손이 빠른" 할머니는 하루도 빠짐없이 아침 5시에 일어나 밭일을 하고 밥을 짓습니다.
+말수는 적지만 식탁 위엔 언제나 정갈한 7첩 반상이 차려집니다.
+
+대표 메뉴:
+- 직접 재배한 콩으로 만든 청국장
+- 푹 익은 묵은지를 넣은 묵은지찜
+
+성격 한 줄 요약:
+"말 안 해도 다 해놓는 성격이에요. 손이 말해요."
+
+🥢 할매 밥상
+<img src="${card1}" alt="할매 밥상" style="width: 100%; margin: 10px 0;" />
+
+된장찌개, 묵은지찜, 나물무침, 제철 나물 등… 정성껏 차린 한 끼를 경험하세요.
+
+🏠 숙소 소개
+<img src="${card1}" alt="숙소 사진" style="width: 100%; margin: 10px 0;" />
+할머니가 직접 지은 한옥 느낌의 방에서 따뜻한 시골 정취를 느낄 수 있어요.
+
+🧺 일손 돕기 체험
+<img src="${card1}" alt="일손 체험" style="width: 100%; margin: 10px 0;" />
+감자 캐기, 장 담그기, 땔감 나르기, 김장 담그기 등
+할머니의 하루를 함께 경험하며 시골의 삶을 배워보세요.`,
+  },
+  {
+    title: '할머니의 손맛2',
+    description: '말보단 손이 빠른 박봉순 할머니의 하루',
+    image: card2,
+    details: `📸 박봉순 할머니 (연세: 82세)
+
+"말보단 손이 빠른" 할머니는 하루도 빠짐없이 아침 5시에 일어나 밭일을 하고 밥을 짓습니다.
+말수는 적지만 식탁 위엔 언제나 정갈한 7첩 반상이 차려집니다.
+
+대표 메뉴:
+- 직접 재배한 콩으로 만든 청국장
+- 푹 익은 묵은지를 넣은 묵은지찜
+
+성격 한 줄 요약:
+"말 안 해도 다 해놓는 성격이에요. 손이 말해요."
+
+🥢 할매 밥상
+<img src="${card1}" alt="할매 밥상" style="width: 100%; margin: 10px 0;" />
+
+된장찌개, 묵은지찜, 나물무침, 제철 나물 등… 정성껏 차린 한 끼를 경험하세요.
+
+🏠 숙소 소개
+<img src="${card1}" alt="숙소 사진" style="width: 100%; margin: 10px 0;" />
+할머니가 직접 지은 한옥 느낌의 방에서 따뜻한 시골 정취를 느낄 수 있어요.
+
+🧺 일손 돕기 체험
+<img src="${card1}" alt="일손 체험" style="width: 100%; margin: 10px 0;" />
+감자 캐기, 장 담그기, 땔감 나르기, 김장 담그기 등
+할머니의 하루를 함께 경험하며 시골의 삶을 배워보세요.`,
+  },
+  {
+    title: '할머니의 손맛3',
+    description: '말보단 손이 빠른 박봉순 할머니의 하루',
+    image: card3,
+    details: `📸 박봉순 할머니 (연세: 82세)
+
+"말보단 손이 빠른" 할머니는 하루도 빠짐없이 아침 5시에 일어나 밭일을 하고 밥을 짓습니다.
+말수는 적지만 식탁 위엔 언제나 정갈한 7첩 반상이 차려집니다.
+
+대표 메뉴:
+- 직접 재배한 콩으로 만든 청국장
+- 푹 익은 묵은지를 넣은 묵은지찜
+
+성격 한 줄 요약:
+"말 안 해도 다 해놓는 성격이에요. 손이 말해요."
+
+🥢 할매 밥상
+<img src="${card1}" alt="할매 밥상" style="width: 100%; margin: 10px 0;" />
+
+된장찌개, 묵은지찜, 나물무침, 제철 나물 등… 정성껏 차린 한 끼를 경험하세요.
+
+🏠 숙소 소개
+<img src="${card1}" alt="숙소 사진" style="width: 100%; margin: 10px 0;" />
+할머니가 직접 지은 한옥 느낌의 방에서 따뜻한 시골 정취를 느낄 수 있어요.
+
+🧺 일손 돕기 체험
+<img src="${card1}" alt="일손 체험" style="width: 100%; margin: 10px 0;" />
+감자 캐기, 장 담그기, 땔감 나르기, 김장 담그기 등
+할머니의 하루를 함께 경험하며 시골의 삶을 배워보세요.`,
+  },
+  {
+    title: '할머니의 손맛4',
+    description: '말보단 손이 빠른 박봉순 할머니의 하루',
+    image: card4,
+    details: `📸 박봉순 할머니 (연세: 82세)
+
+"말보단 손이 빠른" 할머니는 하루도 빠짐없이 아침 5시에 일어나 밭일을 하고 밥을 짓습니다.
+말수는 적지만 식탁 위엔 언제나 정갈한 7첩 반상이 차려집니다.
+
+대표 메뉴:
+- 직접 재배한 콩으로 만든 청국장
+- 푹 익은 묵은지를 넣은 묵은지찜
+
+성격 한 줄 요약:
+"말 안 해도 다 해놓는 성격이에요. 손이 말해요."
+
+🥢 할매 밥상
+<img src="${card1}" alt="할매 밥상" style="width: 100%; margin: 10px 0;" />
+
+된장찌개, 묵은지찜, 나물무침, 제철 나물 등… 정성껏 차린 한 끼를 경험하세요.
+
+🏠 숙소 소개
+<img src="${card1}" alt="숙소 사진" style="width: 100%; margin: 10px 0;" />
+할머니가 직접 지은 한옥 느낌의 방에서 따뜻한 시골 정취를 느낄 수 있어요.
+
+🧺 일손 돕기 체험
+<img src="${card1}" alt="일손 체험" style="width: 100%; margin: 10px 0;" />
+감자 캐기, 장 담그기, 땔감 나르기, 김장 담그기 등
+할머니의 하루를 함께 경험하며 시골의 삶을 배워보세요.`,
+  },
+  {
+    title: '할머니의 손맛5',
+    description: '말보단 손이 빠른 박봉순 할머니의 하루',
+    image: card5,
+    details: `📸 박봉순 할머니 (연세: 82세)
+
+"말보단 손이 빠른" 할머니는 하루도 빠짐없이 아침 5시에 일어나 밭일을 하고 밥을 짓습니다.
+말수는 적지만 식탁 위엔 언제나 정갈한 7첩 반상이 차려집니다.
+
+대표 메뉴:
+- 직접 재배한 콩으로 만든 청국장
+- 푹 익은 묵은지를 넣은 묵은지찜
+
+성격 한 줄 요약:
+"말 안 해도 다 해놓는 성격이에요. 손이 말해요."
+
+🥢 할매 밥상
+<img src="${card1}" alt="할매 밥상" style="width: 100%; margin: 10px 0;" />
+
+된장찌개, 묵은지찜, 나물무침, 제철 나물 등… 정성껏 차린 한 끼를 경험하세요.
+
+🏠 숙소 소개
+<img src="${card1}" alt="숙소 사진" style="width: 100%; margin: 10px 0;" />
+할머니가 직접 지은 한옥 느낌의 방에서 따뜻한 시골 정취를 느낄 수 있어요.
+
+🧺 일손 돕기 체험
+<img src="${card1}" alt="일손 체험" style="width: 100%; margin: 10px 0;" />
+감자 캐기, 장 담그기, 땔감 나르기, 김장 담그기 등
+할머니의 하루를 함께 경험하며 시골의 삶을 배워보세요.`,
+  },
+];
 
 const Experience = () => {
+  const [selectedCard, setSelectedCard] = useState(null);
+
   return (
-    <div className="experience-page">
-      {/* Hero Section */}
-      <section className="experience-hero">
-        <div className="hero-image-container">
-          <img src={heroImage} alt="특별한 체험" className="hero-image" />
-        </div>
-      </section>
-
-      {/* Title Section */}
-      <section className="experience-title">
-        <div className="container">
-          <p className="title-subtitle">소중한 하루를 만드는 시간</p>
-          <h1 className="title-main">특별함, 특별한 체험</h1>
-        </div>
-      </section>
-
-      {/* Experience Cards Section */}
-      <section className="experience-content">
-        <div className="container">
-          
-          {/* Experience 01 - 사과 체험 */}
-          <div className="experience-item">
-            <div className="experience-images">
-              <img src={appleImage1} alt="사과 체험 1" className="image-left" />
-              <img src={appleImage2} alt="사과 체험 2" className="image-right" />
+    <div className='experience-page'>
+      <Swiper
+        effect='coverflow'
+        grabCursor={true}
+        centeredSlides={true}
+        slidesPerView='auto'
+        loop={true}
+        autoplay={{
+          delay: 4000,
+          disableOnInteraction: false,
+        }}
+        navigation={{
+          nextEl: '.custom-button-next',
+          prevEl: '.custom-button-prev',
+        }}
+        coverflowEffect={{
+          rotate: 0,
+          stretch: 0,
+          depth: 150,
+          modifier: 2.5,
+          slideShadows: false,
+        }}
+        modules={[EffectCoverflow, Navigation, Autoplay]}
+        className='experience-carousel'
+      >
+        {cards.map((card, index) => (
+          <SwiperSlide key={index} className='experience-slide'>
+            <div
+              className='experience-card'
+              onClick={() => setSelectedCard(card)}
+            >
+              <div className='card-image'>
+                <img src={card.image} alt={card.title} />
+              </div>
+              <div className='card-content'>
+                <h3>{card.title}</h3>
+                <p>{card.description}</p>
+              </div>
             </div>
-            <div className="experience-text">
-              <h3 className="experience-title-en">Special experience</h3>
-              <p className="experience-intro">
-                할머니 댁에서 보내는 특별한 오늘은 당신에게 잊지못할 추억을 가져다 드립니다.<br />
-                할머니의 손길을 도우며 농촌의 일상을 함께 나누고, 정겨운 특별한 체험을 즐겨보세요.
-              </p>
-              <h2 className="experience-title-kr">특별한 체험 01: 사과 수확과 선별</h2>
-              <p className="experience-description">
-                가을 햇살 아래 탐스러운 사과를 직접 따보고,<br />
-                정성껏 선별하여 박스에 담아보는 수확의 기쁨을 느껴보세요.
-              </p>
-            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+
+      {/* Custom Buttons */}
+      <div className='custom-button-prev'>‹</div>
+      <div className='custom-button-next'>›</div>
+
+      {selectedCard && (
+        <Modal onClose={() => setSelectedCard(null)}>
+          <div className='modal-content'>
+            <h2>{selectedCard.title}</h2>
+            <div
+              dangerouslySetInnerHTML={{ __html: selectedCard.details }}
+              style={{ lineHeight: '1.6', whiteSpace: 'pre-wrap' }}
+            />
           </div>
-
-          {/* Experience 02 - 마늘 체험 */}
-          <div className="experience-item">
-            <div className="experience-images">
-              <img src={garlicImage1} alt="마늘 체험 1" className="image-left" />
-              <img src={garlicImage2} alt="마늘 체험 2" className="image-right" />
-            </div>
-            <div className="experience-text">
-              <h2 className="experience-title-kr">특별한 체험 02: 마늘밭 김매기와 수확</h2>
-              <p className="experience-description">
-                넓은 밭에서 흙을 만지고 풀을 뽑으며,<br />
-                시골의 봄과 여름을 고스란히 경험해보세요.
-              </p>
-            </div>
-          </div>
-
-          {/* Experience 03 - 모내기 체험 */}
-          <div className="experience-item">
-            <div className="experience-images">
-              <img src={riceImage1} alt="모내기 체험 1" className="image-left" />
-              <img src={riceImage2} alt="모내기 체험 2" className="image-right" />
-            </div>
-            <div className="experience-text">
-              <h2 className="experience-title-kr">특별한 체험 03: 모내기와 탈곡 체험</h2>
-              <p className="experience-description">
-                초록 들판에 서서 직접 모를 심고,<br />
-                가을엔 벼를 털며 전통 농사의 리듬을 배워보세요.
-              </p>
-            </div>
-          </div>
-
-          {/* Experience 04 - 참깨 체험 */}
-          <div className="experience-item">
-            <div className="experience-images">
-              <img src={sesameImage1} alt="장터 체험 1" className="image-left" />
-              <img src={sesameImage2} alt="장터 체험 2" className="image-right" />
-            </div>
-            <div className="experience-text">
-              <h2 className="experience-title-kr">특별한 체험 04: 참깨 · 콩 타작하기</h2>
-              <p className="experience-description">
-                수확한 콩과 참깨를 털고 말리는 손맛,<br />
-                처음엔 낯설지만 어느새 정이 가득해지는 체험입니다.
-              </p>
-            </div>
-          </div>
-
-          {/* Experience 05 - 장터 체험 */}
-          <div className="experience-item">
-            <div className="experience-images">
-              <img src={potatoImage1} alt="참깨 체험 1" className="image-left" />
-              <img src={potatoImage2} alt="참깨 체험 2" className="image-right" />
-            </div>
-            <div className="experience-text">
-              <h2 className="experience-title-kr">특별한 체험 05: 시골 장터 둘기</h2>
-              <p className="experience-description">
-                장터에서 텐트를 치고, 국수를 데우고, 손님을 맞으며<br />
-                마을 사람들과 함께 어울려보는 따뜻한 하루를 보내보세요.
-              </p>
-            </div>
-          </div>
-
-        </div>
-      </section>
+        </Modal>
+      )}
     </div>
   );
 };
