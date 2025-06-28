@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../../contexts/AuthContext';
 import './Login.css';
 // import grandmaLogo from '../../assets/images/할머니로고.png';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login, isLoading, error, clearError } = useAuth();
+  
   const [formData, setFormData] = useState({
-    id: '',
+    email: '',
     password: ''
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [localError, setLocalError] = useState('');
+
+  // 로그인 성공 후 이동할 경로
+  const from = location.state?.from?.pathname || '/';
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -19,65 +25,46 @@ const Login = () => {
       [name]: value
     }));
     // 입력 시 에러 메시지 초기화
-    if (error) setError('');
+    if (error) clearError();
+    if (localError) setLocalError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError('');
+    setLocalError('');
+
+    // 기본 유효성 검사
+    if (!formData.email || !formData.password) {
+      setLocalError('이메일과 비밀번호를 모두 입력해주세요.');
+      return;
+    }
+
+    // 이메일 형식 검사
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setLocalError('유효한 이메일 주소를 입력해주세요.');
+      return;
+    }
 
     try {
-      // 백엔드 API 호출 (나중에 활성화)
-      // const response = await loginAPI(formData);
-      
-      // 현재는 로컬스토리지 사용 (개발용)
-      const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-      const user = existingUsers.find(
-        u => (u.email === formData.id || u.id === formData.id) && u.password === formData.password
-      );
-      
-      if (user) {
-        // 로그인 성공 시 사용자 정보 저장
-        localStorage.setItem('currentUser', JSON.stringify({
-          id: user.id,
-          name: user.name,
-          userId: formData.id, // 로그인에 사용한 ID
-          loginTime: new Date().toISOString()
-        }));
-        localStorage.setItem('isLoggedIn', 'true');
-        
-        alert(`${user.name}님, 환영합니다!`);
-        navigate('/'); // 메인페이지로 이동
-      } else {
-        setError('아이디 또는 비밀번호가 올바르지 않습니다.');
-      }
+      await login(formData);
+      // 로그인 성공 시 이전 페이지 또는 메인 페이지로 이동
+      navigate(from, { replace: true });
     } catch (err) {
-      setError('로그인에 실패했습니다. 다시 시도해주세요.');
-    } finally {
-      setIsLoading(false);
+      // AuthContext에서 이미 에러가 설정되므로 추가 처리 불필요
+      console.error('로그인 실패:', err);
     }
   };
 
-  // 백엔드 연동용 API 함수 (나중에 활성화)
-  const loginAPI = async (credentials) => {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        id: credentials.id,
-        password: credentials.password
-      })
+  // 테스트용 계정 정보
+  const handleTestLogin = async () => {
+    setFormData({
+      email: 'test@example.com',
+      password: 'test123'
     });
-    
-    if (!response.ok) {
-      throw new Error('로그인 실패');
-    }
-    
-    return await response.json();
   };
+
+  const displayError = error || localError;
 
   return (
     <div className="login-page">
@@ -94,17 +81,18 @@ const Login = () => {
 
         {/* 로그인 폼 */}
         <form className="login-form" onSubmit={handleSubmit}>
-          {error && <div className="error-message">{error}</div>}
+          {displayError && <div className="error-message">{displayError}</div>}
           
           <div className="input-group">
             <input
-              type="text"
-              name="id"
-              placeholder="아이디"
-              value={formData.id}
+              type="email"
+              name="email"
+              placeholder="이메일 주소"
+              value={formData.email}
               onChange={handleInputChange}
               required
               disabled={isLoading}
+              autoComplete="email"
             />
           </div>
 
@@ -117,6 +105,7 @@ const Login = () => {
               onChange={handleInputChange}
               required
               disabled={isLoading}
+              autoComplete="current-password"
             />
           </div>
 
@@ -129,14 +118,58 @@ const Login = () => {
           </button>
         </form>
 
+        {/* 테스트용 계정 정보 (개발 환경에서만 표시) */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="test-account-info">
+            <p style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>
+              테스트 계정 (개발용):
+            </p>
+            <button 
+              type="button"
+              onClick={handleTestLogin}
+              style={{
+                fontSize: '11px',
+                padding: '4px 8px',
+                backgroundColor: '#f0f0f0',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+              disabled={isLoading}
+            >
+              테스트 계정으로 로그인
+            </button>
+          </div>
+        )}
+
         {/* 하단 링크들 */}
         <div className="login-links">
           <Link to="/auth/signup" className="link">회원가입</Link>
           <span className="divider">|</span>
-          <button className="admin-login-button" onClick={() => navigate('/host')}>
+          <button 
+            className="admin-login-button" 
+            onClick={() => navigate('/host/login')}
+            disabled={isLoading}
+          >
             관리자 로그인
           </button>
         </div>
+
+        {/* 개발 정보 */}
+        {process.env.NODE_ENV === 'development' && (
+          <div style={{ 
+            marginTop: '20px', 
+            padding: '10px', 
+            backgroundColor: '#f9f9f9', 
+            borderRadius: '4px',
+            fontSize: '12px',
+            color: '#666'
+          }}>
+            <p><strong>개발 모드</strong></p>
+            <p>백엔드 서버: {process.env.REACT_APP_API_URL || 'http://localhost:5001'}</p>
+            <p>회원가입 후 로그인하거나 테스트 계정을 사용하세요.</p>
+          </div>
+        )}
       </div>
     </div>
   );

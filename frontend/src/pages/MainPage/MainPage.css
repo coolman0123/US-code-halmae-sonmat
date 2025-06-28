@@ -459,3 +459,229 @@
   margin: 0;
   letter-spacing: 1px;
 }
+
+/* Hosts Section Styles */
+.hosts-section {
+  padding: 80px 0;
+  background-color: #fafafa;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.section-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2c5530;
+  margin-bottom: 16px;
+  line-height: 1.3;
+}
+
+.section-description {
+  font-size: 16px;
+  color: #666;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.hosts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.host-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.host-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.host-image {
+  height: 240px;
+  overflow: hidden;
+  position: relative;
+}
+
+.host-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.host-card:hover .host-image img {
+  transform: scale(1.05);
+}
+
+.host-content {
+  padding: 24px;
+}
+
+.host-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2c5530;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.host-intro {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 16px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.host-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.host-guests {
+  font-size: 14px;
+  color: #666;
+}
+
+.host-price {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c5530;
+}
+
+.host-amenities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.amenity-tag {
+  font-size: 12px;
+  padding: 4px 8px;
+  background-color: #f0f4f1;
+  color: #2c5530;
+  border-radius: 12px;
+  border: 1px solid #e0e8e1;
+}
+
+.loading-container,
+.error-container,
+.empty-container {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #2c5530;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-container p,
+.error-container p,
+.empty-container p {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.retry-button,
+.register-button {
+  padding: 12px 24px;
+  background-color: #2c5530;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.retry-button:hover,
+.register-button:hover {
+  background-color: #1e3921;
+}
+
+.section-footer {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.view-all-button {
+  padding: 16px 32px;
+  background-color: transparent;
+  color: #2c5530;
+  border: 2px solid #2c5530;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.view-all-button:hover {
+  background-color: #2c5530;
+  color: white;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+  .hosts-section {
+    padding: 60px 0;
+  }
+
+  .hosts-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 0 20px;
+  }
+
+  .section-title {
+    font-size: 28px;
+  }
+
+  .section-description {
+    font-size: 14px;
+    padding: 0 20px;
+  }
+
+  .host-content {
+    padding: 20px;
+  }
+
+  .host-name {
+    font-size: 18px;
+  }
+}

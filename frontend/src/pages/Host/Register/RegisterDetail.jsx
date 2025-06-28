@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { hostApi } from '../../../api';
 import './RegisterDetail.css';
 
 const RegisterDetail = () => {
@@ -42,8 +42,6 @@ const RegisterDetail = () => {
     experiences: '',
     accommodationFee: ''
   });
-
-  const BACKEND_URL = 'http://localhost:5001';
 
   // Google Maps API 로딩 (지도 표시용)
   const loadGoogleMapsAPI = () => {
@@ -182,23 +180,15 @@ const RegisterDetail = () => {
     try {
       console.log('🔍 백엔드 지오코딩 요청:', searchQuery);
       
-      const response = await axios.get(`${BACKEND_URL}/api/hosts/geocoding`, {
-        params: { address: searchQuery }
-      });
+      const result = await hostApi.geocoding(searchQuery);
 
-      console.log('✅ 백엔드 지오코딩 응답:', response.data);
+      console.log('✅ 백엔드 지오코딩 응답:', result);
 
-      if (response.data.success) {
-        return response.data.data;
-      } else {
-        throw new Error(response.data.message || '지오코딩 실패');
-      }
+      return result;
     } catch (error) {
       console.error('❌ 백엔드 지오코딩 실패:', error);
       
-      if (error.response?.data?.message) {
-        throw new Error(error.response.data.message);
-      } else if (error.message) {
+      if (error.message) {
         throw new Error(error.message);
       } else {
         throw new Error('지오코딩 요청 중 오류가 발생했습니다.');
@@ -714,40 +704,41 @@ const RegisterDetail = () => {
     try {
       console.log('📤 백엔드로 할머니 등록 데이터 전송...');
       
-              const hostData = {
-          houseNickname: formData.houseNickname,
-          hostIntroduction: formData.experiences,
-          address: {
-            detailAddress: formData.address + (formData.detailAddress ? ` ${formData.detailAddress}` : '')
-          },
-          latitude: parseFloat(formData.lat),
-          longitude: parseFloat(formData.lng),
-          contact: {
-            phone: formData.phone
-          },
-          maxGuests: formData.maxGuests,
-          bedroomCount: formData.bedroomCount,
-          bedCount: formData.bedCount,
-          amenities: formData.amenities, // 이미 배열 형태
-          availableExperiences: formData.experiences,
-          accommodationFee: parseFloat(formData.accommodationFee),
-          housePhotos: formData.photos.map(photo => photo.url)
-        };
+      const hostData = {
+        hostIntroduction: formData.experiences,
+        age: 70, // 기본값 설정
+        characteristics: "따뜻하고 정겨운 시골 할머니",
+        representativeMenu: "시골 밥상, 제철 음식",
+        personalitySummary: "인자하고 정이 많은 성격",
+        address: {
+          zipCode: "00000", // 기본값
+          detailAddress: formData.address + (formData.detailAddress ? ` ${formData.detailAddress}` : '')
+        },
+        contact: {
+          phone: formData.phone
+        },
+        houseNickname: formData.houseNickname,
+        maxGuests: formData.maxGuests,
+        bedroomCount: formData.bedroomCount,
+        bedCount: formData.bedCount,
+        amenities: formData.amenities.length > 0 ? formData.amenities : ["와이파이", "주방"],
+        housePhotos: formData.photos.length >= 3 
+          ? formData.photos.slice(0, 3).map(photo => photo.url)
+          : [
+              "https://example.com/default1.jpg",
+              "https://example.com/default2.jpg", 
+              "https://example.com/default3.jpg"
+            ],
+        availableExperiences: formData.experiences,
+        accommodationFee: formData.accommodationFee + "원/박"
+      };
 
       console.log('📤 전송할 데이터:', hostData);
 
-      const response = await fetch('https://us-code-halmae-sonmat.onrender.com/api/hosts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(hostData)
-      });
-
-      const result = await response.json();
+      const result = await hostApi.registerHost(hostData);
       console.log('📨 백엔드 응답:', result);
 
-      if (response.ok && result.success) {
+      if (result.success) {
         alert(`✅ 할머니 등록이 완료되었습니다!\n\n📋 등록된 정보:\n• 집 이름: ${formData.houseNickname}\n• 주소: ${formData.address}\n• 위도/경도: ${formData.lat}, ${formData.lng}\n• 연락처: ${formData.phone}\n• 숙박비: ${formData.accommodationFee}원`);
         
         // 폼 초기화

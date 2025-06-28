@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../contexts/AuthContext';
 import './SignUp.css';
 // import grandmaLogo from '../../assets/images/할머니로고.png';
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const { register, isLoading, error, clearError } = useAuth();
+  
   const [formData, setFormData] = useState({
-    id: '',
+    name: '',
+    email: '',
+    phone: '',
     password: '',
     confirmPassword: '',
     agreeTerms: false
   });
   const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -28,27 +32,54 @@ const SignUp = () => {
         [name]: ''
       }));
     }
+    if (error) clearError();
   };
 
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.id.trim()) {
-      newErrors.id = '아이디를 입력해주세요.';
+    // 이름 검증
+    if (!formData.name.trim()) {
+      newErrors.name = '이름을 입력해주세요.';
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = '이름은 2자 이상이어야 합니다.';
     }
 
+    // 이메일 검증
+    if (!formData.email.trim()) {
+      newErrors.email = '이메일을 입력해주세요.';
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        newErrors.email = '유효한 이메일 주소를 입력해주세요.';
+      }
+    }
+
+    // 전화번호 검증
+    if (!formData.phone.trim()) {
+      newErrors.phone = '전화번호를 입력해주세요.';
+    } else {
+      const phoneRegex = /^01[0-9]-?[0-9]{4}-?[0-9]{4}$/;
+      if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
+        newErrors.phone = '유효한 전화번호를 입력해주세요. (예: 010-1234-5678)';
+      }
+    }
+
+    // 비밀번호 검증
     if (!formData.password.trim()) {
       newErrors.password = '비밀번호를 입력해주세요.';
-    } else if (formData.password.length < 4) {
-      newErrors.password = '비밀번호는 4자 이상이어야 합니다.';
+    } else if (formData.password.length < 6) {
+      newErrors.password = '비밀번호는 6자 이상이어야 합니다.';
     }
 
+    // 비밀번호 확인 검증
     if (!formData.confirmPassword.trim()) {
       newErrors.confirmPassword = '비밀번호 확인을 입력해주세요.';
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = '비밀번호가 일치하지 않습니다.';
     }
 
+    // 개인정보 동의 검증
     if (!formData.agreeTerms) {
       newErrors.agreeTerms = '개인정보 수집 및 이용에 동의해주세요.';
     }
@@ -58,73 +89,62 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     setErrors({});
 
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      setIsLoading(false);
       return;
     }
 
     try {
-      // 중복 확인 (로컬스토리지)
-      const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-      const idExists = existingUsers.some(user => user.email === formData.id || user.id === formData.id);
-      
-      if (idExists) {
-        setErrors({ id: '이미 사용중인 아이디입니다.' });
-        setIsLoading(false);
-        return;
-      }
-
-      // 사용자 등록
-      const newUser = {
-        id: formData.id, // 메인 ID 필드
-        name: formData.id, // 아이디를 이름으로 사용
-        email: formData.id, // 호환성을 위해 유지
-        password: formData.password,
-        createdAt: new Date().toISOString()
+      const userData = {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        password: formData.password
       };
 
-      existingUsers.push(newUser);
-      localStorage.setItem('users', JSON.stringify(existingUsers));
-
-      // 백엔드 API 호출 (나중에 활성화)
-      // const response = await signupAPI(formData);
-
+      await register(userData);
+      
       // 회원가입 성공 처리
-      alert('회원가입이 완료되었습니다!');
+      alert(`${formData.name}님, 회원가입이 완료되었습니다!\n로그인 페이지로 이동합니다.`);
       navigate('/auth/login');
 
-    } catch (error) {
-      setErrors({ general: '회원가입에 실패했습니다. 다시 시도해주세요.' });
-    } finally {
-      setIsLoading(false);
+    } catch (err) {
+      console.error('회원가입 실패:', err);
+      // AuthContext에서 설정된 에러를 사용하거나 기본 메시지 설정
+      if (!error) {
+        setErrors({ general: '회원가입에 실패했습니다. 다시 시도해주세요.' });
+      }
     }
   };
 
-// 백엔드 연동용 API 함수 (나중에 활성화)
-const signupAPI = async (userData) => {
-  const response = await fetch('/api/auth/signup', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      id: userData.id,
-      password: userData.password,
-      agreeTerms: userData.agreeTerms
-    })
-  });
-  
-  if (!response.ok) {
-    throw new Error('회원가입 실패');
-  }
-  
-  return await response.json();
-};
+  // 전화번호 자동 포맷팅
+  const formatPhoneNumber = (value) => {
+    const numbers = value.replace(/[^\d]/g, '');
+    if (numbers.length <= 3) return numbers;
+    if (numbers.length <= 7) return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+    return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
+  };
+
+  const handlePhoneChange = (e) => {
+    const formattedPhone = formatPhoneNumber(e.target.value);
+    setFormData(prev => ({
+      ...prev,
+      phone: formattedPhone
+    }));
+    
+    if (errors.phone) {
+      setErrors(prev => ({
+        ...prev,
+        phone: ''
+      }));
+    }
+    if (error) clearError();
+  };
+
+  const displayError = error || errors.general;
 
   return (
     <div className="signup-page">
@@ -141,30 +161,61 @@ const signupAPI = async (userData) => {
 
         {/* 회원가입 폼 */}
         <form className="signup-form" onSubmit={handleSubmit}>
-          {errors.general && <div className="error-message">{errors.general}</div>}
+          {displayError && <div className="error-message">{displayError}</div>}
           
           <div className="input-group">
             <input
               type="text"
-              name="id"
-              placeholder="아이디"
-              value={formData.id}
+              name="name"
+              placeholder="이름"
+              value={formData.name}
               onChange={handleInputChange}
-              className={errors.id ? 'error' : ''}
+              className={errors.name ? 'error' : ''}
               disabled={isLoading}
+              autoComplete="name"
             />
-            {errors.id && <span className="field-error">{errors.id}</span>}
+            {errors.name && <span className="field-error">{errors.name}</span>}
+          </div>
+
+          <div className="input-group">
+            <input
+              type="email"
+              name="email"
+              placeholder="이메일 주소"
+              value={formData.email}
+              onChange={handleInputChange}
+              className={errors.email ? 'error' : ''}
+              disabled={isLoading}
+              autoComplete="email"
+            />
+            {errors.email && <span className="field-error">{errors.email}</span>}
+          </div>
+
+          <div className="input-group">
+            <input
+              type="tel"
+              name="phone"
+              placeholder="전화번호 (010-1234-5678)"
+              value={formData.phone}
+              onChange={handlePhoneChange}
+              className={errors.phone ? 'error' : ''}
+              disabled={isLoading}
+              maxLength="13"
+              autoComplete="tel"
+            />
+            {errors.phone && <span className="field-error">{errors.phone}</span>}
           </div>
 
           <div className="input-group">
             <input
               type="password"
               name="password"
-              placeholder="비밀번호"
+              placeholder="비밀번호 (6자 이상)"
               value={formData.password}
               onChange={handleInputChange}
               className={errors.password ? 'error' : ''}
               disabled={isLoading}
+              autoComplete="new-password"
             />
             {errors.password && <span className="field-error">{errors.password}</span>}
           </div>
@@ -178,6 +229,7 @@ const signupAPI = async (userData) => {
               onChange={handleInputChange}
               className={errors.confirmPassword ? 'error' : ''}
               disabled={isLoading}
+              autoComplete="new-password"
             />
             {errors.confirmPassword && <span className="field-error">{errors.confirmPassword}</span>}
           </div>
@@ -187,9 +239,10 @@ const signupAPI = async (userData) => {
             <div className="terms-content">
               <h3>개인정보 수집 및 이용 동의</h3>
               <div className="terms-details">
-                <p><strong>수집하는 개인정보 항목:</strong> 아이디, 비밀번호</p>
-                <p><strong>개인정보 수집 및 이용 목적:</strong> 할매의 손맛 회원 가입 및 회원 관리</p>
+                <p><strong>수집하는 개인정보 항목:</strong> 이름, 이메일, 전화번호, 비밀번호</p>
+                <p><strong>개인정보 수집 및 이용 목적:</strong> 할매의 손맛 회원 가입 및 회원 관리, 서비스 제공</p>
                 <p><strong>개인정보 보유 및 이용 기간:</strong> 회원탈퇴 시까지</p>
+                <p><strong>동의 거부권:</strong> 위 개인정보 수집·이용에 대한 동의를 거부할 권리가 있으나, 동의를 거부할 경우 회원가입이 제한됩니다.</p>
               </div>
             </div>
             
@@ -224,6 +277,22 @@ const signupAPI = async (userData) => {
           <span>이미 계정이 있으신가요? </span>
           <Link to="/auth/login" className="link">로그인</Link>
         </div>
+
+        {/* 개발 정보 */}
+        {process.env.NODE_ENV === 'development' && (
+          <div style={{ 
+            marginTop: '20px', 
+            padding: '10px', 
+            backgroundColor: '#f9f9f9', 
+            borderRadius: '4px',
+            fontSize: '12px',
+            color: '#666'
+          }}>
+            <p><strong>개발 모드</strong></p>
+            <p>백엔드 서버: {process.env.REACT_APP_API_URL || 'http://localhost:5001'}</p>
+            <p>회원가입 후 로그인 페이지에서 해당 계정으로 로그인할 수 있습니다.</p>
+          </div>
+        )}
       </div>
     </div>
   );

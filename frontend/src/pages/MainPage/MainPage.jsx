@@ -1,7 +1,9 @@
 'use client';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { animate, stagger } from 'motion';
 import { splitText } from 'motion-plus';
+import { hostApi } from '../../api';
 import './MainPage.css';
 
 // 이미지 import
@@ -16,6 +18,9 @@ import grandmaLogo from '../../assets/images/할머니로고.png';
 
 const MainPage = () => {
   const animateRef = useRef(null);
+  const [hosts, setHosts] = useState([]);
+  const [isLoadingHosts, setIsLoadingHosts] = useState(true);
+  const [hostError, setHostError] = useState(null);
 
   useEffect(() => {
     if (!animateRef.current) return;
@@ -39,6 +44,60 @@ const MainPage = () => {
       );
     });
   }, []);
+
+  // 호스트 목록 로드
+  useEffect(() => {
+    const loadHosts = async () => {
+      try {
+        setIsLoadingHosts(true);
+        const hostList = await hostApi.getAllHosts();
+        setHosts(hostList.slice(0, 6)); // 최대 6개만 표시
+        setHostError(null);
+      } catch (error) {
+        console.error('호스트 목록 로드 실패:', error);
+        setHostError('호스트 목록을 불러올 수 없습니다.');
+        setHosts([]);
+      } finally {
+        setIsLoadingHosts(false);
+      }
+    };
+
+    loadHosts();
+  }, []);
+
+  // 호스트 카드 컴포넌트
+  const HostCard = ({ host }) => (
+    <div className="host-card">
+      <div className="host-image">
+        {host.housePhotos && host.housePhotos.length > 0 ? (
+          <img 
+            src={host.housePhotos[0]} 
+            alt={host.houseNickname}
+            onError={(e) => {
+              e.target.src = houseImage; // 기본 이미지로 대체
+            }}
+          />
+        ) : (
+          <img src={houseImage} alt={host.houseNickname} />
+        )}
+      </div>
+      <div className="host-content">
+        <h4 className="host-name">{host.houseNickname}</h4>
+        <p className="host-intro">
+          {host.hostIntroduction || host.personalitySummary || '따뜻한 할머니의 집'}
+        </p>
+        <div className="host-details">
+          <span className="host-guests">최대 {host.maxGuests}명</span>
+          <span className="host-price">{host.accommodationFee}</span>
+        </div>
+        <div className="host-amenities">
+          {host.amenities && host.amenities.slice(0, 3).map((amenity, index) => (
+            <span key={index} className="amenity-tag">{amenity}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className='main-page'>
@@ -204,6 +263,55 @@ const MainPage = () => {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Hosts Section - 등록된 할머니들 */}
+      <section className='hosts-section'>
+        <div className='container'>
+          <div className='section-header'>
+            <h2 className='section-title'>따뜻한 마음으로 기다리는 할머니들</h2>
+            <p className='section-description'>
+              정성이 담긴 손맛과 포근한 이야기가 있는 특별한 공간들을 만나보세요
+            </p>
+          </div>
+
+          {isLoadingHosts ? (
+            <div className='loading-container'>
+              <div className='loading-spinner'></div>
+              <p>할머니들을 찾고 있습니다...</p>
+            </div>
+          ) : hostError ? (
+            <div className='error-container'>
+              <p className='error-message'>{hostError}</p>
+              <button 
+                className='retry-button'
+                onClick={() => window.location.reload()}
+              >
+                다시 시도
+              </button>
+            </div>
+          ) : hosts.length > 0 ? (
+            <>
+              <div className='hosts-grid'>
+                {hosts.map((host) => (
+                  <HostCard key={host.id} host={host} />
+                ))}
+              </div>
+              <div className='section-footer'>
+                <Link to='/experiences' className='view-all-button'>
+                  모든 할머니 집 보기
+                </Link>
+              </div>
+            </>
+          ) : (
+            <div className='empty-container'>
+              <p>아직 등록된 할머니 집이 없습니다.</p>
+              <Link to='/host/register' className='register-button'>
+                할머니 집 등록하기
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 

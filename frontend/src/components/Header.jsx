@@ -1,37 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import '../styles/Header.css';
 import logo from '../assets/images/할머니로고.png';
 
 const Header = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
-  const location = useLocation();
-
-  useEffect(() => {
-    // 로그인 상태 확인
-    const checkLoginStatus = () => {
-      const loginStatus = localStorage.getItem('isLoggedIn');
-      const userData = localStorage.getItem('currentUser');
-      
-      if (loginStatus === 'true' && userData) {
-        setIsLoggedIn(true);
-        setCurrentUser(JSON.parse(userData));
-      } else {
-        setIsLoggedIn(false);
-        setCurrentUser(null);
-      }
-    };
-
-    checkLoginStatus();
-
-    // 로컬스토리지 변경 감지
-    window.addEventListener('storage', checkLoginStatus);
-    
-    return () => {
-      window.removeEventListener('storage', checkLoginStatus);
-    };
-  }, [location]); // location 변경 시에도 로그인 상태 재확인
+  const { isLoggedIn, user, isLoading } = useAuth();
 
   return (
     <header>
@@ -59,14 +33,28 @@ const Header = () => {
           <li>
             <Link to='/mypage'>마이페이지</Link>
           </li>
-          <li>
-            {isLoggedIn ? (
-              <>
-                <span className="user-greeting">{currentUser?.name}님</span>
-                <Link to='/auth/logout'>로그아웃</Link>
-              </>
+          <li className="auth-section">
+            {isLoading ? (
+              <span className="loading-text">로딩중...</span>
+            ) : isLoggedIn ? (
+              <div className="user-menu">
+                <span className="user-greeting">
+                  {user?.name}님
+                </span>
+                <Link to='/auth/logout' className="logout-link">
+                  로그아웃
+                </Link>
+              </div>
             ) : (
-              <Link to='/auth/login'>로그인</Link>
+              <div className="login-menu">
+                <Link to='/auth/login' className="login-link">
+                  로그인
+                </Link>
+                <span className="divider">|</span>
+                <Link to='/auth/signup' className="signup-link">
+                  회원가입
+                </Link>
+              </div>
             )}
           </li>
         </ul>

@@ -1,43 +1,85 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../contexts/AuthContext';
 import './Logout.css';
 
 const Logout = () => {
   const navigate = useNavigate();
-  const hasLoggedOut = useRef(false);
+  const { logout, user, isLoggedIn } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
-    if (!hasLoggedOut.current) {
-      hasLoggedOut.current = true;
-
-      // 로그아웃 처리
-      const performLogout = () => {
-        // 로그인 관련 정보 모두 제거
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('authToken'); // 나중에 백엔드 연동시 사용될 토큰도 제거
-        
-        // storage 이벤트 강제 발생 (같은 탭에서도 감지되도록)
-        window.dispatchEvent(new Event('storage'));
-        
-        // 페이지 강제 리로드로 상태 확실히 업데이트
-        setTimeout(() => {
-          alert('로그아웃 되었습니다.');
-          navigate('/');
-          // 추가적으로 페이지 리로드로 Header 상태 확실히 업데이트
-          window.location.reload();
-        }, 1000);
-      };
-
-      performLogout();
+    // 이미 로그아웃된 상태라면 메인 페이지로 이동
+    if (!isLoggedIn) {
+      navigate('/', { replace: true });
+      return;
     }
-  }, [navigate]);
+
+    // 자동 로그아웃 실행
+    const performLogout = async () => {
+      setIsLoggingOut(true);
+      try {
+        await logout();
+        // 로그아웃 성공 후 잠시 대기 후 메인 페이지로 이동
+        setTimeout(() => {
+          navigate('/', { replace: true });
+        }, 2000);
+      } catch (error) {
+        console.error('로그아웃 실패:', error);
+        // 에러가 발생해도 메인 페이지로 이동
+        setTimeout(() => {
+          navigate('/', { replace: true });
+        }, 2000);
+      }
+    };
+
+    performLogout();
+  }, [logout, navigate, isLoggedIn]);
+
+  if (!isLoggedIn && !isLoggingOut) {
+    return null; // 이미 로그아웃된 상태
+  }
 
   return (
-    <div className='logout-container fade-out'>
-      <div className="logout-message">
-        <h2>로그아웃 중입니다...</h2>
-        <p>잠시만 기다려주세요.</p>
+    <div className="logout-page">
+      <div className="logout-container">
+        <div className="logout-content">
+          <div className="logout-icon">
+            <img src="/images/grandma-logo.png" alt="할머니 로고" className="logo-image" />
+          </div>
+          
+          {isLoggingOut ? (
+            <>
+              <h1 className="logout-title">로그아웃 중...</h1>
+              <p className="logout-message">
+                {user?.name ? `${user.name}님, ` : ''}안전하게 로그아웃하고 있습니다.
+              </p>
+              <div className="loading-spinner">
+                <div className="spinner"></div>
+              </div>
+            </>
+          ) : (
+            <>
+              <h1 className="logout-title">로그아웃 완료</h1>
+              <p className="logout-message">
+                {user?.name ? `${user.name}님, ` : ''}이용해 주셔서 감사합니다.
+              </p>
+              <p className="redirect-message">
+                메인 페이지로 이동합니다...
+              </p>
+            </>
+          )}
+        </div>
+
+        <div className="logout-actions">
+          <button 
+            className="home-button"
+            onClick={() => navigate('/')}
+            disabled={isLoggingOut}
+          >
+            메인 페이지로 이동
+          </button>
+        </div>
       </div>
     </div>
   );

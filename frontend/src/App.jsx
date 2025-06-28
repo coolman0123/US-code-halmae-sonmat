@@ -9,6 +9,12 @@ import {
 import Header from './components/Header';
 import Footer from './components/Footer';
 
+// Context Provider
+import { AuthProvider } from './contexts/AuthContext';
+
+// Components
+import ProtectedRoute from './components/ProtectedRoute';
+
 // Pages
 import MainPage from './pages/MainPage/MainPage';
 import Stories from './pages/Stories/Stories';
@@ -104,55 +110,159 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path='/' element={<MainPage />} />
-          <Route path='/stories' element={<Stories />} />
-          <Route path='/experiences' element={<Experience />} />
-          <Route path='/booking' element={<Booking />} />
-          <Route path='/live-reservation' element={<LiveReservation />}>
-            <Route index element={<Navigate to='my' replace />} />
-            <Route path='my' element={<MyReservation />} />
-            <Route path='book' element={<BookNow />} />
-          </Route>
-          <Route
-            path='/live-reservation/detail/:roomId'
-            element={<DetailBooking />}
-          />
-          <Route
-            path='/live-reservation/detail/:roomId/review'
-            element={<Review />}
-          />
-          <Route path='/live-reservation/payment' element={<Payment />} />
-          <Route path='/mypage' element={<MyPage />} />
-          <Route path='/mypage/payment' element={<MyPayment />} />
-          <Route path='/mypage/review/*' element={<MyReview />}>
-            <Route index element={<Navigate to='write' replace />} />
-            <Route path='write' element={<WriteReview />} />
-            <Route path='list' element={<ListReview />} />
-          </Route>
-          <Route path='/mypage/review/form/:id' element={<ReviewForm />} />
-          <Route path='/mypage/notification' element={<Notification />} />
+    <AuthProvider>
+      <Router>
+        <Layout>
+          <Routes>
+            {/* 공개 페이지 */}
+            <Route path='/' element={<MainPage />} />
+            <Route path='/stories' element={<Stories />} />
+            <Route path='/experiences' element={<Experience />} />
+            
+            {/* 인증 페이지 (로그인하지 않은 사용자만) */}
+            <Route 
+              path='/auth/login' 
+              element={
+                <ProtectedRoute requireAuth={false}>
+                  <Login />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path='/auth/signup' 
+              element={
+                <ProtectedRoute requireAuth={false}>
+                  <SignUp />
+                </ProtectedRoute>
+              } 
+            />
 
-          {/* Auth Routes */}
-          <Route path='/auth/login' element={<Login />} />
-          <Route path='/auth/signup' element={<SignUp />} />
-          <Route path='/auth/logout' element={<Logout />} />
+            {/* 호스트 로그인 (별도 처리) */}
+            <Route path="/host/login" element={<HostLogin />} />
 
-          {/* Host Routes */}
-          <Route path="/host/login" element={<HostLogin />} />
-          <Route path="/host" element={<HostRegister />} />
-          <Route path="/host/booking" element={<HostBooking />} />
-          <Route path="/host/booking/add" element={<AddReservation />} />
-          <Route path="/host/payment" element={<HostPayment />} />
-          <Route path="/host/payment/:date" element={<PaymentDetail />} />
-          <Route path="/host/register" element={<HostRegister />} />
-          <Route path="/host/register/new" element={<RegisterForm />} />
-          <Route path="/host/register/detail" element={<RegisterDetail />} />
-        </Routes>
-      </Layout>
-    </Router>
+            {/* 로그인이 필요한 사용자 페이지 */}
+            <Route 
+              path='/booking' 
+              element={
+                <ProtectedRoute>
+                  <Booking />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path='/live-reservation' 
+              element={
+                <ProtectedRoute>
+                  <LiveReservation />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Navigate to='my' replace />} />
+              <Route path='my' element={<MyReservation />} />
+              <Route path='book' element={<BookNow />} />
+            </Route>
+            
+            <Route
+              path='/live-reservation/detail/:roomId'
+              element={
+                <ProtectedRoute>
+                  <DetailBooking />
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path='/live-reservation/detail/:roomId/review'
+              element={
+                <ProtectedRoute>
+                  <Review />
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route 
+              path='/live-reservation/payment' 
+              element={
+                <ProtectedRoute>
+                  <Payment />
+                </ProtectedRoute>
+              } 
+            />
+
+            {/* 마이페이지 (로그인 필요) */}
+            <Route 
+              path='/mypage' 
+              element={
+                <ProtectedRoute>
+                  <MyPage />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path='/mypage/payment' 
+              element={
+                <ProtectedRoute>
+                  <MyPayment />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path='/mypage/review/*' 
+              element={
+                <ProtectedRoute>
+                  <MyReview />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Navigate to='write' replace />} />
+              <Route path='write' element={<WriteReview />} />
+              <Route path='list' element={<ListReview />} />
+            </Route>
+            
+            <Route 
+              path='/mypage/review/form/:id' 
+              element={
+                <ProtectedRoute>
+                  <ReviewForm />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path='/mypage/notification' 
+              element={
+                <ProtectedRoute>
+                  <Notification />
+                </ProtectedRoute>
+              } 
+            />
+
+            {/* 로그아웃 페이지 */}
+            <Route 
+              path='/auth/logout' 
+              element={
+                <ProtectedRoute>
+                  <Logout />
+                </ProtectedRoute>
+              } 
+            />
+
+            {/* 호스트 페이지 (별도 인증 처리) */}
+            <Route path="/host" element={<HostRegister />} />
+            <Route path="/host/booking" element={<HostBooking />} />
+            <Route path="/host/booking/add" element={<AddReservation />} />
+            <Route path="/host/payment" element={<HostPayment />} />
+            <Route path="/host/payment/:date" element={<PaymentDetail />} />
+            <Route path="/host/register" element={<HostRegister />} />
+            <Route path="/host/register/new" element={<RegisterForm />} />
+            <Route path="/host/register/detail" element={<RegisterDetail />} />
+          </Routes>
+        </Layout>
+      </Router>
+    </AuthProvider>
   );
 }
 
