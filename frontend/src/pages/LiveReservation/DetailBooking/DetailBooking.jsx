@@ -194,17 +194,25 @@ const DetailBooking = () => {
       <div className="review-section">
         <div className="review-header">
           <span className="rating">⭐ 4.8 (4,309)</span>
-          <span className="review-link">전체보기 {`>`}</span>
+          <span 
+            className="review-link" 
+            onClick={() => navigate(`/live-reservation/review/${roomId}`)}
+            style={{ cursor: 'pointer' }}
+          >
+            전체보기 {`>`}
+          </span>
         </div>
-        <div className="review-stars">⭐⭐⭐⭐⭐</div>
+        
         <div className="review-content">
           <div className="review-item">
-            <span className="review-date">2023.05.15</span>
-            <p>방이 깨끗하고 친절한 할머니께서 좋았어요</p>
+            <div className="review-stars">⭐⭐⭐⭐⭐</div>
+            <div className="review-date">2023.05.15</div>
+            <div className="review-text">방이 깨끗하고 친절한 할머니께서 좋았어요</div>
           </div>
           <div className="review-item">
-            <span className="review-date">⭐⭐⭐⭐⭐</span>
-            <p>편안한 휴식</p>
+            <div className="review-stars">⭐⭐⭐⭐⭐</div>
+            <div className="review-date">2023.04.28</div>
+            <div className="review-text">방이랑 화장실이 깨끗하고 할머니가 친절하셔서 좋았어요</div>
           </div>
         </div>
       </div>
