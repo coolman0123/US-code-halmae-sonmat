@@ -1,4 +1,4 @@
-//Experience.css
+/*Experience.css*/
 
 .experience-page {
   position: relative;
@@ -7,11 +7,50 @@
 }
 
 .experience-carousel {
-  width: 100%;
+  width: 90vw;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+  overflow: visible;
 }
 
-.experience-slide {
-  width: 260px; /* 카드 크기 줄여서 양옆 보이게 */
+.swiper-wrapper {
+  overflow: visible !important;
+}
+
+.swiper-slide {
+  width: 540px !important;
+  min-height: 440px;
+  margin-right: 20px;
+  margin-left: 20px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), z-index 0.3s;
+  opacity: 0.5;
+  filter: blur(1px);
+  overflow: visible;
+}
+
+.swiper-slide-active {
+  transform: scale(1.18) !important;
+  z-index: 2;
+  opacity: 1;
+  filter: none;
+}
+
+.swiper-slide-next,
+.swiper-slide-prev {
+  transform: scale(0.85) !important;
+  z-index: 1;
+  opacity: 0.8;
+  filter: blur(0.5px);
+}
+
+.swiper-slide {
+  pointer-events: none;
+}
+.swiper-slide-active,
+.swiper-slide-next,
+.swiper-slide-prev {
+  pointer-events: auto;
 }
 
 .experience-card {
@@ -21,6 +60,11 @@
   overflow: hidden;
   transition: transform 0.3s ease;
   cursor: pointer;
+  min-height: 440px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-bottom: 32px;
 }
 
 .experience-card:hover {
@@ -29,7 +73,7 @@
 
 .card-image {
   width: 100%;
-  height: 180px;
+  height: 340px; /* 이미지 높이 더 크게 */
   overflow: hidden;
 }
 
@@ -45,7 +89,7 @@
 }
 
 .card-content {
-  padding: 16px;
+  padding: 24px 16px 0 16px;
   text-align: center;
 }
 
@@ -94,4 +138,29 @@
   right: 10px;
 }
 
-
+.page-shadow-wrapper {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+}
+.side-shadow {
+  position: absolute;
+  top: 0;
+  width: 180px;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+.side-shadow.left {
+  left: 0;
+  background: linear-gradient(to right, #fff 85%, transparent 100%);
+}
+.side-shadow.right {
+  right: 0;
+  background: linear-gradient(to left, #fff 85%, transparent 100%);
+}
+.main-content {
+  position: relative;
+  z-index: 3;
+}
