@@ -192,9 +192,17 @@ class HostController {
         });
       }
 
-
+      // API 키 검증
+      if (!process.env.GOOGLE_MAPS_API_KEY) {
+        console.error('❌ GOOGLE_MAPS_API_KEY가 설정되지 않음');
+        return res.status(500).json({
+          success: false,
+          message: 'Google Maps API 키가 설정되지 않았습니다.'
+        });
+      }
       
-      console.log('지오코딩 요청:', address);
+      console.log('🔍 지오코딩 요청:', address);
+      console.log('🔑 API 키 상태: 설정됨');
       
       // Google Geocoding API 호출
       const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
@@ -204,12 +212,14 @@ class HostController {
           language: 'ko',
           region: 'KR',
           components: 'country:KR'
-        }
+        },
+        timeout: 10000 // 10초 타임아웃
       });
 
       const { data } = response;
       
-      console.log('🔍 Google API 응답:', data.status, data.results?.length);
+      console.log('📍 Google API 응답 상태:', data.status);
+      console.log('📍 결과 개수:', data.results?.length || 0);
       
       if (data.status === 'OK' && data.results && data.results.length > 0) {
         const result = data.results[0];
@@ -223,7 +233,12 @@ class HostController {
           placeId: result.place_id
         };
 
-        console.log(' 지오코딩 성공:', geocodingResult);
+        console.log('✅ 지오코딩 성공:', {
+          input: address,
+          formatted: result.formatted_address,
+          lat: location.lat,
+          lng: location.lng
+        });
         
         res.json({
           success: true,
@@ -231,39 +246,72 @@ class HostController {
         });
       } else {
         let errorMessage = '주소를 찾을 수 없습니다.';
+        let statusCode = 400;
         
         switch (data.status) {
           case 'ZERO_RESULTS':
             errorMessage = '검색 결과가 없습니다. 다른 주소로 시도해보세요.';
+            statusCode = 404;
             break;
           case 'OVER_QUERY_LIMIT':
-            errorMessage = 'API 사용량 한도를 초과했습니다.';
+            errorMessage = 'API 사용량 한도를 초과했습니다. 잠시 후 다시 시도해주세요.';
+            statusCode = 429;
             break;
           case 'REQUEST_DENIED':
-            errorMessage = 'API 요청이 거부되었습니다.';
+            errorMessage = 'API 요청이 거부되었습니다. API 키를 확인해주세요.';
+            statusCode = 403;
             break;
           case 'INVALID_REQUEST':
-            errorMessage = '잘못된 요청입니다.';
+            errorMessage = '잘못된 요청입니다. 주소 형식을 확인해주세요.';
+            statusCode = 400;
             break;
           case 'UNKNOWN_ERROR':
-            errorMessage = '서버 오류가 발생했습니다.';
+            errorMessage = '서버 일시적 오류입니다. 잠시 후 다시 시도해주세요.';
+            statusCode = 500;
             break;
+          default:
+            errorMessage = `알 수 없는 오류가 발생했습니다. (${data.status})`;
+            statusCode = 500;
         }
         
-        console.log('❌ 지오코딩 실패:', data.status, errorMessage);
+        console.log('❌ 지오코딩 실패:', {
+          status: data.status,
+          message: errorMessage,
+          input: address
+        });
         
-        res.status(400).json({
+        res.status(statusCode).json({
           success: false,
           message: errorMessage,
-          status: data.status
+          status: data.status,
+          input: address
         });
       }
     } catch (error) {
-      console.error('❌ 지오코딩 API 오류:', error.message);
+      console.error('❌ 지오코딩 API 네트워크 오류:', {
+        message: error.message,
+        code: error.code,
+        response: error.response?.status,
+        data: error.response?.data
+      });
+      
+      // 네트워크 오류에 따른 사용자 친화적 메시지
+      let userMessage = '지오코딩 요청 처리 중 오류가 발생했습니다.';
+      
+      if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+        userMessage = '네트워크 연결을 확인해주세요.';
+      } else if (error.code === 'ETIMEDOUT') {
+        userMessage = '요청 시간이 초과되었습니다. 다시 시도해주세요.';
+      } else if (error.response?.status === 403) {
+        userMessage = 'API 키가 유효하지 않습니다.';
+      } else if (error.response?.status >= 500) {
+        userMessage = 'Google 서버에 일시적 문제가 있습니다. 잠시 후 다시 시도해주세요.';
+      }
+      
       res.status(500).json({
         success: false,
-        message: '지오코딩 요청 처리 중 오류가 발생했습니다.',
-        error: error.message
+        message: userMessage,
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   }

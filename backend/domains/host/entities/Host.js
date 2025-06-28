@@ -65,9 +65,9 @@ class Host {
     if (!this.address || !this.address.zipCode || !this.address.detailAddress) {
       throw new Error('주소 정보(우편번호, 상세주소)는 필수입니다.');
     }
-    if (!this.latitude || !this.longitude) {
-      throw new Error('위도, 경도 정보는 필수입니다.');
-    }
+    //if (!this.latitude || !this.longitude) {
+    //  throw new Error('위도, 경도 정보는 필수입니다.');
+    //}
     if (!this.contact || !this.contact.phone) throw new Error('연락처는 필수입니다.');
     if (!this.houseNickname) throw new Error('HOST 집 닉네임은 필수입니다.');
     if (!this.maxGuests || this.maxGuests <= 0) throw new Error('숙박가능인원은 1명 이상이어야 합니다.');

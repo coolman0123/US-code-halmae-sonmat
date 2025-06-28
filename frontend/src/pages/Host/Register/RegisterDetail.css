@@ -195,11 +195,21 @@
   width: 100%;
   height: 100%;
   position: relative;
+  min-height: 350px;
 }
 
-#map {
-  width: 100%;
-  height: 100%;
+.map-loaded > div {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 350px !important;
+}
+
+/* 지도 컨테이너 내부 요소 (Kakao Map이 생성될 영역) */
+#map,
+.map-container div[style*="height"] {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 350px !important;
 }
 
 .map-info {
