@@ -49,9 +49,9 @@ const Login = () => {
       return;
     }
 
-    // 입력 유효성 검사
-    if (!formData.email || !formData.password) {
-      setError('이메일과 비밀번호를 모두 입력해주세요.');
+    // 입력 유효성 검사 (이메일만 필수)
+    if (!formData.email) {
+      setError('이메일을 입력해주세요.');
       return;
     }
 
@@ -140,10 +140,9 @@ const Login = () => {
             <input
               type="password"
               name="password"
-              placeholder="비밀번호 입력"
+              placeholder="비밀번호 입력 (선택사항)"
               value={formData.password}
               onChange={handleInputChange}
-              required
               disabled={isLoading}
             />
           </div>

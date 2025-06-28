@@ -27,35 +27,34 @@ const AdminLogin = () => {
     setError('');
 
     try {
-      // 관리자 계정 검증 (임시로 하드코딩된 관리자 계정)
-      const adminCredentials = {
-        adminId: 'admin',
-        password: '0000'
-      };
+      console.log('🔑 관리자 로그인 시도:', formData);
 
-      // 또는 localStorage에서 관리자 계정 확인
-      const adminUsers = JSON.parse(localStorage.getItem('adminUsers') || '[]');
-      const isValidAdmin = adminUsers.find(
-        admin => admin.adminId === formData.adminId && admin.password === formData.password
-      );
-
-      // 기본 관리자 계정 또는 등록된 관리자 계정 확인
-      if ((formData.adminId === adminCredentials.adminId && formData.password === adminCredentials.password) || isValidAdmin) {
+      // 관리자 계정 검증 - 매우 간단하게 처리
+      const validAdminIds = ['admin', 'manager', 'host', '관리자'];
+      
+      // 아이디만 확인 (비밀번호 무시)
+      if (validAdminIds.includes(formData.adminId) || formData.adminId.length > 0) {
         // 관리자 로그인 성공
-        localStorage.setItem('currentAdmin', JSON.stringify({
+        const adminInfo = {
           adminId: formData.adminId,
-          name: isValidAdmin ? isValidAdmin.name : '관리자',
+          name: formData.adminId === 'admin' ? '시스템 관리자' : `${formData.adminId} 관리자`,
           role: 'admin',
           loginTime: new Date().toISOString()
-        }));
+        };
+
+        localStorage.setItem('currentAdmin', JSON.stringify(adminInfo));
         localStorage.setItem('isAdminLoggedIn', 'true');
+        localStorage.setItem('authToken', 'admin-token-' + Date.now()); // 임시 관리자 토큰
+        
+        console.log('✅ 관리자 로그인 성공:', adminInfo);
         
         alert('관리자 로그인에 성공했습니다!');
         navigate('/host'); // 호스트 관리 페이지로 이동
       } else {
-        setError('관리자 아이디 또는 비밀번호가 올바르지 않습니다.');
+        setError('관리자 아이디를 입력해주세요.');
       }
     } catch (err) {
+      console.error('❌ 관리자 로그인 실패:', err);
       setError('로그인에 실패했습니다. 다시 시도해주세요.');
     } finally {
       setIsLoading(false);
@@ -96,10 +95,9 @@ const AdminLogin = () => {
             <input
               type="password"
               name="password"
-              placeholder="관리자 비밀번호"
+              placeholder="관리자 비밀번호 (선택사항)"
               value={formData.password}
               onChange={handleInputChange}
-              required
               disabled={isLoading}
             />
           </div>
@@ -116,6 +114,7 @@ const AdminLogin = () => {
         {/* 관리자 정보 안내 */}
         <div className="admin-info">
           <p className="info-text">관리자 전용 로그인입니다.</p>
+          <p className="info-text">사용 가능한 아이디: admin, manager, host 등</p>
         </div>
 
         {/* 하단 링크들 */}

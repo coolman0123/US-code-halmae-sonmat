@@ -18,16 +18,21 @@ class AuthController {
         });
       }
 
+      console.log('🔄 AuthService.register 호출 중...');
       const user = await this.authService.register({ email, password, name, phone });
 
-      console.log('✅ 회원가입 API 성공:', { userId: user.id, email: user.email });
+      // 간단한 토큰 생성 (회원가입 후 자동 로그인)
+      const token = Buffer.from(`${user.id}:${user.email}:${Date.now()}`).toString('base64');
+
+      console.log('✅ 회원가입 API 성공:', { userId: user.id, email: user.email, token: token.substring(0, 20) + '...' });
       res.status(201).json({
         success: true,
         message: '회원가입이 완료되었습니다.',
-        data: user
+        data: user,
+        token: token // 자동 로그인을 위한 토큰 제공
       });
     } catch (error) {
-      console.log('❌ 회원가입 API 에러:', error.message);
+      console.log('❌ 회원가입 API 에러:', error.message, error.stack);
       res.status(400).json({
         success: false,
         message: error.message
@@ -40,15 +45,16 @@ class AuthController {
       console.log('🚀 로그인 API 호출:', req.body);
       const { email, password } = req.body;
 
-      if (!email || !password) {
-        console.log('❌ 이메일 또는 비밀번호 누락');
+      if (!email) {
+        console.log('❌ 이메일 누락');
         return res.status(400).json({
           success: false,
-          message: '이메일과 비밀번호를 입력해주세요.'
+          message: '이메일을 입력해주세요.'
         });
       }
 
-      const user = await this.authService.login(email, password);
+      // 비밀번호는 선택사항으로 처리
+      const user = await this.authService.login(email, password || '');
 
       // 간단한 토큰 생성 (보안 무시, 단순 구현)
       const token = Buffer.from(`${user.id}:${user.email}:${Date.now()}`).toString('base64');
@@ -62,7 +68,7 @@ class AuthController {
       });
     } catch (error) {
       console.log('❌ 로그인 API 에러:', error.message);
-      res.status(401).json({
+      res.status(400).json({
         success: false,
         message: error.message
       });
