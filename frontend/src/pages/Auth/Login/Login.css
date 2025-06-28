@@ -75,7 +75,7 @@
 
 .input-group input:focus {
   outline: none;
-  border-color: #8B7355;
+  border-color: #8b7355;
   background-color: white;
   box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
 }
@@ -137,10 +137,12 @@
   color: #666;
   text-decoration: none;
   transition: color 0.3s ease;
+  white-space: nowrap;
+  display: inline-block;
 }
 
 .login-links .link:hover {
-  color: #8B7355;
+  color: #8b7355;
   text-decoration: underline;
 }
 
@@ -162,7 +164,7 @@
 }
 
 .admin-login-button:hover {
-  color: #8B7355;
+  color: #8b7355;
   text-decoration: underline;
 }
 
@@ -199,25 +201,25 @@
   .login-page {
     padding: 10px;
   }
-  
+
   .login-container {
     max-width: 100%;
   }
-  
+
   .login-title {
     font-size: 24px;
   }
-  
+
   .grandma-logo {
     width: 80px;
     height: 80px;
   }
-  
+
   .input-group input {
     padding: 12px 15px;
     font-size: 15px;
   }
-  
+
   .login-button {
     padding: 12px;
     font-size: 15px;
