@@ -159,6 +159,18 @@ const BookNow = () => {
     if (selectedRoom) {
       const dummyRooms = getDummyRooms(hostData);
       const roomInfo = dummyRooms.find((room) => room.name === selectedRoom);
+      
+      // 선택한 예약 정보를 localStorage에 저장
+      const bookingData = {
+        room: roomInfo,
+        guests: guests,
+        dates: selectedDates,
+        totalPrice: totalPrice,
+        hostData: hostData
+      };
+      
+      localStorage.setItem('currentBookingData', JSON.stringify(bookingData));
+      
       navigate(`/live-reservation/detail/${roomInfo.id}`);
     }
   };

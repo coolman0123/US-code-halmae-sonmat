@@ -25,9 +25,11 @@ import ReviewForm from "./pages/MyPage/MyReview/ReviewForm/ReviewForm";
 import Notification from "./pages/MyPage/Notification/Notification";
 
 // Auth Pages
-import Login from "./pages/Auth/Login/Login";
-import SignUp from "./pages/Auth/SignUp/SignUp";
-import Logout from "./pages/Auth/Logout/Logout";
+import Login from './pages/Auth/Login/Login';
+import AdminLogin from './pages/Auth/AdminLogin/AdminLogin';
+import SignUp from './pages/Auth/SignUp/SignUp';
+import Logout from './pages/Auth/Logout/Logout';
+
 
 // Host Pages
 import HostHeader from "./components/HostHeader/HostHeader";
@@ -55,9 +57,12 @@ const Layout = ({ children }) => {
 
   // 인증 페이지에서는 Header, Footer 숨기기
   const hideHeaderFooter = [
-    "/auth/login",
-    "/auth/signup",
-    "/host/login",
+
+    '/auth/login',
+    '/auth/admin-login',
+    '/auth/signup',
+    '/host/login',
+
   ].includes(location.pathname);
 
   // 마이페이지 경로에서는 Footer 숨기기
@@ -139,9 +144,11 @@ function App() {
           <Route path="/mypage/notification" element={<Notification />} />
 
           {/* Auth Routes */}
-          <Route path="/auth/login" element={<Login />} />
-          <Route path="/auth/signup" element={<SignUp />} />
-          <Route path="/auth/logout" element={<Logout />} />
+          <Route path='/auth/login' element={<Login />} />
+          <Route path='/auth/admin-login' element={<AdminLogin />} />
+          <Route path='/auth/signup' element={<SignUp />} />
+          <Route path='/auth/logout' element={<Logout />} />
+
 
           {/* Host Routes */}
           <Route path="/host/login" element={<HostLogin />} />

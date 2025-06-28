@@ -133,7 +133,7 @@ const Login = () => {
         <div className="login-links">
           <Link to="/auth/signup" className="link">회원가입</Link>
           <span className="divider">|</span>
-          <button className="admin-login-button" onClick={() => navigate('/host')}>
+          <button className="admin-login-button" onClick={() => navigate('/auth/admin-login')}>
             관리자 로그인
           </button>
         </div>

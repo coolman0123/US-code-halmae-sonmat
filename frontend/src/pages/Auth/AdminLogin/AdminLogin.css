@@ -1,0 +1,233 @@
+.admin-login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.admin-login-container {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+  position: relative;
+}
+
+.admin-login-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #3498db, #2c3e50);
+  border-radius: 15px 15px 0 0;
+}
+
+.admin-login-header {
+  margin-bottom: 30px;
+}
+
+.header-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.grandma-logo {
+  margin-bottom: 15px;
+}
+
+.logo-image {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+.admin-login-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 15px 0 10px 0;
+  letter-spacing: -0.5px;
+}
+
+.admin-subtitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #3498db;
+  margin: 0;
+  padding: 10px 20px;
+  background: rgba(52, 152, 219, 0.1);
+  border-radius: 25px;
+  display: inline-block;
+}
+
+.admin-login-form {
+  margin-bottom: 25px;
+}
+
+.input-group {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 15px 20px;
+  border: 2px solid #e1e8ed;
+  border-radius: 10px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  background: #f8f9fa;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #3498db;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.input-group input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.admin-login-button {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #3498db, #2c3e50);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.admin-login-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+}
+
+.admin-login-button:active {
+  transform: translateY(0);
+}
+
+.admin-login-button:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.error-message {
+  background: #e74c3c;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.admin-info {
+  background: rgba(52, 152, 219, 0.05);
+  border: 1px solid rgba(52, 152, 219, 0.2);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 25px;
+}
+
+.info-text {
+  color: #2c3e50;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.demo-info {
+  color: #7f8c8d;
+  font-size: 12px;
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.admin-login-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.admin-login-links .link {
+  color: #3498db;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.admin-login-links .link:hover {
+  color: #2c3e50;
+  text-decoration: underline;
+}
+
+.divider {
+  color: #bdc3c7;
+  font-weight: 300;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 480px) {
+  .admin-login-container {
+    padding: 30px 25px;
+    margin: 10px;
+  }
+  
+  .admin-login-title {
+    font-size: 24px;
+  }
+  
+  .admin-subtitle {
+    font-size: 16px;
+    padding: 8px 16px;
+  }
+  
+  .logo-image {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .input-group input {
+    padding: 12px 16px;
+    font-size: 15px;
+  }
+  
+  .admin-login-button {
+    padding: 12px;
+    font-size: 15px;
+  }
+} 
