@@ -21,8 +21,91 @@ const HostBooking = () => {
     // 저장된 예약 데이터를 날짜별로 처리 (입실 날짜만 표시)
     savedReservations.forEach(reservation => {
       const startDate = new Date(reservation.startDate);
-
+      const year = startDate.getFullYear();
+      const month = startDate.getMonth() + 1;
+      const day = startDate.getDate();
+      const dateKey = `${year}-${month}-${day}`;
       
+      if (!data[dateKey]) {
+        data[dateKey] = [];
+      }
+      
+      // 해당 숙소의 가격 정보 찾기
+      let housePrice = null;
+      if (reservation.totalPrice) {
+        // 예약 데이터에 가격이 있으면 사용
+        housePrice = reservation.totalPrice;
+      } else {
+        // 할매 정보에서 가격 찾기
+        const hostInfo = hostsList.find(host => host.houseName === reservation.houseName);
+        if (hostInfo && hostInfo.price) {
+          housePrice = parseInt(hostInfo.price);
+        }
+      }
+      
+      data[dateKey].push({
+        status: reservation.status, // 'available' 또는 'unavailable'
+        houseName: reservation.houseName,
+        displayText: reservation.status === 'available' ? '가' : '완',
+        price: housePrice // 가격 정보 추가
+      });
+    });
+    
+    // 기본 임시 데이터 (저장된 데이터가 없을 때)
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    if (savedReservations.length === 0 && year === 2025 && month === 5) {
+      // 할매 정보에서 가격 가져오기 (기본 데이터용)
+      const defaultPrice = hostsList.length > 0 && hostsList[0].price ? parseInt(hostsList[0].price) : 340000;
+      
+      // 예약 불가능한 날짜들 (빨강색 - '완')
+      const unavailableDays = [2, 3, 7, 8, 9, 15, 16, 22, 23, 29, 30];
+      unavailableDays.forEach(day => {
+        const dateKey = `${year}-${month + 1}-${day}`;
+        if (!data[dateKey]) {
+          data[dateKey] = [];
+        }
+        data[dateKey].push({
+          status: 'unavailable',
+          houseName: '여여',
+          displayText: '완',
+          price: defaultPrice
+        });
+      });
+
+      // 예약 가능한 날짜들 (녹색 - '가')
+      const availableDays = [1, 4, 5, 6, 10, 11, 12, 13, 14, 17, 18, 19, 20, 21, 25, 26, 27, 28];
+      availableDays.forEach(day => {
+        const dateKey = `${year}-${month + 1}-${day}`;
+        if (!data[dateKey]) {
+          data[dateKey] = [];
+        }
+        data[dateKey].push({
+          status: 'available',
+          houseName: '여여',
+          displayText: '가',
+          price: defaultPrice
+        });
+      });
+
+      // 24일에 여러 숙소 예시 추가
+      const day24Key = `${year}-${month + 1}-24`;
+      data[day24Key] = [
+        { status: 'available', houseName: '여여', displayText: '가', price: defaultPrice },
+        { status: 'unavailable', houseName: '모모', displayText: '완', price: 280000 },
+        { status: 'available', houseName: '소소', displayText: '가', price: 280000 },
+        { status: 'unavailable', houseName: '영영', displayText: '완', price: 300000 },
+        { status: 'unavailable', houseName: '패밀리', displayText: '완', price: 400000 }
+      ];
+    }
+    
+    return data;
+  };
+
+  // 백엔드에서 예약 데이터 조회하는 함수 (별도 분리)
+  const fetchBookingDataFromAPI = async () => {
+    try {
       const response = await fetch('https://us-code-halmae-sonmat.onrender.com/api/trips', {
         method: 'GET',
         headers: {
@@ -73,81 +156,22 @@ const HostBooking = () => {
         });
       }
 
-      // 백엔드 데이터가 없거나 적을 때 기본 임시 데이터 추가
-      const year = currentDate.getFullYear();
-      const month = currentDate.getMonth();
+      // 백엔드 데이터와 localStorage 데이터를 합치기
+      const localData = generateBookingData();
       
-
-      // 해당 숙소의 가격 정보 찾기
-      let housePrice = null;
-      if (reservation.totalPrice) {
-        // 예약 데이터에 가격이 있으면 사용
-        housePrice = reservation.totalPrice;
-      } else {
-        // 할매 정보에서 가격 찾기
-        const hostInfo = hostsList.find(host => host.houseName === reservation.houseName);
-        if (hostInfo && hostInfo.price) {
-          housePrice = parseInt(hostInfo.price);
+      // 두 데이터를 병합
+      Object.keys(localData).forEach(dateKey => {
+        if (!data[dateKey]) {
+          data[dateKey] = [];
         }
-      }
-      
-      data[dateKey].push({
-        status: reservation.status, // 'available' 또는 'unavailable'
-        houseName: reservation.houseName,
-        displayText: reservation.status === 'available' ? '가' : '완',
-        price: housePrice // 가격 정보 추가
+        data[dateKey] = [...data[dateKey], ...localData[dateKey]];
       });
-    });
-    
-    // 기본 임시 데이터 (저장된 데이터가 없을 때)
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    
-    if (savedReservations.length === 0 && year === 2025 && month === 5) {
-      // 할매 정보에서 가격 가져오기 (기본 데이터용)
-      const defaultPrice = hostsList.length > 0 && hostsList[0].price ? parseInt(hostsList[0].price) : 340000;
-      
-      // 예약 불가능한 날짜들 (빨강색 - '완')
-      const unavailableDays = [2, 3, 7, 8, 9, 15, 16, 22, 23, 29, 30];
-      unavailableDays.forEach(day => {
-        const dateKey = `${year}-${month + 1}-${day}`;
-        if (!data[dateKey]) {
-          data[dateKey] = [];
-        }
-        data[dateKey].push({
-          status: 'unavailable',
-          houseName: '여여',
-          displayText: '완',
-          price: defaultPrice
 
-        });
-
-
-      // 예약 가능한 날짜들 (녹색 - '가')
-      const availableDays = [1, 4, 5, 6, 10, 11, 12, 13, 14, 17, 18, 19, 20, 21, 25, 26, 27, 28];
-      availableDays.forEach(day => {
-        const dateKey = `${year}-${month + 1}-${day}`;
-        if (!data[dateKey]) {
-          data[dateKey] = [];
-        }
-        data[dateKey].push({
-          status: 'available',
-          houseName: '여여',
-          displayText: '가',
-          price: defaultPrice
-
-        });
-
-      // 24일에 여러 숙소 예시 추가
-      const day24Key = `${year}-${month + 1}-24`;
-      data[day24Key] = [
-        { status: 'available', houseName: '여여', displayText: '가', price: defaultPrice },
-        { status: 'unavailable', houseName: '모모', displayText: '완', price: 280000 },
-        { status: 'available', houseName: '소소', displayText: '가', price: 280000 },
-        { status: 'unavailable', houseName: '영영', displayText: '완', price: 300000 },
-        { status: 'unavailable', houseName: '패밀리', displayText: '완', price: 400000 }
-      ];
-
+      return data;
+    } catch (error) {
+      console.error('백엔드 데이터 조회 실패:', error);
+      // 백엔드 실패 시 localStorage 데이터만 사용
+      return generateBookingData();
     }
   };
 
