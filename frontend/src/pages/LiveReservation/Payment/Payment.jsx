@@ -32,6 +32,9 @@ const Payment = () => {
     name: '여여',
     price: 340000
   });
+  const [tripData, setTripData] = useState(null);
+  const [realHostData, setRealHostData] = useState(null);
+  const [loading, setLoading] = useState(true);
   
   const [guestInfo, setGuestInfo] = useState({
     name: '',
@@ -51,43 +54,83 @@ const Payment = () => {
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [currentTerms, setCurrentTerms] = useState('');
 
+  // 실제 여행 데이터 가져오기
+  const fetchTripAndHostData = async () => {
+    try {
+      setLoading(true);
+      console.log('Payment 페이지에서 데이터 로딩 시작');
+
+      // 현재 예약 정보 불러오기
+      const savedBookingData = localStorage.getItem('currentBookingData');
+      if (!savedBookingData) {
+        console.error('예약 데이터가 없습니다');
+        setLoading(false);
+        return;
+      }
+
+      const parsedBookingData = JSON.parse(savedBookingData);
+      console.log('Payment 저장된 예약 데이터:', parsedBookingData);
+      setBookingData(parsedBookingData);
+
+      if (parsedBookingData.room && parsedBookingData.room.tripId) {
+        // 실제 Trip 데이터 조회
+        const tripResponse = await fetch(
+          `https://us-code-halmae-sonmat.onrender.com/api/trips/${parsedBookingData.room.tripId}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        if (tripResponse.ok) {
+          const tripResult = await tripResponse.json();
+          console.log('Payment 실제 Trip 데이터:', tripResult);
+          
+          if (tripResult.success && tripResult.data) {
+            setTripData(tripResult.data);
+
+            // 호스트 데이터도 가져오기
+            const hostResponse = await fetch(
+              `https://us-code-halmae-sonmat.onrender.com/api/hosts/${tripResult.data.hostId}`,
+              {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              }
+            );
+
+            if (hostResponse.ok) {
+              const hostResult = await hostResponse.json();
+              console.log('Payment 실제 Host 데이터:', hostResult);
+              
+              if (hostResult.success && hostResult.data) {
+                setRealHostData(hostResult.data);
+              }
+            }
+          }
+        }
+      }
+
+      // 기존 fallback 데이터들도 유지
+      if (parsedBookingData.room) {
+        setSelectedRoom(parsedBookingData.room);
+      }
+      if (parsedBookingData.hostData) {
+        setHostData(prev => ({ ...prev, ...parsedBookingData.hostData }));
+      }
+
+    } catch (error) {
+      console.error('Payment 데이터 로딩 오류:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // 현재 예약 정보 불러오기
-    const savedBookingData = localStorage.getItem('currentBookingData');
-    if (savedBookingData) {
-      try {
-        const parsedBookingData = JSON.parse(savedBookingData);
-        setBookingData(parsedBookingData);
-        if (parsedBookingData.room) {
-          setSelectedRoom(parsedBookingData.room);
-        }
-        if (parsedBookingData.hostData) {
-          setHostData(prev => ({ ...prev, ...parsedBookingData.hostData }));
-        }
-      } catch (error) {
-        console.error('예약 데이터 파싱 오류:', error);
-      }
-    }
-
-    // Host Register Detail에서 저장된 데이터 가져오기
-    const hostsList = JSON.parse(localStorage.getItem('hostsList') || '[]');
-    if (hostsList.length > 0) {
-      const latestHost = hostsList[hostsList.length - 1];
-      setHostData(prev => ({ ...prev, ...latestHost }));
-    }
-
-    // Host Register New에서 저장된 기본 정보 가져오기
-    const savedData = localStorage.getItem('hostRegisterData');
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        if (parsedData.basicInfo) {
-          setBasicInfo(prev => ({ ...prev, ...parsedData.basicInfo }));
-        }
-      } catch (error) {
-        console.error('호스트 등록 데이터 파싱 오류:', error);
-      }
-    }
+    fetchTripAndHostData();
   }, []);
 
   const handleInputChange = (e) => {
@@ -117,20 +160,144 @@ const Payment = () => {
     }
   };
 
-  const handlePayment = () => {
-    // 결제 완료 후 예약 상태 업데이트
-    if (bookingData) {
-      // 기존 예약 데이터 가져오기
-      const existingReservations = JSON.parse(localStorage.getItem('reservations') || '[]');
+  const handlePayment = async () => {
+    try {
+      // 입력 필드 유효성 검사
+      if (!guestInfo.name || !guestInfo.phone || !guestInfo.email) {
+        alert('예약자 정보를 모두 입력해주세요.');
+        return;
+      }
+
+      if (!agreeTerms.booking || !agreeTerms.privacy || !agreeTerms.thirdParty) {
+        alert('필수 약관에 동의해주세요.');
+        return;
+      }
+
+      if (!bookingData || !bookingData.room) {
+        alert('예약 정보가 없습니다. 다시 시도해주세요.');
+        return;
+      }
+
+      // 로그인한 사용자 정보 가져오기 또는 테스트 사용자 생성
+      let currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
       
-      // 새 예약 데이터 생성 (결제 완료된 예약)
+      if (!currentUser.id) {
+        // 테스트용 사용자 자동 생성
+        const testUser = {
+          id: `test-user-${Date.now()}`,
+          name: guestInfo.name || '테스트 사용자',
+          email: guestInfo.email || 'test@example.com',
+          phone: guestInfo.phone || '010-1234-5678',
+          userType: 'guest',
+          createdAt: new Date().toISOString()
+        };
+        
+        localStorage.setItem('currentUser', JSON.stringify(testUser));
+        currentUser = testUser;
+        
+        console.log('테스트 사용자 생성:', testUser);
+      }
+
+      // 실제 Trip과 Host 데이터 검증
+      if (!tripData || !realHostData) {
+        alert('여행 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+        return;
+      }
+
+      // 1단계: 결제 정보 생성 (실제 데이터 사용)
+      const paymentData = {
+        userId: currentUser.id,
+        tripId: tripData.id,
+        hostId: realHostData.id,
+        guestInfo: {
+          name: guestInfo.name,
+          phone: guestInfo.phone,
+          email: guestInfo.email,
+          guestCount: getTotalGuests()
+        },
+        bookingDetails: {
+          tripTitle: getTripTitle(),
+          tripDescription: getTripDescription(),
+          hostName: getHostName(),
+          hostPhone: getHostPhone(),
+          location: getLocationInfo(),
+          dates: {
+            checkIn: bookingData.dates.checkIn,
+            checkOut: bookingData.dates.checkOut,
+            tripStartDate: tripData.startDate,
+            tripEndDate: tripData.endDate
+          },
+          room: {
+            ...bookingData.room,
+            actualTripId: tripData.id,
+            actualHostId: realHostData.id
+          },
+          guests: bookingData.guests
+        },
+        amount: getRoomPrice(),
+        paymentMethod: paymentMethod,
+        additionalInfo: {
+          hostIntroduction: getHostIntroduction(),
+          tripIncludes: tripData.included || [],
+          tripExcludes: tripData.excluded || [],
+          maxParticipants: tripData.maxParticipants,
+          currentParticipants: tripData.currentParticipants
+        }
+      };
+
+      console.log('결제 데이터 생성:', paymentData);
+
+      const createResponse = await fetch('https://us-code-halmae-sonmat.onrender.com/api/payments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(paymentData)
+      });
+
+      if (!createResponse.ok) {
+        throw new Error('결제 정보 생성에 실패했습니다.');
+      }
+
+      const createResult = await createResponse.json();
+      console.log('결제 생성 결과:', createResult);
+
+      if (!createResult.success) {
+        throw new Error(createResult.message || '결제 정보 생성에 실패했습니다.');
+      }
+
+      // 2단계: 결제 처리
+      const processResponse = await fetch(
+        `https://us-code-halmae-sonmat.onrender.com/api/payments/${createResult.data.id}/process`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      if (!processResponse.ok) {
+        throw new Error('결제 처리에 실패했습니다.');
+      }
+
+      const processResult = await processResponse.json();
+      console.log('결제 처리 결과:', processResult);
+
+      if (!processResult.success) {
+        throw new Error(processResult.message || '결제 처리에 실패했습니다.');
+      }
+
+      // 3단계: 로컬 스토리지에도 예약 정보 저장 (기존 기능 유지)
+      const existingReservations = JSON.parse(localStorage.getItem('reservations') || '[]');
       const checkInDate = new Date(bookingData.dates.checkIn);
       const newReservation = {
         id: Date.now(),
+        paymentId: createResult.data.id,
         houseName: bookingData.room.name,
-        startDate: checkInDate.toISOString().split('T')[0], // YYYY-MM-DD 형식
+        startDate: checkInDate.toISOString().split('T')[0],
         endDate: new Date(bookingData.dates.checkOut).toISOString().split('T')[0],
-        status: 'unavailable', // 예약 완료 상태 (빨간색 '완')
+        status: 'unavailable',
         guestInfo: {
           name: guestInfo.name,
           phone: guestInfo.phone,
@@ -142,32 +309,52 @@ const Payment = () => {
         createdAt: new Date().toISOString()
       };
 
-      // 같은 날짜에 이미 예약이 있다면 상태를 업데이트, 없다면 새로 추가
-      const dateKey = checkInDate.toISOString().split('T')[0];
-      const existingIndex = existingReservations.findIndex(
-        reservation => reservation.startDate === dateKey && reservation.houseName === bookingData.room.name
-      );
+      existingReservations.push(newReservation);
+      localStorage.setItem('reservations', JSON.stringify(existingReservations));
 
-      if (existingIndex !== -1) {
-        // 기존 예약 상태 업데이트
-        existingReservations[existingIndex] = {
-          ...existingReservations[existingIndex],
-          ...newReservation
+      // 4단계: Trip에 참가자 등록 (실제 Trip 업데이트)
+      try {
+        const participantData = {
+          userId: currentUser.id,
+          guestInfo: {
+            name: guestInfo.name,
+            phone: guestInfo.phone,
+            email: guestInfo.email,
+            guestCount: getTotalGuests()
+          },
+          paymentId: createResult.data.id,
+          joinedAt: new Date().toISOString()
         };
-      } else {
-        // 새 예약 추가
-        existingReservations.push(newReservation);
+
+        const joinResponse = await fetch(
+          `https://us-code-halmae-sonmat.onrender.com/api/trips/${tripData.id}/join`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(participantData)
+          }
+        );
+
+        if (joinResponse.ok) {
+          const joinResult = await joinResponse.json();
+          console.log('Trip 참가 등록 성공:', joinResult);
+        } else {
+          console.warn('Trip 참가 등록 실패, 하지만 결제는 성공');
+        }
+      } catch (tripJoinError) {
+        console.warn('Trip 참가 등록 중 오류:', tripJoinError);
+        // Trip 참가 등록이 실패해도 결제는 성공했으므로 계속 진행
       }
 
-      // localStorage에 저장
-      localStorage.setItem('reservations', JSON.stringify(existingReservations));
-      
-      console.log('예약 완료:', newReservation);
-    }
+      alert(`✅ 결제가 완료되었습니다!\n\n🏠 ${getTripTitle()}\n📍 ${getLocationInfo()}\n💰 ${getRoomPrice().toLocaleString()}원\n\n마이페이지에서 예약 내역을 확인할 수 있습니다.`);
+      navigate('/');
 
-    // 결제 처리 로직
-    alert('결제가 완료되었습니다!');
-    navigate('/');
+    } catch (error) {
+      console.error('결제 처리 중 오류:', error);
+      alert(error.message || '결제 처리 중 오류가 발생했습니다.');
+    }
   };
 
   const showTermsContent = (termsType) => {
@@ -208,7 +395,53 @@ const Payment = () => {
   };
 
   const getRoomPrice = () => {
-    return bookingData?.totalPrice || selectedRoom?.price || 340000;
+    return tripData?.price || bookingData?.totalPrice || selectedRoom?.price || 340000;
+  };
+
+  // 실제 데이터 사용을 위한 헬퍼 함수들
+  const getTripTitle = () => {
+    return tripData?.title || selectedRoom?.name || '여여';
+  };
+
+  const getTripDescription = () => {
+    return tripData?.description || `${realHostData?.personalitySummary || '따뜻한 할머니'}가 준비한 특별한 숙소입니다.`;
+  };
+
+  const getHostName = () => {
+    return realHostData?.name || hostData?.name || '할매';
+  };
+
+  const getHostPhone = () => {
+    return realHostData?.phoneNumber || hostData?.phone || '010-5517-1521';
+  };
+
+  const getLocationInfo = () => {
+    if (realHostData && realHostData.address) {
+      return realHostData.address.detailAddress || realHostData.address;
+    }
+    if (tripData && tripData.location) {
+      return tripData.location.detailAddress || tripData.location.region || '충남 논산시 연무읍';
+    }
+    return hostData.address || '충남 논산시 연무읍';
+  };
+
+  const getHostIntroduction = () => {
+    if (realHostData) {
+      return {
+        introduction: realHostData.hostIntroduction || realHostData.personalitySummary || '따뜻한 할머니입니다',
+        age: realHostData.age ? `${realHostData.age}세` : '정보 없음',
+        specialty: realHostData.characteristics || '정보 없음',
+        menu: realHostData.representativeMenu || '정보 없음',
+        personality: realHostData.personalitySummary || '정보 없음'
+      };
+    }
+    return {
+      introduction: basicInfo?.introduction || '따뜻한 할머니가 정성스럽게 준비한 숙소입니다.',
+      age: basicInfo?.age || '정보 없음',
+      specialty: basicInfo?.specialty || '정보 없음',
+      menu: basicInfo?.menu || '정보 없음',
+      personality: basicInfo?.personality || '정보 없음'
+    };
   };
 
   const getTermsContent = () => {
@@ -361,18 +594,40 @@ const Payment = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="payment-container">
+        <div className="loading-container">
+          <div className="loading-spinner">🔄</div>
+          <p>여행 정보와 결제 페이지를 준비하고 있습니다...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="payment-container">
       <div className="payment-content">
+        {/* 실제 여행 정보 표시 */}
+        {tripData && (
+          <div className="trip-info-banner">
+            <h2>🌿 {getTripTitle()}</h2>
+            <p>📍 {getLocationInfo()}</p>
+            <p>👵 호스트: {getHostName()}</p>
+            <p>📅 여행 기간: {tripData.startDate} ~ {tripData.endDate}</p>
+            <p>💰 참가비: {getRoomPrice().toLocaleString()}원</p>
+          </div>
+        )}
+
         {/* 왼쪽 섹션 */}
         <div className="payment-left">
           {/* 예약정보 */}
           <div className="section">
-            <h3 className="section-title">예약정보</h3>
+            <h3 className="section-title">🏠 예약정보</h3>
             <div className="reservation-info">
               <div className="info-row">
-                <span className="label">할매집</span>
-                <span className="value">{selectedRoom.name}</span>
+                <span className="label">여행명</span>
+                <span className="value">{getTripTitle()}</span>
               </div>
               <div className="info-row">
                 <span className="label">체크인</span>
@@ -383,15 +638,70 @@ const Payment = () => {
                 <span className="value">{getCheckOutDate()} 11:00</span>
               </div>
               <div className="info-row">
-                <span className="label">숙박일수</span>
-                <span className="value">1박 2일</span>
+                <span className="label">여행 기간</span>
+                <span className="value">
+                  {tripData ? `${tripData.startDate} ~ ${tripData.endDate}` : '1박 2일'}
+                </span>
               </div>
               <div className="info-row">
-                <span className="label">인원</span>
+                <span className="label">참가 인원</span>
                 <span className="value">성인 {getTotalGuests()}명</span>
               </div>
+              {tripData && (
+                <>
+                  <div className="info-row">
+                    <span className="label">최대 참가 인원</span>
+                    <span className="value">{tripData.maxParticipants}명</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="label">현재 참가 신청</span>
+                    <span className="value">{tripData.currentParticipants}명</span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
+
+          {/* 호스트 정보 */}
+          {realHostData && (
+            <div className="section">
+              <h3 className="section-title">👵 호스트 정보</h3>
+              <div className="host-info">
+                <div className="info-row">
+                  <span className="label">이름</span>
+                  <span className="value">{getHostName()}</span>
+                </div>
+                <div className="info-row">
+                  <span className="label">연락처</span>
+                  <span className="value">{getHostPhone()}</span>
+                </div>
+                <div className="info-row">
+                  <span className="label">주소</span>
+                  <span className="value">{getLocationInfo()}</span>
+                </div>
+                <div className="info-row">
+                  <span className="label">특징</span>
+                  <span className="value">{getHostIntroduction().personality}</span>
+                </div>
+                <div className="info-row">
+                  <span className="label">대표 메뉴</span>
+                  <span className="value">{getHostIntroduction().menu}</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 여행 포함 사항 */}
+          {tripData && tripData.included && tripData.included.length > 0 && (
+            <div className="section">
+              <h3 className="section-title">✅ 포함 사항</h3>
+              <div className="included-items">
+                {tripData.included.map((item, index) => (
+                  <div key={index} className="included-item">• {item}</div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* 이용자 정보 */}
           <div className="section">
@@ -507,15 +817,25 @@ const Payment = () => {
         {/* 오른쪽 섹션 */}
         <div className="payment-right">
           <div className="payment-summary">
-            <h3 className="summary-title">결제정보</h3>
+            <h3 className="summary-title">💳 결제정보</h3>
             
-            {/* 숙소 이미지 */}
+            {/* 여행 이미지 */}
             <div className="accommodation-summary">
               <div className="accommodation-image">
-                {hostData.photo ? (
+                {realHostData?.housePhotos && realHostData.housePhotos.length > 0 ? (
+                  <img src={realHostData.housePhotos[0]} alt="숙소 이미지" />
+                ) : hostData.photo ? (
                   <img src={hostData.photo} alt="숙소 이미지" />
                 ) : (
-                  <div className="placeholder-image">할머니의 손맛</div>
+                  <div className="placeholder-image">🏠 할머니의 손맛</div>
+                )}
+              </div>
+              <div className="accommodation-details">
+                <h4>{getTripTitle()}</h4>
+                <p>👵 {getHostName()}</p>
+                <p>📍 {getLocationInfo()}</p>
+                {tripData && (
+                  <p>👥 {tripData.currentParticipants}/{tripData.maxParticipants}명 참가</p>
                 )}
               </div>
             </div>
@@ -523,16 +843,22 @@ const Payment = () => {
             {/* 요금 상세 */}
             <div className="price-breakdown">
               <div className="price-item">
-                <span>숙박 요금</span>
+                <span>🏡 여행 참가비</span>
                 <span>{getRoomPrice().toLocaleString()}원</span>
               </div>
+              {tripData && tripData.included && tripData.included.length > 0 && (
+                <div className="price-note">
+                  <small>✅ 포함: {tripData.included.slice(0, 2).join(', ')}{tripData.included.length > 2 ? ' 외' : ''}</small>
+                </div>
+              )}
               <div className="price-item">
-                <span>10% 환급 <span className="refund-condition">※일손돕기 시</span></span>
+                <span>🎁 농촌체험 할인 <span className="refund-condition">※일손돕기 시</span></span>
                 <span>-{Math.floor(getRoomPrice() * 0.1).toLocaleString()}원</span>
               </div>
-              <div className="price-item">
-                <span>총 결제금액</span>
-                <span>{getRoomPrice().toLocaleString()}원</span>
+              <div className="price-divider"></div>
+              <div className="price-item total">
+                <span><strong>💰 총 결제금액</strong></span>
+                <span><strong>{getRoomPrice().toLocaleString()}원</strong></span>
               </div>
             </div>
 
@@ -542,17 +868,30 @@ const Payment = () => {
               onClick={handlePayment}
               disabled={!agreeTerms.booking || !agreeTerms.privacy || !agreeTerms.thirdParty}
             >
-              {getRoomPrice().toLocaleString()}원 결제하기
+              💳 {getRoomPrice().toLocaleString()}원 결제하기
             </button>
 
             {/* 주의사항 */}
             <div className="payment-notice">
-              <h4>결제 전 확인사항</h4>
+              <h4>⚠️ 결제 전 확인사항</h4>
               <ul>
-                <li>예약 확정 후 취소 시 취소 수수료가 발생할 수 있습니다.</li>
-                <li>체크인 시간은 15:00, 체크아웃 시간은 11:00입니다.</li>
+                <li>✅ 예약 확정 후 취소 시 취소 수수료가 발생할 수 있습니다.</li>
+                <li>🕒 체크인 시간은 15:00, 체크아웃 시간은 11:00입니다.</li>
+                <li>🌾 일손 돕기 참여 시 10% 환급 혜택을 받을 수 있습니다.</li>
+                <li>📞 숙소 관련 문의: {getHostPhone()}</li>
+                {tripData && tripData.maxParticipants && (
+                  <li>👥 최대 {tripData.maxParticipants}명까지 참가 가능합니다.</li>
+                )}
               </ul>
             </div>
+
+            {/* 여행 특별 안내 */}
+            {tripData && tripData.description && (
+              <div className="trip-special-notice">
+                <h4>🌿 여행 특별 안내</h4>
+                <p>{getTripDescription()}</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

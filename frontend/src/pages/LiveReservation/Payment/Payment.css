@@ -505,3 +505,190 @@
     font-size: 13px;
   }
 }
+
+/* 새로 추가된 요소들의 스타일 */
+
+/* 로딩 상태 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 20px;
+  text-align: center;
+  background: white;
+  border-radius: 12px;
+  margin: 20px;
+}
+
+.loading-spinner {
+  font-size: 48px;
+  animation: spin 2s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-container p {
+  color: #666;
+  font-size: 16px;
+}
+
+/* 여행 정보 배너 */
+.trip-info-banner {
+  background: linear-gradient(135deg, #e91e63, #f06292);
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  text-align: center;
+  grid-column: 1 / -1; /* 전체 너비 차지 */
+}
+
+.trip-info-banner h2 {
+  margin: 0 0 12px 0;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.trip-info-banner p {
+  margin: 6px 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* 호스트 정보 */
+.host-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 포함 사항 */
+.included-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.included-item {
+  padding: 8px 12px;
+  background-color: #e8f5e8;
+  color: #2e7d32;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* 숙소 상세 정보 */
+.accommodation-details {
+  margin-top: 16px;
+}
+
+.accommodation-details h4 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.accommodation-details p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+/* 가격 구분선 */
+.price-divider {
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 16px 0;
+}
+
+/* 가격 노트 */
+.price-note {
+  margin: 8px 0;
+  padding: 8px 12px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.price-note small {
+  color: #666;
+  font-size: 12px;
+}
+
+/* 총 결제금액 강조 */
+.price-item.total {
+  padding-top: 16px;
+  border-top: 2px solid #e91e63;
+  margin-top: 8px;
+}
+
+.price-item.total span {
+  font-size: 18px;
+  color: #e91e63;
+}
+
+/* 여행 특별 안내 */
+.trip-special-notice {
+  margin-top: 20px;
+  padding: 16px;
+  background: linear-gradient(135deg, #f8f9fa, #e8f5e8);
+  border-radius: 8px;
+  border-left: 4px solid #4caf50;
+}
+
+.trip-special-notice h4 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2e7d32;
+}
+
+.trip-special-notice p {
+  margin: 0;
+  font-size: 13px;
+  color: #555;
+  line-height: 1.4;
+}
+
+/* 모바일 대응 개선 */
+@media (max-width: 768px) {
+  .trip-info-banner {
+    margin: 10px;
+    padding: 16px;
+  }
+
+  .trip-info-banner h2 {
+    font-size: 20px;
+  }
+
+  .included-items {
+    grid-template-columns: 1fr;
+  }
+
+  .accommodation-details h4 {
+    font-size: 15px;
+  }
+
+  .accommodation-details p {
+    font-size: 13px;
+  }
+
+  .trip-special-notice {
+    margin: 16px 0;
+    padding: 12px;
+  }
+
+  .trip-special-notice h4 {
+    font-size: 13px;
+  }
+
+  .trip-special-notice p {
+    font-size: 12px;
+  }
+}

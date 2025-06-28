@@ -234,12 +234,47 @@ const BookNow = () => {
               dateData={{}}
               renderDateContent={renderDateContent}
             />
+            {/* 객실 미리보기 섹션 */}
+            <div className='preview-section'>
+              <h4>선택 날짜의 예약 가능한 객실</h4>
+              <p className='preview-date'>📅 {formatDate(tempSelectedDates.checkIn)}</p>
+              
+              {previewLoading && (
+                <div className='preview-loading'>객실 조회 중...</div>
+              )}
+              
+              {!previewLoading && previewRooms.length === 0 && (
+                <div className='preview-no-rooms'>
+                  이 날짜에는 예약 가능한 객실이 없습니다.
+                </div>
+              )}
+              
+              {!previewLoading && previewRooms.length > 0 && (
+                <div className='preview-rooms'>
+                  {previewRooms.map((room) => (
+                    <div key={room.id} className='preview-room-card'>
+                      <div className='preview-room-info'>
+                        <div className='preview-room-name'>{room.name}</div>
+                        <div className='preview-room-details'>
+                          최대 {room.maxPeople}명 · {room.price.toLocaleString()}원
+                        </div>
+                      </div>
+                      <div className='preview-room-status available'>
+                        예약가능
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            
             <div className='modal-footer'>
               <button 
                 className='confirm-button'
                 onClick={handleConfirmDates}
+                disabled={previewLoading}
               >
-                확인
+                {previewRooms.length > 0 ? `이 날짜로 선택 (${previewRooms.length}개 객실)` : '확인'}
               </button>
             </div>
           </div>
