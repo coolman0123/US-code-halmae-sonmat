@@ -124,6 +124,34 @@
   border-left: 4px solid #d63031;
 }
 
+/* 서버 상태 표시 */
+.server-status {
+  font-size: 14px;
+  margin-bottom: 15px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.server-status.checking {
+  color: #856404;
+  background-color: #fff3cd;
+  border-left: 4px solid #ffc107;
+}
+
+.server-status.ok {
+  color: #155724;
+  background-color: #d4edda;
+  border-left: 4px solid #28a745;
+}
+
+.server-status.error {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-left: 4px solid #dc3545;
+}
+
 /* 하단 링크들 */
 .login-links {
   display: flex;
@@ -166,6 +194,60 @@
 .admin-login-button:hover {
   color: #8b7355;
   text-decoration: underline;
+}
+
+/* 디버깅 섹션 */
+.debug-section {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.debug-section h4 {
+  margin: 0 0 15px 0;
+  color: #495057;
+  font-size: 16px;
+}
+
+.debug-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.debug-button {
+  padding: 8px 12px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.debug-button:hover {
+  background-color: #5a6268;
+}
+
+.debug-info {
+  background-color: #ffffff;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.debug-info pre {
+  margin: 0;
+  font-size: 11px;
+  color: #495057;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-family: 'Courier New', monospace;
 }
 
 /* 소셜 로그인 (추후 사용) */

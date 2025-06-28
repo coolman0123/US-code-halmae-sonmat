@@ -26,13 +26,36 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false, // HTTPS 환경에서는 true로 설정
+    secure: process.env.NODE_ENV === 'production', // 프로덕션에서는 HTTPS 필요
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24시간
+    maxAge: 24 * 60 * 60 * 1000, // 24시간
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // 크로스 도메인 쿠키 허용
   }
 }));
 
 app.use(express.json());
+
+// 헬스체크 엔드포인트
+app.get('/health', (req, res) => {
+  console.log('🏥 헬스체크 요청');
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    message: '서버가 정상적으로 작동 중입니다.'
+  });
+});
+
+// API 요청 로깅 미들웨어
+app.use('/api', (req, res, next) => {
+  console.log('📡 API 요청:', {
+    method: req.method,
+    url: req.url,
+    headers: req.headers,
+    body: req.body,
+    timestamp: new Date().toISOString()
+  });
+  next();
+});
 
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);

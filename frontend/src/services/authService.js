@@ -1,10 +1,18 @@
 // 백엔드 API 서비스
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://us-code-halmae-sonmat.onrender.com';
 
+console.log('🔧 API 설정:', {
+  VITE_API_URL: import.meta.env.VITE_API_URL,
+  API_BASE_URL: API_BASE_URL,
+  NODE_ENV: import.meta.env.NODE_ENV,
+  MODE: import.meta.env.MODE
+});
+
 // 공통 API 요청 함수
 const apiRequest = async (endpoint, options = {}) => {
   try {
     const token = localStorage.getItem('authToken');
+    const fullUrl = `${API_BASE_URL}${endpoint}`;
     const config = {
       headers: {
         'Content-Type': 'application/json',
@@ -15,16 +23,63 @@ const apiRequest = async (endpoint, options = {}) => {
       ...options
     };
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-    const data = await response.json();
+    console.log('🌐 API 요청:', {
+      url: fullUrl,
+      method: config.method || 'GET',
+      headers: config.headers,
+      body: options.body
+    });
+
+    const response = await fetch(fullUrl, config);
+    
+    console.log('📡 응답 상태:', {
+      status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers.entries())
+    });
+
+    let data;
+    try {
+      data = await response.json();
+      console.log('📥 응답 데이터:', data);
+    } catch (jsonError) {
+      console.error('❌ JSON 파싱 실패:', jsonError);
+      const text = await response.text();
+      console.log('📄 응답 텍스트:', text);
+      throw new Error(`서버 응답을 파싱할 수 없습니다: ${text}`);
+    }
 
     if (!response.ok) {
-      throw new Error(data.message || '요청에 실패했습니다.');
+      console.error(`❌ HTTP 에러 ${response.status}:`, data);
+      throw new Error(data.message || `서버 에러 (${response.status})`);
     }
 
     return data;
   } catch (error) {
-    console.error(`API Request Error [${endpoint}]:`, error);
+    console.error(`❌ API Request Error [${endpoint}]:`, {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    throw error;
+  }
+};
+
+// ================== 서버 상태 확인 ==================
+
+/**
+ * 서버 헬스체크
+ * @returns {Promise<Object>} 서버 상태
+ */
+export const healthCheck = async () => {
+  try {
+    console.log('🏥 서버 헬스체크 시작');
+    const response = await fetch(`${API_BASE_URL}/health`);
+    const data = await response.json();
+    console.log('✅ 서버 헬스체크 성공:', data);
+    return data;
+  } catch (error) {
+    console.error('❌ 서버 헬스체크 실패:', error);
     throw error;
   }
 };
@@ -40,7 +95,11 @@ const apiRequest = async (endpoint, options = {}) => {
  */
 export const login = async (credentials) => {
   try {
-    console.log('🚀 프론트엔드 로그인 시도:', credentials);
+    console.log('🚀 프론트엔드 로그인 시도:', {
+      email: credentials.email,
+      passwordLength: credentials.password?.length,
+      apiUrl: API_BASE_URL
+    });
     
     const data = await apiRequest('/api/auth/login', {
       method: 'POST',
@@ -55,19 +114,23 @@ export const login = async (credentials) => {
     // 토큰이 있다면 localStorage에 저장
     if (data.token) {
       localStorage.setItem('authToken', data.token);
-      console.log('✅ 토큰 저장 완료');
+      console.log('✅ 토큰 저장 완료:', data.token.substring(0, 20) + '...');
     }
     
     // 사용자 정보 저장
     if (data.data) {
       localStorage.setItem('currentUser', JSON.stringify(data.data));
       localStorage.setItem('isLoggedIn', 'true');
-      console.log('✅ 사용자 정보 저장 완료');
+      console.log('✅ 사용자 정보 저장 완료:', data.data);
     }
     
     return data;
   } catch (error) {
-    console.error('❌ Login error:', error);
+    console.error('❌ Login error 상세:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     throw error;
   }
 };

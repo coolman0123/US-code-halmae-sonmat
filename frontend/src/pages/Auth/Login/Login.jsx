@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
+import { healthCheck } from '../../../services/authService';
 import './Login.css';
 
 const Login = () => {
@@ -11,6 +12,22 @@ const Login = () => {
     password: ''
   });
   const [error, setError] = useState('');
+  const [serverStatus, setServerStatus] = useState('checking'); // 'checking', 'ok', 'error'
+  const [debugInfo, setDebugInfo] = useState('');
+
+  // 컴포넌트 마운트 시 서버 상태 확인
+  useEffect(() => {
+    const checkServer = async () => {
+      try {
+        await healthCheck();
+        setServerStatus('ok');
+      } catch (error) {
+        console.error('서버 연결 실패:', error);
+        setServerStatus('error');
+      }
+    };
+    checkServer();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -26,6 +43,12 @@ const Login = () => {
     e.preventDefault();
     setError('');
 
+    // 서버 상태 먼저 확인
+    if (serverStatus === 'error') {
+      setError('서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
     // 입력 유효성 검사
     if (!formData.email || !formData.password) {
       setError('이메일과 비밀번호를 모두 입력해주세요.');
@@ -33,6 +56,7 @@ const Login = () => {
     }
 
     try {
+      console.log('🔐 로그인 폼 제출:', { email: formData.email });
       const response = await login(formData);
       
       if (response.success) {
@@ -40,11 +64,37 @@ const Login = () => {
         navigate('/'); // 메인페이지로 이동
       }
     } catch (err) {
+      console.error('🔐 로그인 폼 에러:', err);
       setError(err.message || '로그인에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
+  // 디버깅용 서버 테스트 함수
+  const handleServerTest = async () => {
+    try {
+      setDebugInfo('서버 테스트 중...');
+      const result = await healthCheck();
+      setDebugInfo(`서버 테스트 성공: ${JSON.stringify(result, null, 2)}`);
+    } catch (error) {
+      setDebugInfo(`서버 테스트 실패: ${error.message}\n${error.stack}`);
+    }
+  };
 
+  // 디버깅용 로그인 테스트 함수
+  const handleLoginTest = async () => {
+    try {
+      setDebugInfo('로그인 테스트 중...');
+      const testData = {
+        email: 'test@example.com',
+        password: 'test123'
+      };
+      
+      const response = await login(testData);
+      setDebugInfo(`로그인 테스트 성공: ${JSON.stringify(response, null, 2)}`);
+    } catch (error) {
+      setDebugInfo(`로그인 테스트 실패: ${error.message}\n${error.stack}`);
+    }
+  };
 
   return (
     <div className="login-page">
@@ -58,6 +108,17 @@ const Login = () => {
             <h1 className="login-title">할매의 손맛</h1>
           </Link>
         </div>
+
+        {/* 서버 상태 표시 */}
+        {serverStatus === 'checking' && (
+          <div className="server-status checking">서버 연결 확인 중...</div>
+        )}
+        {serverStatus === 'error' && (
+          <div className="server-status error">⚠️ 서버에 연결할 수 없습니다</div>
+        )}
+        {serverStatus === 'ok' && (
+          <div className="server-status ok">✅ 서버 연결 정상</div>
+        )}
 
         {/* 로그인 폼 */}
         <form className="login-form" onSubmit={handleSubmit}>
@@ -104,6 +165,26 @@ const Login = () => {
             관리자 로그인
           </button>
         </div>
+
+        {/* 디버깅 섹션 (개발/테스트 시에만 표시) */}
+        {(import.meta.env.MODE === 'development' || serverStatus === 'error') && (
+          <div className="debug-section">
+            <h4>디버깅 정보</h4>
+            <div className="debug-buttons">
+              <button onClick={handleServerTest} className="debug-button">
+                서버 연결 테스트
+              </button>
+              <button onClick={handleLoginTest} className="debug-button">
+                로그인 API 테스트
+              </button>
+            </div>
+            {debugInfo && (
+              <div className="debug-info">
+                <pre>{debugInfo}</pre>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
