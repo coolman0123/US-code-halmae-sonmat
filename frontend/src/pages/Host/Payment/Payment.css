@@ -297,7 +297,11 @@
   }
 }
 
-.payment-management-page .calendar-container .calendar-grid .calendar-day .day-number,
+.payment-management-page
+  .calendar-container
+  .calendar-grid
+  .calendar-day
+  .day-number,
 .payment-management-page .calendar-day .day-number,
 .calendar-day .day-number,
 div.day-number {

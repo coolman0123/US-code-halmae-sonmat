@@ -16,8 +16,6 @@
   position: relative;
 }
 
-
-
 .payment-detail-title {
   font-size: 28px;
   font-weight: 700;
@@ -103,6 +101,27 @@
   flex-shrink: 0;
 }
 
+.refund-info {
+  border: 2px solid #d9d9d9;
+  border-radius: 6px;
+  padding: 3px 5px;
+  color: #c1c1c1;
+  font-size: 10px;
+  font-weight: 800;
+  display: inline-block;
+  margin-bottom: 9px;
+  text-align: center;
+  background: #fff;
+}
+
+.payment-amount-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  min-width: 90px;
+}
+
 /* 반응형 디자인 */
 @media (max-width: 768px) {
   .payment-detail-page {
@@ -162,4 +181,4 @@
   .payment-amount {
     font-size: 16px;
   }
-} 
+}
