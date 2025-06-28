@@ -76,8 +76,8 @@ router.get('/', (req, res, next) => hostController.getAllHosts(req, res, next));
  * @swagger
  * /api/hosts/geocoding:
  *   get:
- *     summary: Google Maps Geocoding API Proxy
- *     description: 주소를 입력받아 위도/경도를 반환하는 프록시 API
+ *     summary: Kakao Maps Geocoding API Proxy
+ *     description: 주소를 입력받아 위도/경도를 반환하는 카카오 지오코딩 프록시 API
  *     tags: [Host]
  *     parameters:
  *       - in: query
@@ -89,7 +89,7 @@ router.get('/', (req, res, next) => hostController.getAllHosts(req, res, next));
  *           example: "선릉로 221"
  *     responses:
  *       200:
- *         description: 지오코딩 성공
+ *         description: 카카오 지오코딩 성공
  *         content:
  *           application/json:
  *             schema:
@@ -106,17 +106,29 @@ router.get('/', (req, res, next) => hostController.getAllHosts(req, res, next));
  *                       example: "선릉로 221"
  *                     formattedAddress:
  *                       type: string
- *                       example: "대한민국 서울특별시 강남구 선릉로 221"
+ *                       example: "서울 강남구 선릉로 221"
+ *                     roadAddress:
+ *                       type: string
+ *                       example: "서울 강남구 선릉로 221"
  *                     latitude:
  *                       type: number
  *                       example: 37.5074846
  *                     longitude:
  *                       type: number
  *                       example: 127.0484407
- *                     placeId:
+ *                     addressType:
  *                       type: string
+ *                       example: "REGION_ADDR"
  *       400:
- *         description: 잘못된 요청 또는 주소를 찾을 수 없음
+ *         description: 잘못된 요청
+ *       401:
+ *         description: Kakao API 키 인증 실패
+ *       403:
+ *         description: Kakao API 접근 거부
+ *       404:
+ *         description: 검색 결과 없음
+ *       429:
+ *         description: API 사용량 한도 초과
  *       500:
  *         description: 서버 오류
  */

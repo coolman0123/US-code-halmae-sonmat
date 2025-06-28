@@ -206,12 +206,9 @@
 
 /* 지도 컨테이너 내부 요소 (Kakao Map이 생성될 영역) */
 #map,
-.map-container div[style*="height"] {
-  width: 100% !important;
-  height: 100% !important;
-  min-height: 350px !important;
+.map-container {
+  overflow: hidden; /* 이게 이벤트 전파를 막을 수 있음 */
 }
-
 .map-info {
   position: absolute;
   bottom: 10px;
@@ -804,5 +801,164 @@
   
   .status-ready, .status-loading {
     font-size: 12px;
+  }
+}
+
+/* 전체화면 버튼 스타일 */
+.fullscreen-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.fullscreen-btn:hover {
+  background-color: rgba(255, 255, 255, 1);
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.fullscreen-btn:active {
+  transform: scale(0.95);
+}
+
+/* 전체화면 모달 스타일 */
+.fullscreen-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(2px);
+}
+
+.fullscreen-modal-header {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.fullscreen-modal-content {
+  flex: 1;
+  position: relative;
+  background-color: #f8f9fa;
+  overflow: hidden;
+}
+
+.fullscreen-map-container {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+}
+
+.fullscreen-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 10px 20px;
+  border-radius: 25px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.close-fullscreen-btn {
+  background-color: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.close-fullscreen-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* 지도 컨테이너 반응형 개선 */
+.map-container {
+  position: relative;
+  overflow: hidden;
+}
+
+/* 모바일에서 전체화면 모달 최적화 */
+@media (max-width: 768px) {
+  .fullscreen-btn {
+    width: 35px;
+    height: 35px;
+    font-size: 14px;
+    top: 8px;
+    right: 8px;
+  }
+  
+  .fullscreen-modal-header {
+    padding: 12px 15px;
+  }
+  
+  .fullscreen-controls {
+    bottom: 15px;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 13px;
+    gap: 10px;
+  }
+  
+  .close-fullscreen-btn {
+    font-size: 20px;
+    padding: 3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .fullscreen-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+    top: 6px;
+    right: 6px;
+  }
+  
+  .fullscreen-modal-header {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  
+  .fullscreen-controls {
+    bottom: 10px;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    gap: 8px;
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .close-fullscreen-btn {
+    font-size: 18px;
   }
 } 

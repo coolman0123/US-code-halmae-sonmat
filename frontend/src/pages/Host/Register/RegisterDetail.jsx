@@ -15,7 +15,8 @@ const RegisterDetail = () => {
     isLoading: true,
     isSearching: false,
     error: null,
-    mapInitialized: false
+    mapInitialized: false,
+    isFullscreen: false
   });
 
   const [formData, setFormData] = useState({
@@ -45,18 +46,30 @@ const RegisterDetail = () => {
 
   const BACKEND_URL = 'http://localhost:5001';
   // Kakao Map API 키 - 환경변수에서 읽기
-  const KAKAO_MAP_API_KEY = import.meta.env.VITE_KAKAO_MAP_API_KEY || '90ae47b29041df889ea6ef2d93c8520e';
+  const KAKAO_MAP_API_KEY = import.meta.env.VITE_KAKAO_API_KEY || import.meta.env.VITE_KAKAO_MAP_API_KEY || '90ae47b29041df889ea6ef2d93c8520e';
+  
+  // API 키 유효성 검사
+  useEffect(() => {
+    if (!KAKAO_MAP_API_KEY || KAKAO_MAP_API_KEY === '90ae47b29041df889ea6ef2d93c8520e') {
+      console.warn('⚠️ Kakao API 키가 기본값이거나 설정되지 않았습니다.');
+      console.warn('💡 frontend/.env 파일에 VITE_KAKAO_API_KEY=실제_API_키 를 설정해주세요.');
+    } else {
+      console.log('✅ Kakao API 키가 설정되었습니다.');
+    }
+  }, []);
 
-  // Kakao Maps API 로딩 (지도 표시용)
+  // Kakao Maps API 로딩 (지도 표시용 + 지오코딩용)
   const loadKakaoMapsAPI = () => {
     return new Promise((resolve, reject) => {
-      // Kakao API 상태 확인 함수
+      // Kakao API 상태 확인 함수 (지오코딩 서비스 포함)
       const checkKakaoReady = () => {
         return window.kakao && 
                window.kakao.maps && 
                window.kakao.maps.LatLng && 
                window.kakao.maps.Map &&
-               window.kakao.maps.Marker;
+               window.kakao.maps.Marker &&
+               window.kakao.maps.services &&
+               window.kakao.maps.services.Geocoder;
       };
 
       // 이미 완전히 로드된 경우
@@ -71,7 +84,9 @@ const RegisterDetail = () => {
         maps: !!window.kakao?.maps,
         LatLng: !!window.kakao?.maps?.LatLng,
         Map: !!window.kakao?.maps?.Map,
-        Marker: !!window.kakao?.maps?.Marker
+        Marker: !!window.kakao?.maps?.Marker,
+        services: !!window.kakao?.maps?.services,
+        Geocoder: !!window.kakao?.maps?.services?.Geocoder
       });
 
       // 기존 스크립트가 있는지 확인
@@ -84,36 +99,66 @@ const RegisterDetail = () => {
         if (window.kakao && window.kakao.maps && window.kakao.maps.load) {
           window.kakao.maps.load(() => {
             console.log('✅ 기존 스크립트 - Kakao Maps API 로드 완료');
-            if (checkKakaoReady()) {
-              resolve();
-            } else {
-              reject(new Error('Kakao Maps API 로드 후에도 일부 기능이 없음'));
-            }
+            
+            // 기존 스크립트에도 재시도 로직 적용
+            let retryCount = 0;
+            const maxRetries = 3;
+            
+            const checkAndRetry = () => {
+              if (checkKakaoReady()) {
+                console.log('✅ 기존 스크립트 - 모든 API 기능 확인 완료');
+                resolve();
+              } else if (retryCount < maxRetries) {
+                retryCount++;
+                console.log(`🔄 기존 스크립트 - API 기능 체크 재시도 ${retryCount}/${maxRetries}`);
+                setTimeout(checkAndRetry, 300 * retryCount);
+              } else {
+                // services가 없어도 지도 기본 기능이 있으면 진행
+                if (window.kakao?.maps?.Map && window.kakao?.maps?.Marker) {
+                  console.log('⚠️ 기존 스크립트 - 지도 기본 기능은 사용 가능');
+                  resolve();
+                } else {
+                  reject(new Error('Kakao Maps API 로드 후에도 일부 기능이 없음'));
+                }
+              }
+            };
+            
+            checkAndRetry();
           });
         } else {
           // 폴링 방식으로 완전 로딩 대기
+          let pollCount = 0;
+          const maxPolls = 50; // 10초
+          
           const checkLoaded = setInterval(() => {
+            pollCount++;
             if (checkKakaoReady()) {
               clearInterval(checkLoaded);
               console.log('✅ 폴링 - Kakao Maps API 완전 로드 확인');
               resolve();
+            } else if (pollCount >= maxPolls) {
+              clearInterval(checkLoaded);
+              
+              // 기본 기능이라도 있으면 진행
+              if (window.kakao?.maps?.Map) {
+                console.log('⚠️ 폴링 - 지도 기본 기능만 사용 가능');
+                resolve();
+              } else {
+                console.error('❌ Kakao Maps API 로딩 타임아웃');
+                reject(new Error('Kakao Maps API 로딩 타임아웃'));
+              }
             }
           }, 200);
-          
-          // 10초 후 타임아웃
-          setTimeout(() => {
-            clearInterval(checkLoaded);
-            console.error('❌ Kakao Maps API 로딩 타임아웃');
-            reject(new Error('Kakao Maps API 로딩 타임아웃'));
-          }, 10000);
         }
         return;
       }
 
-      // 새 스크립트 로드
-      console.log('📥 새 Kakao Maps API 스크립트 로딩 시작');
+      // 새 스크립트 로드 (services 라이브러리 포함)
+      console.log('📥 새 Kakao Maps API 스크립트 로딩 시작 (지오코딩 포함)');
+      console.log('🔑 사용 중인 API 키:', KAKAO_MAP_API_KEY ? KAKAO_MAP_API_KEY.substring(0, 10) + '...' : '없음');
+      
       const script = document.createElement('script');
-      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_API_KEY}&autoload=false`;
+      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_MAP_API_KEY}&autoload=false&libraries=services`;
       script.async = true;
       script.defer = true;
       
@@ -124,13 +169,44 @@ const RegisterDetail = () => {
           window.kakao.maps.load(() => {
             console.log('✅ 새 스크립트 - Kakao Maps API 초기화 완료');
             
-            // 완전 로딩 확인
-            if (checkKakaoReady()) {
-              resolve();
-            } else {
-              console.error('❌ API 로드 후에도 일부 기능 누락');
-              reject(new Error('Kakao Maps API 일부 기능이 로드되지 않음'));
-            }
+            // 완전 로딩 확인 (재시도 로직 포함)
+            let retryCount = 0;
+            const maxRetries = 5;
+            
+            const checkAndRetry = () => {
+              if (checkKakaoReady()) {
+                console.log('✅ 모든 Kakao API 기능 확인 완료');
+                resolve();
+              } else if (retryCount < maxRetries) {
+                retryCount++;
+                console.log(`🔄 API 기능 체크 재시도 ${retryCount}/${maxRetries}`);
+                setTimeout(checkAndRetry, 200 * retryCount);
+              } else {
+                console.error('❌ API 로드 후에도 일부 기능 누락 (최대 재시도 초과)');
+                
+                // 상세 진단
+                console.log('🔍 상세 API 상태:', {
+                  kakao: !!window.kakao,
+                  maps: !!window.kakao?.maps,
+                  LatLng: !!window.kakao?.maps?.LatLng,
+                  Map: !!window.kakao?.maps?.Map,
+                  Marker: !!window.kakao?.maps?.Marker,
+                  services: !!window.kakao?.maps?.services,
+                  Geocoder: !!window.kakao?.maps?.services?.Geocoder,
+                  event: !!window.kakao?.maps?.event
+                });
+                
+                // services가 없어도 지도 표시는 가능하므로 부분적으로 성공 처리
+                if (window.kakao?.maps?.Map && window.kakao?.maps?.Marker) {
+                  console.log('⚠️ 지도 기본 기능은 사용 가능 (지오코딩 제외)');
+                  resolve();
+                } else {
+                  reject(new Error('Kakao Maps API 핵심 기능이 로드되지 않음'));
+                }
+              }
+            };
+            
+            checkAndRetry();
           });
         } else {
           console.error('❌ kakao.maps.load 함수가 없음');
@@ -197,7 +273,11 @@ const RegisterDetail = () => {
       
       const options = {
         center: defaultPosition,
-        level: 6 // 확대 레벨 (1~14, 숫자가 작을수록 확대)
+        level: 50, // 확대 레벨 (1~14, 숫자가 작을수록 확대)
+        draggable: true, // 지도 드래그 가능
+        scrollwheel: true, // 마우스 휠로 확대/축소 가능
+        doubleClickZoom: true, // 더블클릭으로 확대 가능
+        keyboardShortcuts: true // 키보드 단축키 사용 가능
       };
 
       console.log('🔧 지도 옵션:', options);
@@ -238,6 +318,7 @@ const RegisterDetail = () => {
   };
 
   // 백엔드 지오코딩 API 호출
+  // 백엔드 카카오 지오코딩 API 호출
   const searchAddressWithBackend = async (searchQuery) => {
     try {
       console.log('🔍 백엔드 지오코딩 요청:', searchQuery);
@@ -318,9 +399,13 @@ const RegisterDetail = () => {
       const position = new window.kakao.maps.LatLng(latitude, longitude);
       console.log('📍 마커 위치 생성:', position);
 
-      // 지도 중심 이동 및 확대
-      mapRef.current.setCenter(position);
-      mapRef.current.setLevel(3); // 더 자세한 레벨로 확대
+      // 지도 중심 이동 및 확대 (부드러운 애니메이션)
+      mapRef.current.panTo(position); // 부드럽게 이동
+      
+      // 적절한 확대 레벨 설정 (마커가 잘 보이도록)
+      setTimeout(() => {
+        mapRef.current.setLevel(2); // 매우 자세한 레벨로 확대
+      }, 300);
 
       // 기존 마커 제거
       if (markerRef.current) {
@@ -410,7 +495,17 @@ const RegisterDetail = () => {
     try {
       console.log('📍 주소 검색 요청:', searchQuery);
       
-      const result = await searchAddressWithBackend(searchQuery);
+      // 프론트엔드 카카오 지오코딩 시도, 실패 시 백엔드로 폴백
+      let result;
+      try {
+        console.log('🔍 프론트엔드 카카오 지오코딩 시도');
+        result = await searchAddressWithKakao(searchQuery);
+        console.log('✅ 프론트엔드 지오코딩 성공');
+      } catch (frontendError) {
+        console.warn('⚠️ 프론트엔드 지오코딩 실패, 백엔드로 폴백:', frontendError.message);
+        result = await searchAddressWithBackend(searchQuery);
+        console.log('✅ 백엔드 지오코딩 폴백 성공');
+      }
 
       // 결과 검증
       if (!result || !result.latitude || !result.longitude) {
@@ -491,13 +586,13 @@ const RegisterDetail = () => {
   // API 테스트 핸들러
   const handleAPITest = async () => {
     try {
-      console.log('🧪 백엔드 API 테스트 시작');
+      console.log('🧪 백엔드 카카오 지오코딩 API 테스트 시작');
       const result = await searchAddressWithBackend('선릉로 221');
-      console.log('✅ API 테스트 성공:', result);
-      alert(`✅ API 테스트 성공!\n\n주소: ${result.formattedAddress}\n위도: ${result.latitude}\n경도: ${result.longitude}`);
+      console.log('✅ 백엔드 API 테스트 성공:', result);
+      alert(`✅ 백엔드 카카오 지오코딩 테스트 성공!\n\n주소: ${result.formattedAddress}\n도로명주소: ${result.roadAddress || '없음'}\n위도: ${result.latitude}\n경도: ${result.longitude}`);
     } catch (error) {
-      console.error('❌ API 테스트 실패:', error);
-      alert(`❌ API 테스트 실패: ${error.message}`);
+      console.error('❌ 백엔드 API 테스트 실패:', error);
+      alert(`❌ 백엔드 카카오 지오코딩 테스트 실패: ${error.message}`);
     }
   };
 
@@ -569,6 +664,8 @@ const RegisterDetail = () => {
     console.log('- window.kakao.maps.LatLng:', window.kakao?.maps?.LatLng);
     console.log('- window.kakao.maps.Map:', window.kakao?.maps?.Map);
     console.log('- window.kakao.maps.Marker:', window.kakao?.maps?.Marker);
+    console.log('- window.kakao.maps.services:', window.kakao?.maps?.services);
+    console.log('- window.kakao.maps.services.Geocoder:', window.kakao?.maps?.services?.Geocoder);
     console.log('- window.kakao.maps.load:', window.kakao?.maps?.load);
     
     if (window.kakao?.maps?.LatLng) {
@@ -579,9 +676,85 @@ const RegisterDetail = () => {
         console.error('❌ LatLng 테스트 실패:', error);
       }
     }
+
+    if (window.kakao?.maps?.services?.Geocoder) {
+      try {
+        const testGeocoder = new window.kakao.maps.services.Geocoder();
+        console.log('✅ Geocoder 테스트 성공:', testGeocoder);
+      } catch (error) {
+        console.error('❌ Geocoder 테스트 실패:', error);
+      }
+    }
     
-    alert(`Kakao API 상태:\n- kakao: ${!!window.kakao}\n- maps: ${!!window.kakao?.maps}\n- LatLng: ${!!window.kakao?.maps?.LatLng}\n- Map: ${!!window.kakao?.maps?.Map}\n- Marker: ${!!window.kakao?.maps?.Marker}`);
+    alert(`Kakao API 상태:\n- kakao: ${!!window.kakao}\n- maps: ${!!window.kakao?.maps}\n- LatLng: ${!!window.kakao?.maps?.LatLng}\n- Map: ${!!window.kakao?.maps?.Map}\n- Marker: ${!!window.kakao?.maps?.Marker}\n- services: ${!!window.kakao?.maps?.services}\n- Geocoder: ${!!window.kakao?.maps?.services?.Geocoder}`);
   };
+
+  // 전체화면 지도 열기
+  const handleFullscreenMap = () => {
+    console.log('🔍 전체화면 지도 열기');
+    setMapState(prev => ({ ...prev, isFullscreen: true }));
+    
+    // 전체화면 모달이 열린 후 지도 크기 재조정
+    setTimeout(() => {
+      if (mapRef.current) {
+        window.kakao.maps.event.trigger(mapRef.current, 'resize');
+        console.log('📐 전체화면 지도 크기 재조정 완료');
+      }
+    }, 100);
+  };
+
+  // 전체화면 지도 닫기
+  const handleCloseFullscreenMap = () => {
+    console.log('❌ 전체화면 지도 닫기');
+    setMapState(prev => ({ ...prev, isFullscreen: false }));
+    
+    // 모달이 닫힌 후 원래 지도 크기 재조정
+    setTimeout(() => {
+      if (mapRef.current) {
+        window.kakao.maps.event.trigger(mapRef.current, 'resize');
+        console.log('📐 원래 지도 크기 재조정 완료');
+      }
+    }, 100);
+  };
+
+  // ESC 키로 전체화면 닫기 및 지도 위치 관리
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && mapState.isFullscreen) {
+        handleCloseFullscreenMap();
+      }
+    };
+
+    if (mapState.isFullscreen) {
+      document.addEventListener('keydown', handleKeyDown);
+      // 전체화면일 때 body 스크롤 막기
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+      
+      // 전체화면이 닫힐 때 지도를 원래 컨테이너로 돌려놓기
+      if (mapRef.current && mapContainerRef.current) {
+        setTimeout(() => {
+          try {
+            const mapContainer = mapRef.current.getContainer();
+            if (mapContainer && mapContainer.parentNode !== mapContainerRef.current) {
+              mapContainerRef.current.appendChild(mapContainer);
+              // 지도 크기 재조정
+              window.kakao.maps.event.trigger(mapRef.current, 'resize');
+              console.log('📐 지도를 원래 위치로 복원 완료');
+            }
+          } catch (error) {
+            console.error('❌ 지도 복원 중 오류:', error);
+          }
+        }, 100);
+      }
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [mapState.isFullscreen]);
 
   // Enter 키 검색
   const handleAddressKeyPress = (e) => {
@@ -688,10 +861,20 @@ const RegisterDetail = () => {
       } catch (error) {
         console.error('❌ 컴포넌트 초기화 실패:', error);
         if (mounted) {
+          let errorMessage = 'Kakao 지도 초기화에 실패했습니다.';
+          
+          if (error.message.includes('로딩 타임아웃')) {
+            errorMessage = '⏰ Kakao 지도 로딩 시간이 초과되었습니다. 네트워크를 확인해주세요.';
+          } else if (error.message.includes('핵심 기능')) {
+            errorMessage = '🔑 Kakao API 키를 확인해주세요. (.env 파일의 VITE_KAKAO_API_KEY)';
+          } else if (KAKAO_MAP_API_KEY === '90ae47b29041df889ea6ef2d93c8520e') {
+            errorMessage = '🔑 .env 파일에 VITE_KAKAO_API_KEY=실제_API_키 를 설정해주세요.';
+          }
+          
           setMapState(prev => ({ 
             ...prev, 
             isLoading: false, 
-            error: 'Kakao 지도 초기화에 실패했습니다. 지도 없이 계속 진행할 수 있습니다.',
+            error: errorMessage,
             apiReady: true  // 백엔드 API는 사용 가능
           }));
         }
@@ -824,28 +1007,31 @@ const RegisterDetail = () => {
       console.log('📤 백엔드로 할머니 등록 데이터 전송...');
       
       const hostData = {
-        houseNickname: formData.houseNickname,
+        // PAGE1 데이터 (기본값 설정)
         hostIntroduction: formData.experiences,
-        address: {
-          detailAddress: formData.address + (formData.detailAddress ? ` ${formData.detailAddress}` : '')
-        },
+        age: 70, // 기본값
+        characteristics: '따뜻한 마음으로 손님을 맞이하는 할머니입니다.', // 기본값
+        representativeMenu: '전통 한식', // 기본값
+        personalitySummary: '정겨운 시골 할머니', // 기본값
+        
+        // PAGE2 데이터
+        address: formData.address + (formData.detailAddress ? ` ${formData.detailAddress}` : ''),
         latitude: parseFloat(formData.lat),
         longitude: parseFloat(formData.lng),
-        contact: {
-          phone: formData.phone
-        },
+        contact: formData.phone,
+        houseNickname: formData.houseNickname,
         maxGuests: formData.maxGuests,
         bedroomCount: formData.bedroomCount,
         bedCount: formData.bedCount,
         amenities: formData.amenities,
+        housePhotos: formData.photos.map(photo => photo.url),
         availableExperiences: formData.experiences,
-        accommodationFee: parseFloat(formData.accommodationFee),
-        housePhotos: formData.photos.map(photo => photo.url)
+        accommodationFee: formData.accommodationFee
       };
 
       console.log('📤 전송할 데이터:', hostData);
 
-      const response = await fetch('https://us-code-halmae-sonmat.onrender.com/api/hosts', {
+      const response = await fetch(`${BACKEND_URL}/api/hosts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -857,7 +1043,7 @@ const RegisterDetail = () => {
       console.log('📨 백엔드 응답:', result);
 
       if (response.ok && result.success) {
-        alert(`✅ 할머니 등록이 완료되었습니다!\n\n📋 등록된 정보:\n• 집 이름: ${formData.houseNickname}\n• 주소: ${formData.address}\n• 위도/경도: ${formData.lat}, ${formData.lng}\n• 연락처: ${formData.phone}\n• 숙박비: ${formData.accommodationFee}원`);
+        alert(`✅ 카카오 지오코딩으로 할머니 등록 완료!\n\n📋 등록된 정보:\n• 집 이름: ${formData.houseNickname}\n• 주소: ${formData.address}${formData.detailAddress ? ' ' + formData.detailAddress : ''}\n• 위도/경도: ${formData.lat}, ${formData.lng}\n• 연락처: ${formData.phone}\n• 숙박비: ${formData.accommodationFee}원\n• 최대 인원: ${formData.maxGuests}명\n• 편의시설: ${formData.amenities.length}개\n\n🏠 카카오 지오코딩으로 정확한 위치가 설정되었습니다!`);
         
         // 폼 초기화
         setFormData({
@@ -889,7 +1075,10 @@ const RegisterDetail = () => {
           mapRef.current.setLevel(6);
         }
 
-        navigate('/host/register');
+        // 등록 성공 후 메인 페이지로 이동
+        setTimeout(() => {
+          navigate('/');
+        }, 2000);
       } else {
         throw new Error(result.message || '등록에 실패했습니다.');
       }
@@ -912,9 +1101,9 @@ const RegisterDetail = () => {
               {/* API 상태 표시 */}
               <div className="api-status">
                 {mapState.apiReady ? (
-                  <span className="status-ready">✅ Kakao Maps API 준비 완료</span>
+                  <span className="status-ready">✅ Kakao Maps + 지오코딩 API 준비 완료</span>
                 ) : (
-                  <span className="status-loading">🔄 Kakao Maps API 로딩 중...</span>
+                  <span className="status-loading">🔄 Kakao Maps + 지오코딩 API 로딩 중...</span>
                 )}
                 
                 {/* 개발용 테스트 버튼 */}
@@ -926,7 +1115,7 @@ const RegisterDetail = () => {
                       onClick={handleAPITest}
                       style={{marginLeft: '10px', fontSize: '12px', padding: '4px 8px'}}
                     >
-                      지오코딩 테스트
+                      백엔드 지오코딩 테스트
                     </button>
                     <button 
                       type="button" 
@@ -1014,6 +1203,44 @@ const RegisterDetail = () => {
                   }}
                 ></div>
                 
+                {/* 전체화면 버튼 */}
+                {mapState.mapInitialized && (
+                  <button
+                    type="button"
+                    className="fullscreen-btn"
+                    onClick={handleFullscreenMap}
+                    title="전체화면으로 지도 보기"
+                    style={{
+                      position: 'absolute',
+                      top: '10px',
+                      right: '10px',
+                      width: '40px',
+                      height: '40px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                      border: '1px solid #ddd',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      zIndex: 3,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '16px',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+                      e.target.style.transform = 'scale(1.05)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                      e.target.style.transform = 'scale(1)';
+                    }}
+                  >
+                    🔍
+                  </button>
+                )}
+
                 {/* 지도 위치 정보 */}
                 {formData.lat && formData.lng && (
                   <div className="map-info">
@@ -1399,6 +1626,125 @@ const RegisterDetail = () => {
           </form>
         </div>
       </main>
+
+      {/* 전체화면 지도 모달 */}
+      {mapState.isFullscreen && (
+        <div 
+          className="fullscreen-modal"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            zIndex: 9999,
+            display: 'flex',
+            flexDirection: 'column'
+          }}
+          onClick={handleCloseFullscreenMap}
+        >
+          {/* 모달 헤더 */}
+          <div 
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              padding: '15px 20px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              backdropFilter: 'blur(10px)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ fontSize: '18px', fontWeight: '600', color: '#2c5530' }}>
+                🗺️ 전체화면 지도
+              </span>
+              {formData.lat && formData.lng && (
+                <span style={{ fontSize: '14px', color: '#666' }}>
+                  📍 {parseFloat(formData.lat).toFixed(6)}, {parseFloat(formData.lng).toFixed(6)}
+                </span>
+              )}
+            </div>
+            <button
+              onClick={handleCloseFullscreenMap}
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                padding: '5px',
+                borderRadius: '50%',
+                transition: 'background-color 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = 'transparent';
+              }}
+              title="전체화면 닫기 (ESC)"
+            >
+              ❌
+            </button>
+          </div>
+
+          {/* 전체화면 지도 컨테이너 */}
+          <div 
+            style={{
+              flex: 1,
+              position: 'relative',
+              backgroundColor: '#f8f9fa'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div 
+              style={{
+                width: '100%',
+                height: '100%',
+                minHeight: '400px'
+              }}
+              ref={(el) => {
+                if (el && mapState.isFullscreen && mapRef.current) {
+                  // 전체화면 모달이 열릴 때 지도를 모달 컨테이너로 이동
+                  if (!el.firstChild) {
+                    el.appendChild(mapRef.current.getContainer());
+                    // 지도 크기 재조정
+                    setTimeout(() => {
+                      window.kakao.maps.event.trigger(mapRef.current, 'resize');
+                    }, 100);
+                  }
+                }
+              }}
+            />
+            
+            {/* 전체화면에서의 컨트롤 */}
+            <div 
+              style={{
+                position: 'absolute',
+                bottom: '20px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                padding: '10px 20px',
+                borderRadius: '25px',
+                backdropFilter: 'blur(10px)',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '15px'
+              }}
+            >
+              <span style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>
+                💡 지도를 드래그하거나 스크롤하여 확대/축소할 수 있습니다
+              </span>
+              <span style={{ fontSize: '12px', color: '#666' }}>
+                ESC 키로 닫기
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
