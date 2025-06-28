@@ -10,6 +10,7 @@ const authRoutes = require('./domains/auth/routes/authRoutes');
 
 const tripRoutes = require('./domains/trip/routes/tripRoutes');
 const reviewRoutes = require('./domains/review/routes/reviewRoutes');
+const paymentRoutes = require('./domains/payment/routes/paymentRoutes');
 require('dotenv').config();
 
 const app = express();
