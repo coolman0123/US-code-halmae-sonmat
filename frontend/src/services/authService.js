@@ -11,7 +11,7 @@ const apiRequest = async (endpoint, options = {}) => {
         ...(token && { 'Authorization': `Bearer ${token}` }),
         ...options.headers
       },
-      credentials: 'include',
+      // credentials 제거 (토큰 기반이므로 쿠키 불필요)
       ...options
     };
 
@@ -40,6 +40,8 @@ const apiRequest = async (endpoint, options = {}) => {
  */
 export const login = async (credentials) => {
   try {
+    console.log('🚀 프론트엔드 로그인 시도:', credentials);
+    
     const data = await apiRequest('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify({
@@ -48,20 +50,24 @@ export const login = async (credentials) => {
       })
     });
     
-    // JWT 토큰이 있다면 localStorage에 저장
+    console.log('✅ 로그인 응답:', data);
+    
+    // 토큰이 있다면 localStorage에 저장
     if (data.token) {
       localStorage.setItem('authToken', data.token);
+      console.log('✅ 토큰 저장 완료');
     }
     
     // 사용자 정보 저장
     if (data.data) {
       localStorage.setItem('currentUser', JSON.stringify(data.data));
       localStorage.setItem('isLoggedIn', 'true');
+      console.log('✅ 사용자 정보 저장 완료');
     }
     
     return data;
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('❌ Login error:', error);
     throw error;
   }
 };
@@ -98,17 +104,20 @@ export const signup = async (userData) => {
  */
 export const logout = async () => {
   try {
-    // 서버에 로그아웃 요청
+    console.log('🚪 로그아웃 시도');
+    // 서버에 로그아웃 요청 (선택사항, 토큰 기반에서는 클라이언트에서만 삭제해도 됨)
     await apiRequest('/api/auth/logout', {
       method: 'POST'
     });
+    console.log('✅ 서버 로그아웃 완료');
   } catch (error) {
-    console.error('Logout error:', error);
+    console.error('❌ Logout error:', error);
   } finally {
     // 로컬 스토리지에서 인증 정보 제거
     localStorage.removeItem('authToken');
     localStorage.removeItem('currentUser');
     localStorage.removeItem('isLoggedIn');
+    console.log('✅ 로컬 인증 정보 삭제 완료');
   }
 };
 
@@ -118,14 +127,15 @@ export const logout = async () => {
  */
 export const getCurrentUser = async () => {
   try {
+    console.log('👤 현재 사용자 정보 요청');
     const data = await apiRequest('/api/auth/me', {
       method: 'GET'
     });
+    console.log('✅ 사용자 정보 조회 성공:', data.data);
     return data.data;
   } catch (error) {
-    console.error('Get current user error:', error);
-    // 토큰이 유효하지 않으면 로그아웃 처리
-    await logout();
+    console.error('❌ Get current user error:', error);
+    // 에러만 던지고, 호출하는 곳에서 처리하도록 함
     throw error;
   }
 };
@@ -138,12 +148,19 @@ export const validateToken = async () => {
   try {
     const token = localStorage.getItem('authToken');
     if (!token) {
+      console.log('❌ 토큰이 없음');
       return false;
     }
 
-    await getCurrentUser();
+    console.log('🔍 토큰 유효성 검사 시도');
+    const data = await apiRequest('/api/auth/validate', {
+      method: 'GET'
+    });
+    
+    console.log('✅ 토큰 유효성 검사 성공:', data);
     return true;
   } catch (error) {
+    console.log('❌ 토큰 유효성 검사 실패:', error.message);
     return false;
   }
 };
@@ -153,7 +170,10 @@ export const validateToken = async () => {
  * @returns {boolean} 로그인 상태
  */
 export const isLoggedIn = () => {
-  return localStorage.getItem('isLoggedIn') === 'true' && localStorage.getItem('authToken');
+  const hasToken = !!localStorage.getItem('authToken');
+  const isMarkedLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  console.log('🔍 로그인 상태 확인:', { hasToken, isMarkedLoggedIn });
+  return hasToken && isMarkedLoggedIn;
 };
 
 /**

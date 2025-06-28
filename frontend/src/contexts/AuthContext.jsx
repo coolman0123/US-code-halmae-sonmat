@@ -41,17 +41,31 @@ export const AuthProvider = ({ children }) => {
                 setIsAuthenticated(true);
               } catch (error) {
                 console.error('사용자 정보 가져오기 실패:', error);
-                await logout();
+                // 무한 루프 방지를 위해 직접 상태만 초기화
+                setUser(null);
+                setIsAuthenticated(false);
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('isLoggedIn');
               }
             }
           } else {
-            // 토큰이 유효하지 않으면 로그아웃 처리
-            await logout();
+            // 토큰이 유효하지 않으면 상태 초기화
+            setUser(null);
+            setIsAuthenticated(false);
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('isLoggedIn');
           }
         }
       } catch (error) {
         console.error('인증 초기화 오류:', error);
-        await logout();
+        // 상태 초기화만 진행
+        setUser(null);
+        setIsAuthenticated(false);
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('isLoggedIn');
       } finally {
         setIsLoading(false);
       }

@@ -50,16 +50,15 @@ class AuthController {
 
       const user = await this.authService.login(email, password);
 
-      // 세션에 사용자 정보 저장 (간단한 방식)
-      req.session = req.session || {};
-      req.session.userId = user.id;
-      req.session.user = user;
+      // 간단한 토큰 생성 (보안 무시, 단순 구현)
+      const token = Buffer.from(`${user.id}:${user.email}:${Date.now()}`).toString('base64');
 
-      console.log('✅ 로그인 API 성공:', { userId: user.id, email: user.email });
+      console.log('✅ 로그인 API 성공:', { userId: user.id, email: user.email, token });
       res.json({
         success: true,
         message: '로그인 성공',
-        data: user
+        data: user,
+        token: token
       });
     } catch (error) {
       console.log('❌ 로그인 API 에러:', error.message);
@@ -72,12 +71,7 @@ class AuthController {
 
   async logout(req, res) {
     try {
-      // 세션 제거
-      if (req.session) {
-        req.session.userId = null;
-        req.session.user = null;
-      }
-
+      // 토큰 기반에서는 클라이언트에서 토큰을 삭제하면 됨
       res.json({
         success: true,
         message: '로그아웃 되었습니다.'
@@ -92,20 +86,41 @@ class AuthController {
 
   async getCurrentUser(req, res) {
     try {
-      if (!req.session || !req.session.userId) {
+      // Authorization 헤더에서 토큰 추출
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return res.status(401).json({
           success: false,
           message: '로그인이 필요합니다.'
         });
       }
 
-      const user = await this.authService.getUserById(req.session.userId);
+      const token = authHeader.split(' ')[1];
+      
+      // 토큰 디코딩 (간단한 방식)
+      try {
+        const decoded = Buffer.from(token, 'base64').toString('utf-8');
+        const [userId, email] = decoded.split(':');
+        
+        if (!userId) {
+          throw new Error('유효하지 않은 토큰');
+        }
 
-      res.json({
-        success: true,
-        data: user
-      });
+        const user = await this.authService.getUserById(userId);
+
+        res.json({
+          success: true,
+          data: user
+        });
+      } catch (tokenError) {
+        console.log('❌ 토큰 디코딩 실패:', tokenError.message);
+        return res.status(401).json({
+          success: false,
+          message: '유효하지 않은 토큰입니다.'
+        });
+      }
     } catch (error) {
+      console.log('❌ getCurrentUser 에러:', error.message);
       res.status(404).json({
         success: false,
         message: error.message
@@ -113,26 +128,46 @@ class AuthController {
     }
   }
 
-  // 토큰 유효성 검사를 위한 엔드포인트 (현재는 세션 기반)
+  // 토큰 유효성 검사를 위한 엔드포인트
   async validateToken(req, res) {
     try {
-      if (!req.session || !req.session.userId) {
+      // Authorization 헤더에서 토큰 추출
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return res.status(401).json({
           success: false,
-          message: '유효하지 않은 세션입니다.'
+          message: '토큰이 없습니다.'
         });
       }
 
-      const user = await this.authService.getUserById(req.session.userId);
+      const token = authHeader.split(' ')[1];
+      
+      // 토큰 디코딩 (간단한 방식)
+      try {
+        const decoded = Buffer.from(token, 'base64').toString('utf-8');
+        const [userId, email] = decoded.split(':');
+        
+        if (!userId) {
+          throw new Error('유효하지 않은 토큰');
+        }
 
-      res.json({
-        success: true,
-        data: user
-      });
+        const user = await this.authService.getUserById(userId);
+
+        res.json({
+          success: true,
+          data: user
+        });
+      } catch (tokenError) {
+        console.log('❌ 토큰 검증 실패:', tokenError.message);
+        return res.status(401).json({
+          success: false,
+          message: '유효하지 않은 토큰입니다.'
+        });
+      }
     } catch (error) {
       res.status(401).json({
         success: false,
-        message: '세션이 만료되었습니다.'
+        message: '토큰 검증에 실패했습니다.'
       });
     }
   }
