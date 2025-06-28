@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa';
 import SelectButton from '../../../../components/Button/Button';
 import whiteCamera from '../../../../assets/icons/흰카메라.png';
@@ -9,11 +9,15 @@ import './ReviewForm.css';
 
 const ReviewForm = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(null);
   const [content, setContent] = useState('');
   const [photos, setPhotos] = useState([]);
   const [error, setError] = useState('');
+  const [hasRuralExperience, setHasRuralExperience] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [reservationData, setReservationData] = useState({});
 
   const dummyData = [
     {
@@ -48,12 +52,148 @@ const ReviewForm = () => {
     },
   ];
 
-  const data = dummyData.find((item) => item.id === Number(id)) || {};
+  useEffect(() => {
+    // 로그인한 사용자 정보 가져오기
+    const userData = localStorage.getItem("currentUser");
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    
+    if (isLoggedIn === "true" && userData) {
+      try {
+        const user = JSON.parse(userData);
+        setCurrentUser(user);
+        loadReservationData(user);
+      } catch (error) {
+        console.error("사용자 데이터 파싱 오류:", error);
+        navigate("/auth/login");
+      }
+    } else {
+      navigate("/auth/login");
+    }
+  }, [id, navigate]);
+
+  const loadReservationData = (user) => {
+    // 사용자별 결제 정보 가져오기
+    const allPaymentData = {
+      'user': [
+        {
+          id: 1,
+          location: '여여',
+          date: '2025.06.24',
+          price: '340,000원',
+        },
+        {
+          id: 2,
+          location: '모모',
+          date: '2025.05.24',
+          price: '150,000원',
+        },
+      ],
+      'admin': [
+        {
+          id: 3,
+          location: '소소',
+          date: '2025.04.14',
+          price: '150,000원',
+        },
+        {
+          id: 4,
+          location: '호호',
+          date: '2025.03.14',
+          price: '170,000원',
+        },
+      ],
+      '22': [
+        {
+          id: 5,
+          location: '패밀리',
+          date: '2025.03.02',
+          price: '150,000원',
+        },
+        {
+          id: 6,
+          location: '여여',
+          date: '2025.02.15',
+          price: '340,000원',
+        },
+      ]
+    };
+
+    const userPayments = allPaymentData[user.email] || [];
+    const currentReservation = userPayments.find(payment => payment.id === Number(id));
+    
+    if (currentReservation) {
+      // 할매 등록 정보 가져오기
+      const savedHostData = localStorage.getItem('hostRegisterData');
+      let basicInfo = {};
+      if (savedHostData) {
+        try {
+          const parsedData = JSON.parse(savedHostData);
+          basicInfo = parsedData.basicInfo || {};
+        } catch (error) {
+          console.error('할매 등록 데이터 파싱 오류:', error);
+        }
+      }
+
+      setReservationData({
+        ...currentReservation,
+        description: `"${basicInfo.personality || '따뜻한'}" ${basicInfo.name || '할머니'}`
+      });
+    }
+  };
+
+  const handleSubmitReview = () => {
+    if (content.length < 10) {
+      setError('후기는 최소 10자 이상 작성해주세요.');
+      return;
+    }
+
+    if (!currentUser) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    // 새 리뷰 데이터 생성
+    const newReview = {
+      id: Date.now(), // 임시 ID
+      reservationId: Number(id),
+      userId: currentUser.email,
+      place: reservationData.location,
+      date: new Date().toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).replace(/\. /g, '.').replace('.', ''),
+      quote: reservationData.description,
+      rating: rating,
+      content: content,
+      hasRuralExperience: hasRuralExperience,
+      photos: photos.map(file => URL.createObjectURL(file)), // 실제 구현시에는 서버에 업로드
+      createdAt: new Date().toISOString()
+    };
+
+    // localStorage에 리뷰 저장
+    const existingReviews = JSON.parse(localStorage.getItem('userReviews') || '{}');
+    if (!existingReviews[currentUser.email]) {
+      existingReviews[currentUser.email] = [];
+    }
+    existingReviews[currentUser.email].push(newReview);
+    localStorage.setItem('userReviews', JSON.stringify(existingReviews));
+
+    alert('후기 등록이 완료되었습니다!');
+    navigate('/mypage/review/list');
+  };
+
+  const data = reservationData;
 
   const handlePhotoUpload = (e) => {
     const selectedFiles = Array.from(e.target.files);
     const totalFiles = [...photos, ...selectedFiles].slice(0, 5);
     setPhotos(totalFiles);
+  };
+
+  const handlePhotoDelete = (indexToDelete) => {
+    const updatedPhotos = photos.filter((_, index) => index !== indexToDelete);
+    setPhotos(updatedPhotos);
   };
 
   const handleChange = (e) => {
@@ -82,7 +222,7 @@ const ReviewForm = () => {
       </div>
 
       <div className='rating-section'>
-        <h3>숙소는 어땠나요?</h3>
+        <h3>할매집은 어땠나요?</h3>
         <div className='stars'>
           {[...Array(5)].map((_, i) => {
             const currentRating = i + 1;
@@ -121,11 +261,27 @@ const ReviewForm = () => {
         </p>
       </div>
 
+      <div className='rural-experience-section'>
+        <h3>일손 돕기 체험을 하셨나요?</h3>
+        <div className='checkbox-wrapper'>
+          <label className='checkbox-label'>
+            <input
+              type='checkbox'
+              checked={hasRuralExperience}
+              onChange={(e) => setHasRuralExperience(e.target.checked)}
+              className='checkbox-input'
+            />
+            <span className='checkbox-custom'></span>
+            네
+          </label>
+        </div>
+      </div>
+
       <div className='experience-section'>
-        <h3>숙소에서의 경험을 공유해 주세요</h3>
+        <h3>할매집에서의 경험을 공유해 주세요</h3>
         <div className='guide-box'>
           <b>이렇게 작성하면 좋아요!</b>
-          <p>청결도, 서비스 등 숙소에 대한 전반적인 경험을 작성해 주세요.</p>
+          <p>할머니와의 추억, 이야기, 밥, 느낀점 등 전반적인 경험을 작성해주면 좋아요</p>
         </div>
         <textarea
           maxLength={1000}
@@ -142,12 +298,20 @@ const ReviewForm = () => {
       {photos.length > 0 && (
         <div className='photo-preview-list'>
           {photos.map((file, index) => (
-            <img
-              key={index}
-              src={URL.createObjectURL(file)}
-              alt={`preview-${index}`}
-              className='photo-preview'
-            />
+            <div key={index} className='photo-preview-container'>
+              <img
+                src={URL.createObjectURL(file)}
+                alt={`preview-${index}`}
+                className='photo-preview'
+              />
+              <button
+                type='button'
+                className='photo-delete-btn'
+                onClick={() => handlePhotoDelete(index)}
+              >
+                ×
+              </button>
+            </div>
           ))}
         </div>
       )}
@@ -161,23 +325,19 @@ const ReviewForm = () => {
         onChange={handlePhotoUpload}
       />
       <div className='button-group'>
-        <label htmlFor='photo-upload'>
+        <div onClick={() => document.getElementById('photo-upload').click()}>
           <SelectButton
             selected={photos.length > 0}
             icon={photos.length > 0 ? whiteCamera : blackCamera}
             text={`사진 추가하기 (${photos.length}/5)`}
           />
-        </label>
+        </div>
 
         <SelectButton
           text='등록 완료'
-          selected={content.length >= 10}
-          disabled={content.length < 10}
-          onClick={() => {
-            if (content.length >= 10) {
-              alert('후기 등록 완료');
-            }
-          }}
+          selected={content.length >= 10 && rating > 0}
+          disabled={content.length < 10 || rating === 0}
+          onClick={handleSubmitReview}
         />
       </div>
     </div>

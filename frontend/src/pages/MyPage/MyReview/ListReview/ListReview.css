@@ -59,3 +59,49 @@
   color: #333;
   white-space: pre-line; /* 줄바꿈 적용 */
 }
+
+.experience-badge {
+  background-color: #4CAF50;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+  margin-top: 4px;
+}
+
+.review-photos {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.review-photo {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.no-reviews {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.no-reviews p {
+  margin: 8px 0;
+}
+
+.no-reviews p:first-child {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.no-reviews p:last-child {
+  font-size: 14px;
+  color: #999;
+}
