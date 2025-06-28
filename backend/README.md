@@ -17,7 +17,7 @@ KAKAO_REST_API_KEY=your_kakao_rest_api_key_here
 2. 내 애플리케이션 > 애플리케이션 추가하기
 3. 앱 설정 > 앱 키에서 "REST API 키" 복사
 4. 플랫폼 설정 > Web 플랫폼 추가
-5. 사이트 도메인 등록 (localhost:5001 등)
+5. 사이트 도메인 등록 (프로덕션: https://us-code-halmae-sonmat.onrender.com, 로컬: localhost:5001 등)
 
 #### API 사용 설정
 

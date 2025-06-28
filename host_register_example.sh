@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # 호스트 등록 API 테스트용 curl 스크립트
-# 서버가 localhost:5001에서 실행 중이어야 합니다.
+# 서버가 https://us-code-halmae-sonmat.onrender.com에서 실행 중이어야 합니다.
 
-curl -X POST http://localhost:5001/api/hosts \
+curl -X POST https://us-code-halmae-sonmat.onrender.com/api/hosts \
   -H "Content-Type: application/json" \
   -d '{
     "hostIntroduction": "따뜻한 마음으로 손님을 맞이하는 할머니입니다",

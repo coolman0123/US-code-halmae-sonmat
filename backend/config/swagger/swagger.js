@@ -9,7 +9,7 @@ const options = {
       description: '할매의 손맛 프로젝트 API 문서',
     },
     servers: [
-
+    { url: 'https://us-code-halmae-sonmat.onrender.com',   description: 'Production' },
     { url: 'http://localhost:5001',                         description: 'Local'      }
     ],
   },

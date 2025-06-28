@@ -1,5 +1,5 @@
 // 백엔드 API 서비스
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://us-code-halmae-sonmat.onrender.com';
 
 // 공통 API 요청 함수
 const apiRequest = async (endpoint, options = {}) => {

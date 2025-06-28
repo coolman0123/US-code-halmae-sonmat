@@ -53,7 +53,7 @@ const RegisterDetail = () => {
     personality: ''
   });
 
-  const BACKEND_URL = 'http://localhost:5001';
+  const BACKEND_URL = 'https://us-code-halmae-sonmat.onrender.com';
   // Kakao Map API 키 - 환경변수에서 읽기
   const KAKAO_MAP_API_KEY = import.meta.env.VITE_KAKAO_API_KEY || import.meta.env.VITE_KAKAO_MAP_API_KEY || '90ae47b29041df889ea6ef2d93c8520e';
   

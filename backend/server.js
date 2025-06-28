@@ -16,7 +16,7 @@ require('dotenv').config();
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'],
+  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173', 'https://us-code-halmae-sonmat-hev09y1qr-coolman0123s-projects.vercel.app'],
   credentials: true
 }));
 

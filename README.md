@@ -89,7 +89,8 @@ Firebase 설정을 위한 환경 변수 파일을 생성하세요:
 
 백엔드 서버 실행 후 Swagger UI를 통해 API 문서를 확인할 수 있습니다:
 ```
-http://localhost:3000/api-docs
+Production: https://us-code-halmae-sonmat.onrender.com/api-docs
+Local: http://localhost:3000/api-docs
 ```
 
 ## 🎨 주요 페이지
@@ -161,7 +162,7 @@ KAKAO_REST_API_KEY=your_kakao_rest_api_key_here
    - **JavaScript 키**: 프론트엔드 지도 표시용
    - **REST API 키**: 백엔드 지오코딩용
 4. **플랫폼 설정 > Web 플랫폼 추가**
-5. **사이트 도메인 등록** (localhost:3000, localhost:5001 등)
+5. **사이트 도메인 등록** (프로덕션: https://us-code-halmae-sonmat-hev09y1qr-coolman0123s-projects.vercel.app, 로컬: localhost:3000, localhost:5001 등)
 6. **제품 설정**:
    - **Kakao Map** 활성화
    - **Local (주소 검색)** 활성화
