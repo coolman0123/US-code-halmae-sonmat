@@ -92,4 +92,18 @@ router.post('/logout', (req, res) => authController.logout(req, res));
  */
 router.get('/me', (req, res) => authController.getCurrentUser(req, res));
 
+/**
+ * @swagger
+ * /api/auth/validate:
+ *   get:
+ *     summary: 토큰/세션 유효성 검사
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: 유효한 세션
+ *       401:
+ *         description: 유효하지 않은 세션
+ */
+router.get('/validate', (req, res) => authController.validateToken(req, res));
+
 module.exports = router; 

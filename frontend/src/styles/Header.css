@@ -76,6 +76,21 @@ nav li a:hover {
   margin-right: 10px;
 }
 
+.logout-button {
+  font-size: 16px;
+  color: #333;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  padding: 0;
+}
+
+.logout-button:hover {
+  color: #8b4513;
+}
+
 nav li:last-child {
   margin-left: 35px;
   display: flex;

@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const session = require('express-session');
 const swaggerUi = require('swagger-ui-express');
 const specs = require('./config/swagger/swagger');
 const userRoutes = require('./routes/userRoutes');
@@ -17,6 +18,19 @@ app.use(cors({
   origin: ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'],
   credentials: true
 }));
+
+// 세션 설정
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'grandma-hand-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: false, // HTTPS 환경에서는 true로 설정
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 24시간
+  }
+}));
+
 app.use(express.json());
 
 app.use('/api/users', userRoutes);

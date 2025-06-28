@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import { AuthProvider } from "./contexts/AuthContext";
 
 // Pages
 import MainPage from "./pages/MainPage/MainPage";
@@ -113,61 +114,63 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<MainPage />} />
-          <Route path="/stories" element={<Stories />} />
-          <Route path="/experiences" element={<Experience />} />
-          <Route path="/booking" element={<Booking />} />
-          <Route path="/live-reservation" element={<LiveReservation />}>
-            <Route index element={<Navigate to="my" replace />} />
-            <Route path="my" element={<MyReservation />} />
-            <Route path="book" element={<BookNow />} />
-          </Route>
-          <Route
-            path="/live-reservation/detail/:roomId"
-            element={<DetailBooking />}
-          />
-          <Route
-            path="/live-reservation/review/:roomId"
-            element={<Review />}
-          />
-          <Route
-            path="/live-reservation/review-photos/:roomId"
-            element={<ReviewPhotos />}
-          />
-          <Route path="/live-reservation/payment" element={<Payment />} />
-          <Route path="/mypage" element={<MyPage />} />
-          <Route path="/mypage/payment" element={<MyPayment />} />
-          <Route path="/mypage/review/*" element={<MyReview />}>
-            <Route index element={<Navigate to="write" replace />} />
-            <Route path="write" element={<WriteReview />} />
-            <Route path="list" element={<ListReview />} />
-          </Route>
-          <Route path="/mypage/review/form/:id" element={<ReviewForm />} />
-          <Route path="/mypage/notification" element={<Notification />} />
+    <AuthProvider>
+      <Router>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<MainPage />} />
+            <Route path="/stories" element={<Stories />} />
+            <Route path="/experiences" element={<Experience />} />
+            <Route path="/booking" element={<Booking />} />
+            <Route path="/live-reservation" element={<LiveReservation />}>
+              <Route index element={<Navigate to="my" replace />} />
+              <Route path="my" element={<MyReservation />} />
+              <Route path="book" element={<BookNow />} />
+            </Route>
+            <Route
+              path="/live-reservation/detail/:roomId"
+              element={<DetailBooking />}
+            />
+            <Route
+              path="/live-reservation/review/:roomId"
+              element={<Review />}
+            />
+            <Route
+              path="/live-reservation/review-photos/:roomId"
+              element={<ReviewPhotos />}
+            />
+            <Route path="/live-reservation/payment" element={<Payment />} />
+            <Route path="/mypage" element={<MyPage />} />
+            <Route path="/mypage/payment" element={<MyPayment />} />
+            <Route path="/mypage/review/*" element={<MyReview />}>
+              <Route index element={<Navigate to="write" replace />} />
+              <Route path="write" element={<WriteReview />} />
+              <Route path="list" element={<ListReview />} />
+            </Route>
+            <Route path="/mypage/review/form/:id" element={<ReviewForm />} />
+            <Route path="/mypage/notification" element={<Notification />} />
 
-          {/* Auth Routes */}
-          <Route path='/auth/login' element={<Login />} />
-          <Route path='/auth/admin-login' element={<AdminLogin />} />
-          <Route path='/auth/signup' element={<SignUp />} />
-          <Route path='/auth/logout' element={<Logout />} />
+            {/* Auth Routes */}
+            <Route path='/auth/login' element={<Login />} />
+            <Route path='/auth/admin-login' element={<AdminLogin />} />
+            <Route path='/auth/signup' element={<SignUp />} />
+            <Route path='/auth/logout' element={<Logout />} />
 
 
-          {/* Host Routes */}
-          <Route path="/host/login" element={<HostLogin />} />
-          <Route path="/host" element={<HostRegister />} />
-          <Route path="/host/booking" element={<HostBooking />} />
-          <Route path="/host/booking/add" element={<AddReservation />} />
-          <Route path="/host/payment" element={<HostPayment />} />
-          <Route path="/host/payment/:date" element={<PaymentDetail />} />
-          <Route path="/host/register" element={<HostRegister />} />
-          <Route path="/host/register/new" element={<RegisterForm />} />
-          <Route path="/host/register/detail" element={<RegisterDetail />} />
-        </Routes>
-      </Layout>
-    </Router>
+            {/* Host Routes */}
+            <Route path="/host/login" element={<HostLogin />} />
+            <Route path="/host" element={<HostRegister />} />
+            <Route path="/host/booking" element={<HostBooking />} />
+            <Route path="/host/booking/add" element={<AddReservation />} />
+            <Route path="/host/payment" element={<HostPayment />} />
+            <Route path="/host/payment/:date" element={<PaymentDetail />} />
+            <Route path="/host/register" element={<HostRegister />} />
+            <Route path="/host/register/new" element={<RegisterForm />} />
+            <Route path="/host/register/detail" element={<RegisterDetail />} />
+          </Routes>
+        </Layout>
+      </Router>
+    </AuthProvider>
   );
 }
 

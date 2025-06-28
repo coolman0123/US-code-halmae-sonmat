@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../contexts/AuthContext';
 import './Login.css';
-// import grandmaLogo from '../../assets/images/할머니로고.png';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login, isLoading } = useAuth();
   const [formData, setFormData] = useState({
-    id: '',
+    email: '',
     password: ''
   });
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleInputChange = (e) => {
@@ -24,60 +24,27 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
 
+    // 입력 유효성 검사
+    if (!formData.email || !formData.password) {
+      setError('이메일과 비밀번호를 모두 입력해주세요.');
+      return;
+    }
+
     try {
-      // 백엔드 API 호출 (나중에 활성화)
-      // const response = await loginAPI(formData);
+      const response = await login(formData);
       
-      // 현재는 로컬스토리지 사용 (개발용)
-      const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-      const user = existingUsers.find(
-        u => (u.email === formData.id || u.id === formData.id) && u.password === formData.password
-      );
-      
-      if (user) {
-        // 로그인 성공 시 사용자 정보 저장
-        localStorage.setItem('currentUser', JSON.stringify({
-          id: user.id,
-          name: user.name,
-          userId: formData.id, // 로그인에 사용한 ID
-          loginTime: new Date().toISOString()
-        }));
-        localStorage.setItem('isLoggedIn', 'true');
-        
-        alert(`${user.name}님, 환영합니다!`);
+      if (response.success) {
+        alert(`${response.data.name}님, 환영합니다!`);
         navigate('/'); // 메인페이지로 이동
-      } else {
-        setError('아이디 또는 비밀번호가 올바르지 않습니다.');
       }
     } catch (err) {
-      setError('로그인에 실패했습니다. 다시 시도해주세요.');
-    } finally {
-      setIsLoading(false);
+      setError(err.message || '로그인에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
-  // 백엔드 연동용 API 함수 (나중에 활성화)
-  const loginAPI = async (credentials) => {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        id: credentials.id,
-        password: credentials.password
-      })
-    });
-    
-    if (!response.ok) {
-      throw new Error('로그인 실패');
-    }
-    
-    return await response.json();
-  };
+
 
   return (
     <div className="login-page">
@@ -98,10 +65,10 @@ const Login = () => {
           
           <div className="input-group">
             <input
-              type="text"
-              name="id"
-              placeholder="아이디"
-              value={formData.id}
+              type="email"
+              name="email"
+              placeholder="이메일"
+              value={formData.email}
               onChange={handleInputChange}
               required
               disabled={isLoading}
