@@ -1,7 +1,7 @@
-import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import './PaymentDetail.css';
-import hostImage from '../../../assets/images/내 결제_숙소.png';
+import React from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import "./PaymentDetail.css";
+import hostImage from "../../../assets/images/내 결제_숙소.png";
 
 const PaymentDetail = () => {
   const { date } = useParams(); // URL에서 날짜 파라미터 받기
@@ -9,7 +9,7 @@ const PaymentDetail = () => {
 
   // 날짜 파싱 (예: 20250604 -> 2025.06.04)
   const formatDate = (dateString) => {
-    if (!dateString || dateString.length !== 8) return '';
+    if (!dateString || dateString.length !== 8) return "";
     const year = dateString.substring(0, 4);
     const month = dateString.substring(4, 6);
     const day = dateString.substring(6, 8);
@@ -18,12 +18,12 @@ const PaymentDetail = () => {
 
   // 요일 계산
   const getWeekday = (dateString) => {
-    if (!dateString || dateString.length !== 8) return '';
+    if (!dateString || dateString.length !== 8) return "";
     const year = parseInt(dateString.substring(0, 4));
     const month = parseInt(dateString.substring(4, 6)) - 1;
     const day = parseInt(dateString.substring(6, 8));
     const date = new Date(year, month, day);
-    const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+    const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
     return weekdays[date.getDay()];
   };
 
@@ -33,51 +33,62 @@ const PaymentDetail = () => {
     return [
       {
         id: 1,
-        title: '여여',
-        dateRange: '이용일자 2025.06.29 - 2025.06.30',
-        description: '김현진 님 예약',
-        amount: 250000,
-        image: hostImage
+        title: "봉순가",
+        dateRange: "이용일자 2025.06.29 - 2025.06.30",
+        description: "김현진 님 예약",
+        amount: 50000,
+        image: hostImage,
       },
       {
         id: 2,
-        title: '여여',
-        dateRange: '이용일자 2025.06.29 - 2025.06.30',
-        description: '김현진 님 예약',
-        amount: 340000,
-        image: hostImage
+        title: "옥순가",
+        dateRange: "이용일자 2025.06.29 - 2025.06.30",
+        description: "신혜림 님 예약",
+        amount: 45000,
+        image: hostImage,
       },
       {
         id: 3,
-        title: '여여',
-        dateRange: '이용일자 2025.06.29 - 2025.06.30',
-        description: '김현진 님 예약',
-        amount: 340000,
-        image: hostImage
+        title: "금자가",
+        dateRange: "이용일자 2025.06.29 - 2025.06.30",
+        description: "김지연 님 예약",
+        amount: 48000,
+        image: hostImage,
       },
       {
         id: 4,
-        title: '여여',
-        dateRange: '이용일자 2025.06.29 - 2025.06.30',
-        description: '김현진 님 예약',
-        amount: 340000,
-        image: hostImage
-      }
+        title: "다감가",
+        dateRange: "이용일자 2025.06.29 - 2025.06.30",
+        description: "김초연 님 예약",
+        amount: 55000,
+        image: hostImage,
+      },
+      {
+        id: 4,
+        title: "말순가",
+        dateRange: "이용일자 2025.06.29 - 2025.06.30",
+        description: "정영준 님 예약",
+        amount: 43000,
+        image: hostImage,
+      },
     ];
   };
 
   const paymentDetails = getPaymentDetails();
-  const totalAmount = paymentDetails.reduce((sum, item) => sum + item.amount, 0);
+  const totalAmount = paymentDetails.reduce(
+    (sum, item) => sum + item.amount,
+    0
+  );
 
   const handleBack = () => {
-    navigate('/host/payment');
+    navigate("/host/payment");
   };
 
   return (
     <div className="payment-detail-page">
       <div className="payment-detail-container">
         <h1 className="payment-detail-title">결제 관리</h1>
-        
+
         <div className="date-info">
           <span className="date-text">
             {formatDate(date)} ({getWeekday(date)})
@@ -87,8 +98,8 @@ const PaymentDetail = () => {
         <div className="payment-list">
           {paymentDetails.map((payment) => (
             <div key={payment.id} className="payment-item">
-              <img 
-                src={payment.image} 
+              <img
+                src={payment.image}
                 alt={payment.title}
                 className="payment-image"
               />
@@ -97,8 +108,15 @@ const PaymentDetail = () => {
                 <p className="payment-date">{payment.dateRange}</p>
                 <p className="payment-description">{payment.description}</p>
               </div>
-              <div className="payment-amount">
-                {payment.amount.toLocaleString('ko-KR')} 원
+              <div className="payment-amount-group">
+                <div className="refund-info">
+                  {`${Math.floor(payment.amount * 0.1).toLocaleString(
+                    "ko-KR"
+                  )}원 환급`}
+                </div>
+                <div className="payment-amount">
+                  {payment.amount.toLocaleString("ko-KR")} 원
+                </div>
               </div>
             </div>
           ))}
@@ -108,4 +126,4 @@ const PaymentDetail = () => {
   );
 };
 
-export default PaymentDetail; 
+export default PaymentDetail;
