@@ -48,6 +48,7 @@ import DetailBooking from "./pages/LiveReservation/DetailBooking/DetailBooking";
 import MyReservation from "./pages/LiveReservation/MyReservation/MyReservation";
 import Payment from "./pages/LiveReservation/Payment/Payment";
 import Review from "./pages/LiveReservation/Review/Review";
+import ReviewPhotos from "./pages/LiveReservation/ReviewPhotos/ReviewPhotos";
 
 import "./App.css";
 
@@ -129,8 +130,12 @@ function App() {
             element={<DetailBooking />}
           />
           <Route
-            path="/live-reservation/detail/:roomId/review"
+            path="/live-reservation/review/:roomId"
             element={<Review />}
+          />
+          <Route
+            path="/live-reservation/review-photos/:roomId"
+            element={<ReviewPhotos />}
           />
           <Route path="/live-reservation/payment" element={<Payment />} />
           <Route path="/mypage" element={<MyPage />} />
