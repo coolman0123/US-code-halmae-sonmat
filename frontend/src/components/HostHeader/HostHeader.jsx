@@ -54,7 +54,7 @@ const HostHeader = () => {
           <li><Link to="/host/booking">예약 관리</Link></li>
           <li><Link to="/host/payment">결제 관리</Link></li>
           <li>
-            <Link to="/">홈으로</Link>
+            <Link to="/">로그아웃</Link>
           </li>
         </ul>
       </nav>

@@ -11,6 +11,14 @@ class PaymentService {
     this.hostRepository = new HostRepository();
   }
 
+  async getAllPayments() {
+    try {
+      return await this.paymentRepository.findAll();
+    } catch (error) {
+      throw new Error(`모든 결제 조회 중 오류가 발생했습니다: ${error.message}`);
+    }
+  }
+
   async createPayment(paymentData) {
     try {
       // 유효성 검사

@@ -110,3 +110,239 @@
     margin-bottom: 30px;
   }
 }
+
+/* 새로 추가된 요소들의 스타일 */
+
+/* 페이지 헤더 */
+.page-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fa, #e8f5e8);
+  border-radius: 12px;
+}
+
+.page-header h2 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 24px;
+}
+
+.page-header p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+/* 로딩 및 에러 상태 */
+.loading-container, .error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.loading-spinner {
+  font-size: 48px;
+  animation: spin 2s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-container p {
+  color: #666;
+  font-size: 16px;
+}
+
+.error-message {
+  background: #ffeaea;
+  border: 1px solid #ffcdd2;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 400px;
+}
+
+.error-message h3 {
+  margin: 0 0 8px 0;
+  color: #c62828;
+}
+
+.error-message p {
+  margin: 0 0 16px 0;
+  color: #666;
+}
+
+.retry-button {
+  background-color: #e91e63;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.retry-button:hover {
+  background-color: #c2185b;
+}
+
+/* 리뷰 카드 개선 */
+.review-card.selected {
+  border-color: #e91e63;
+  box-shadow: 0 4px 12px rgba(233, 30, 99, 0.2);
+  background-color: #fef7f7;
+}
+
+.price {
+  font-size: 14px;
+  color: #e91e63;
+  font-weight: 600;
+}
+
+.trip-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.trip-period {
+  font-size: 12px;
+  color: #4caf50;
+  background-color: #e8f5e8;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  width: fit-content;
+}
+
+.not-reviewable {
+  font-size: 12px;
+  color: #ff9800;
+  background-color: #fff3e0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  width: fit-content;
+}
+
+/* 빈 상태 */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  border: 2px dashed #ddd;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.empty-state h3 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 20px;
+}
+
+.empty-state p {
+  margin: 0 0 20px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.go-booking-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.go-booking-btn:hover {
+  background-color: #45a049;
+}
+
+/* 선택된 여행 미리보기 */
+.selected-trip-preview {
+  background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border-left: 4px solid #4caf50;
+}
+
+.selected-trip-preview h3 {
+  margin: 0 0 8px 0;
+  color: #2e7d32;
+  font-size: 16px;
+}
+
+.preview-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.preview-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 15px;
+}
+
+.preview-date {
+  color: #666;
+  font-size: 13px;
+}
+
+/* 모바일 대응 개선 */
+@media (max-width: 768px) {
+  .page-header {
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+
+  .page-header h2 {
+    font-size: 20px;
+  }
+
+  .page-header p {
+    font-size: 13px;
+  }
+
+  .trip-details {
+    display: none; /* 모바일에서는 상세 정보 숨김 */
+  }
+
+  .empty-state {
+    padding: 40px 16px;
+  }
+
+  .empty-icon {
+    font-size: 48px;
+  }
+
+  .empty-state h3 {
+    font-size: 18px;
+  }
+
+  .selected-trip-preview {
+    padding: 12px;
+  }
+
+  .preview-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}

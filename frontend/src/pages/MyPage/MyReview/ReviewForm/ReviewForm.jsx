@@ -17,173 +17,215 @@ const ReviewForm = () => {
   const [error, setError] = useState('');
   const [hasRuralExperience, setHasRuralExperience] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-  const [reservationData, setReservationData] = useState({});
-
-  const dummyData = [
-    {
-      id: 1,
-      location: '여여',
-      date: '2025.06.24',
-      description: '"말보단 손이 빠른" 박봉순 할머니',
-    },
-    {
-      id: 2,
-      location: '모모',
-      date: '2025.05.24',
-      description: '"입은 좀 험하지만 속은 꿀" 김옥순 할머니',
-    },
-    {
-      id: 3,
-      location: '소소',
-      date: '2025.04.14',
-      description: '"전쟁통에도 솥은 놓지 않았다" 이금자 할머니',
-    },
-    {
-      id: 4,
-      location: '호호',
-      date: '2025.03.14',
-      description: '"한 마디면 눈물 터지는" 정다감 할머니',
-    },
-    {
-      id: 5,
-      location: '패밀리',
-      date: '2025.03.02',
-      description: '"메뉴는 고정, 맛은 고정불변" 조말순 할머니',
-    },
-  ];
+  const [selectedTrip, setSelectedTrip] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    // 로그인한 사용자 정보 가져오기
-    const userData = localStorage.getItem("currentUser");
-    const isLoggedIn = localStorage.getItem("isLoggedIn");
-    
-    if (isLoggedIn === "true" && userData) {
-      try {
-        const user = JSON.parse(userData);
-        setCurrentUser(user);
-        loadReservationData(user);
-      } catch (error) {
-        console.error("사용자 데이터 파싱 오류:", error);
-        navigate("/auth/login");
-      }
-    } else {
-      navigate("/auth/login");
-    }
+    loadSelectedTripData();
   }, [id, navigate]);
 
-  const loadReservationData = (user) => {
-    // 사용자별 결제 정보 가져오기
-    const allPaymentData = {
-      'user': [
-        {
-          id: 1,
-          location: '여여',
-          date: '2025.06.24',
-          price: '340,000원',
-        },
-        {
-          id: 2,
-          location: '모모',
-          date: '2025.05.24',
-          price: '150,000원',
-        },
-      ],
-      'admin': [
-        {
-          id: 3,
-          location: '소소',
-          date: '2025.04.14',
-          price: '150,000원',
-        },
-        {
-          id: 4,
-          location: '호호',
-          date: '2025.03.14',
-          price: '170,000원',
-        },
-      ],
-      '22': [
-        {
-          id: 5,
-          location: '패밀리',
-          date: '2025.03.02',
-          price: '150,000원',
-        },
-        {
-          id: 6,
-          location: '여여',
-          date: '2025.02.15',
-          price: '340,000원',
-        },
-      ]
-    };
-
-    const userPayments = allPaymentData[user.email] || [];
-    const currentReservation = userPayments.find(payment => payment.id === Number(id));
-    
-    if (currentReservation) {
-      // 할매 등록 정보 가져오기
-      const savedHostData = localStorage.getItem('hostRegisterData');
-      let basicInfo = {};
-      if (savedHostData) {
-        try {
-          const parsedData = JSON.parse(savedHostData);
-          basicInfo = parsedData.basicInfo || {};
-        } catch (error) {
-          console.error('할매 등록 데이터 파싱 오류:', error);
-        }
+  const loadSelectedTripData = async () => {
+    try {
+      setLoading(true);
+      
+      // 로그인한 사용자 정보 확인
+      const userData = localStorage.getItem("currentUser");
+      const isLoggedIn = localStorage.getItem("isLoggedIn");
+      
+      if (!isLoggedIn || isLoggedIn !== "true" || !userData) {
+        navigate("/auth/login");
+        return;
       }
 
-      setReservationData({
-        ...currentReservation,
-        description: `"${basicInfo.personality || '따뜻한'}" ${basicInfo.name || '할머니'}`
+      const user = JSON.parse(userData);
+      setCurrentUser(user);
+
+      // WriteReview에서 선택된 여행 정보 가져오기
+      const selectedTripData = localStorage.getItem('selectedTripForReview');
+      if (selectedTripData) {
+        const tripData = JSON.parse(selectedTripData);
+        console.log('리뷰 작성용 선택된 여행 데이터:', tripData);
+        
+        // ID가 일치하는지 확인
+        if (tripData.id === Number(id)) {
+          setSelectedTrip(tripData);
+        } else {
+          console.error('ID가 일치하지 않습니다:', tripData.id, id);
+          navigate('/mypage/review/write');
+        }
+      } else {
+        console.error('선택된 여행 데이터가 없습니다.');
+        navigate('/mypage/review/write');
+      }
+    } catch (error) {
+      console.error('여행 데이터 로드 오류:', error);
+      navigate('/mypage/review/write');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmitReview = async () => {
+    try {
+      // 입력 유효성 검사
+      if (rating === 0) {
+        setError('별점을 선택해주세요.');
+        return;
+      }
+
+      if (content.length < 10) {
+        setError('후기는 최소 10자 이상 작성해주세요.');
+        return;
+      }
+
+      if (!currentUser || !selectedTrip) {
+        alert('필요한 정보가 없습니다. 다시 시도해주세요.');
+        return;
+      }
+
+      setSubmitting(true);
+      setError('');
+
+      console.log('리뷰 작성 시작:', {
+        userId: currentUser.id,
+        tripId: selectedTrip.tripId,
+        hostId: selectedTrip.hostId,
+        paymentId: selectedTrip.paymentId
       });
+
+      // 실제 백엔드 API로 리뷰 데이터 전송
+      const reviewData = {
+        userId: currentUser.id,
+        tripId: selectedTrip.tripId,
+        hostId: selectedTrip.hostId,
+        paymentId: selectedTrip.paymentId,
+        rating: rating,
+        content: content,
+        hasRuralExperience: hasRuralExperience,
+        // photos: photos, // 파일 업로드는 추후 구현
+        tripDetails: {
+          tripTitle: selectedTrip.location,
+          tripDate: selectedTrip.date,
+          hostName: selectedTrip.hostData?.name || '할머니',
+          location: selectedTrip.hostData?.address || selectedTrip.description
+        }
+      };
+
+      console.log('전송할 리뷰 데이터:', reviewData);
+
+      const response = await fetch('https://us-code-halmae-sonmat.onrender.com/api/reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reviewData)
+      });
+
+      if (!response.ok) {
+        throw new Error('리뷰 등록에 실패했습니다.');
+      }
+
+      const result = await response.json();
+      console.log('리뷰 등록 결과:', result);
+
+      if (!result.success) {
+        throw new Error(result.message || '리뷰 등록에 실패했습니다.');
+      }
+
+      // 백엔드 저장 성공 시 로컬 스토리지에도 저장 (캐시 목적)
+      const localReview = {
+        id: result.data.id,
+        userId: currentUser.id,
+        tripId: selectedTrip.tripId,
+        hostId: selectedTrip.hostId,
+        paymentId: selectedTrip.paymentId,
+        place: selectedTrip.location,
+        date: selectedTrip.date,
+        hostName: selectedTrip.hostData?.name || '할머니',
+        quote: selectedTrip.description,
+        rating: rating,
+        content: content,
+        hasRuralExperience: hasRuralExperience,
+        photos: photos.map(file => URL.createObjectURL(file)),
+        createdAt: result.data.createdAt || new Date().toISOString()
+      };
+
+      // localStorage에 리뷰 저장 (기존 기능 유지)
+      const existingReviews = JSON.parse(localStorage.getItem('userReviews') || '{}');
+      if (!existingReviews[currentUser.id]) {
+        existingReviews[currentUser.id] = [];
+      }
+      existingReviews[currentUser.id].push(localReview);
+      localStorage.setItem('userReviews', JSON.stringify(existingReviews));
+
+      // 선택된 여행 정보 삭제
+      localStorage.removeItem('selectedTripForReview');
+
+      alert(`✅ 리뷰가 성공적으로 등록되었습니다!\n\n🏠 ${selectedTrip.location}\n⭐ ${rating}점\n📝 ${content.substring(0, 50)}${content.length > 50 ? '...' : ''}`);
+      navigate('/mypage/review/list');
+
+    } catch (error) {
+      console.error('리뷰 제출 오류:', error);
+      setError(error.message || '리뷰 등록 중 오류가 발생했습니다.');
+      
+      // API 오류 시에도 로컬 스토리지에 저장 (fallback)
+      try {
+        const fallbackReview = {
+          id: Date.now(),
+          userId: currentUser.id,
+          place: selectedTrip.location,
+          date: selectedTrip.date,
+          quote: selectedTrip.description,
+          rating: rating,
+          content: content,
+          hasRuralExperience: hasRuralExperience,
+          photos: photos.map(file => URL.createObjectURL(file)),
+          createdAt: new Date().toISOString(),
+          isLocal: true // 로컬 저장 표시
+        };
+
+        const existingReviews = JSON.parse(localStorage.getItem('userReviews') || '{}');
+        if (!existingReviews[currentUser.id]) {
+          existingReviews[currentUser.id] = [];
+        }
+        existingReviews[currentUser.id].push(fallbackReview);
+        localStorage.setItem('userReviews', JSON.stringify(existingReviews));
+
+        alert('⚠️ 서버 오류로 인해 리뷰가 임시 저장되었습니다.\n나중에 다시 동기화됩니다.');
+        navigate('/mypage/review/list');
+      } catch (localError) {
+        console.error('로컬 저장 오류:', localError);
+      }
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const handleSubmitReview = () => {
-    if (content.length < 10) {
-      setError('후기는 최소 10자 이상 작성해주세요.');
-      return;
-    }
+  if (loading) {
+    return (
+      <div className='review-form-wrapper'>
+        <div className='loading-container'>
+          <div className='loading-spinner'>🔄</div>
+          <p>리뷰 작성 페이지를 준비하고 있습니다...</p>
+        </div>
+      </div>
+    );
+  }
 
-    if (!currentUser) {
-      alert('로그인이 필요합니다.');
-      return;
-    }
-
-    // 새 리뷰 데이터 생성
-    const newReview = {
-      id: Date.now(), // 임시 ID
-      reservationId: Number(id),
-      userId: currentUser.email,
-      place: reservationData.location,
-      date: new Date().toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      }).replace(/\. /g, '.').replace('.', ''),
-      quote: reservationData.description,
-      rating: rating,
-      content: content,
-      hasRuralExperience: hasRuralExperience,
-      photos: photos.map(file => URL.createObjectURL(file)), // 실제 구현시에는 서버에 업로드
-      createdAt: new Date().toISOString()
-    };
-
-    // localStorage에 리뷰 저장
-    const existingReviews = JSON.parse(localStorage.getItem('userReviews') || '{}');
-    if (!existingReviews[currentUser.email]) {
-      existingReviews[currentUser.email] = [];
-    }
-    existingReviews[currentUser.email].push(newReview);
-    localStorage.setItem('userReviews', JSON.stringify(existingReviews));
-
-    alert('후기 등록이 완료되었습니다!');
-    navigate('/mypage/review/list');
-  };
-
-  const data = reservationData;
+  if (!selectedTrip) {
+    return (
+      <div className='review-form-wrapper'>
+        <div className='error-container'>
+          <h3>❌ 여행 정보를 찾을 수 없습니다</h3>
+          <p>리뷰를 작성할 여행을 다시 선택해주세요.</p>
+          <button onClick={() => navigate('/mypage/review/write')} className='retry-button'>
+            여행 선택하러 가기
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const handlePhotoUpload = (e) => {
     const selectedFiles = Array.from(e.target.files);
@@ -210,14 +252,26 @@ const ReviewForm = () => {
 
   return (
     <div className='review-form-wrapper'>
-      <h2 className='review-title'>후기 작성</h2>
+      <div className='page-header'>
+        <h2 className='review-title'>📝 리뷰 작성</h2>
+        <p>소중한 경험을 다른 분들과 공유해주세요</p>
+      </div>
 
       <div className='room-info'>
-        <img src={roomImg} alt='숙소 이미지' />
-        <div>
-          <div className='room-title'>{data.location}</div>
-          <div className='room-date'>{data.date}</div>
-          <div className='room-desc'>{data.description}</div>
+        <img 
+          src={selectedTrip.hostData?.housePhotos?.[0] || roomImg} 
+          alt='숙소 이미지' 
+        />
+        <div className='room-details'>
+          <div className='room-title'>🏠 {selectedTrip.location}</div>
+          <div className='room-date'>📅 {selectedTrip.date}</div>
+          <div className='room-price'>💰 {selectedTrip.price}</div>
+          <div className='room-desc'>👵 {selectedTrip.description}</div>
+          {selectedTrip.tripData && (
+            <div className='trip-period'>
+              🗓️ {selectedTrip.tripData.startDate} ~ {selectedTrip.tripData.endDate}
+            </div>
+          )}
         </div>
       </div>
 
@@ -334,9 +388,9 @@ const ReviewForm = () => {
         </div>
 
         <SelectButton
-          text='등록 완료'
-          selected={content.length >= 10 && rating > 0}
-          disabled={content.length < 10 || rating === 0}
+          text={submitting ? '📤 등록 중...' : '✅ 등록 완료'}
+          selected={content.length >= 10 && rating > 0 && !submitting}
+          disabled={content.length < 10 || rating === 0 || submitting}
           onClick={handleSubmitReview}
         />
       </div>

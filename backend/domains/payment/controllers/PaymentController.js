@@ -5,6 +5,18 @@ class PaymentController {
     this.paymentService = new PaymentService();
   }
 
+  async getAllPayments(req, res, next) {
+    try {
+      const payments = await this.paymentService.getAllPayments();
+      res.status(200).json({
+        success: true,
+        data: payments
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async createPayment(req, res, next) {
     try {
       const payment = await this.paymentService.createPayment(req.body);

@@ -200,12 +200,218 @@
   color: #9ca3af !important;
 }
 
+/* 결제 금액 표시 개선 */
 .payment-amount {
-  font-size: 11px;
-  font-weight: 500;
-  color: #333;
-  line-height: 1.2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 9px;
+  font-weight: 600;
+  text-align: center;
+  padding: 2px 3px;
+  border-radius: 6px;
   margin-top: 2px;
+  min-height: 32px;
+  justify-content: center;
+  line-height: 1.1;
+  transition: all 0.2s ease;
+}
+
+.payment-amount:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.amount-icon {
+  font-size: 8px;
+  margin-bottom: 1px;
+}
+
+.amount-value {
+  font-size: 8px;
+  font-weight: 700;
+}
+
+/* 금액별 색상 구분 */
+.payment-amount.high-amount {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+
+.payment-amount.medium-amount {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+}
+
+.payment-amount.low-amount {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+/* 새로 추가된 UI 요소들 */
+
+/* 로딩 상태 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.loading-spinner {
+  font-size: 48px;
+  animation: spin 2s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-container p {
+  color: #666;
+  font-size: 16px;
+  margin: 0;
+}
+
+/* 에러 상태 */
+.error-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.error-message {
+  background: #ffeaea;
+  border: 1px solid #ffcdd2;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 400px;
+  text-align: center;
+}
+
+.error-message h3 {
+  margin: 0 0 8px 0;
+  color: #c62828;
+  font-size: 18px;
+}
+
+.error-message p {
+  margin: 0 0 16px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.retry-button {
+  background-color: #e91e63;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.retry-button:hover {
+  background-color: #c2185b;
+}
+
+/* 결제 통계 */
+.payment-statistics {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fa, #e8f5e8);
+  border-radius: 12px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* 요약 섹션 */
+.payment-summary-section {
+  margin-bottom: 20px;
+}
+
+.payment-summary-text {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 8px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.payment-summary-note {
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+  background-color: #f0f9ff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border-left: 4px solid #3b82f6;
+}
+
+/* 빈 상태 */
+.no-payments {
+  margin-top: 30px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  border: 2px dashed #ddd;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.empty-state h3 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 20px;
+}
+
+.empty-state p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
 }
 
 /* 반응형 디자인 */
@@ -256,6 +462,41 @@
 
   .payment-amount {
     font-size: 10px;
+    min-height: 28px;
+  }
+
+  .payment-amount .amount-icon {
+    font-size: 7px;
+  }
+
+  .payment-amount .amount-value {
+    font-size: 7px;
+  }
+
+  /* 통계 모바일 대응 */
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .stat-card {
+    padding: 15px;
+  }
+
+  .stat-value {
+    font-size: 20px;
+  }
+
+  .stat-label {
+    font-size: 13px;
+  }
+
+  .payment-summary-text {
+    font-size: 14px;
+  }
+
+  .payment-summary-note {
+    font-size: 12px;
   }
 }
 
@@ -290,6 +531,40 @@
 
   .payment-amount {
     font-size: 9px;
+    min-height: 24px;
+  }
+
+  .payment-amount .amount-icon {
+    font-size: 6px;
+  }
+
+  .payment-amount .amount-value {
+    font-size: 6px;
+  }
+
+  /* 더 작은 화면에서 통계 숨김 또는 간소화 */
+  .payment-statistics {
+    padding: 15px;
+  }
+
+  .stat-value {
+    font-size: 18px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+  }
+
+  .empty-state {
+    padding: 40px 16px;
+  }
+
+  .empty-icon {
+    font-size: 48px;
+  }
+
+  .empty-state h3 {
+    font-size: 18px;
   }
 
   .month-navigation {
