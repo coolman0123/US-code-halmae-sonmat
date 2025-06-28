@@ -108,7 +108,7 @@ const DetailBooking = () => {
       <div className="review-section">
         <div className="review-header">
           <span className="rating">⭐ 4.8 (4,309)</span>
-          <span className="review-link">전체보기 ></span>
+          <span className="review-link">전체보기 </span>
         </div>
         <div className="review-stars">⭐⭐⭐⭐⭐</div>
         <div className="review-content">
