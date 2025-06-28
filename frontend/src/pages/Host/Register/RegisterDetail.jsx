@@ -445,34 +445,6 @@ const RegisterDetail = () => {
       return;
     }
 
-      // 기존 할매 목록 가져오기
-      const existingHosts = JSON.parse(localStorage.getItem('hostsList') || '[]');
-      
-      // 새 할매 정보 추가
-      existingHosts.push(completeHostData);
-      
-      // localStorage에 저장
-      localStorage.setItem('hostsList', JSON.stringify(existingHosts));
-      
-      // Stories 페이지 실시간 업데이트를 위한 커스텀 이벤트 발생
-      window.dispatchEvent(new CustomEvent('hostRegistered', { 
-        detail: { host: completeHostData } 
-      }));
-      
-      console.log('할매 등록 완료:', completeHostData);
-      alert('할매 등록이 완료되었습니다!');
-      
-      // 등록 데이터 정리
-      localStorage.removeItem('hostRegisterData');
-      
-      // 할매 목록 페이지로 돌아가기
-      navigate('/host');
-    } catch (error) {
-      console.error('할매 등록 실패:', error);
-      alert('할매 등록에 실패했습니다. 다시 시도해주세요.');
-
-    }
-
     if (!formData.houseNickname) {
       alert('할머니 집 이름을 입력해주세요.');
       return;
@@ -491,25 +463,25 @@ const RegisterDetail = () => {
     try {
       console.log('📤 백엔드로 할머니 등록 데이터 전송...');
       
-              const hostData = {
-          houseNickname: formData.houseNickname,
-          hostIntroduction: formData.experiences,
-          address: {
-            detailAddress: formData.address + (formData.detailAddress ? ` ${formData.detailAddress}` : '')
-          },
-          latitude: parseFloat(formData.lat),
-          longitude: parseFloat(formData.lng),
-          contact: {
-            phone: formData.phone
-          },
-          maxGuests: formData.maxGuests,
-          bedroomCount: formData.bedroomCount,
-          bedCount: formData.bedCount,
-          amenities: formData.amenities, // 이미 배열 형태
-          availableExperiences: formData.experiences,
-          accommodationFee: parseFloat(formData.accommodationFee),
-          housePhotos: formData.photos.map(photo => photo.url)
-        };
+      const hostData = {
+        houseNickname: formData.houseNickname,
+        hostIntroduction: formData.experiences,
+        address: {
+          detailAddress: formData.address + (formData.detailAddress ? ` ${formData.detailAddress}` : '')
+        },
+        latitude: parseFloat(formData.lat),
+        longitude: parseFloat(formData.lng),
+        contact: {
+          phone: formData.phone
+        },
+        maxGuests: formData.maxGuests,
+        bedroomCount: formData.bedroomCount,
+        bedCount: formData.bedCount,
+        amenities: formData.amenities,
+        availableExperiences: formData.experiences,
+        accommodationFee: parseFloat(formData.accommodationFee),
+        housePhotos: formData.photos.map(photo => photo.url)
+      };
 
       console.log('📤 전송할 데이터:', hostData);
 
