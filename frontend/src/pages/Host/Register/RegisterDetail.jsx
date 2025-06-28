@@ -44,10 +44,35 @@ const RegisterDetail = () => {
     accommodationFee: ''
   });
 
+  // PAGE1에서 저장된 기본 정보
+  const [basicInfo, setBasicInfo] = useState({
+    introduction: '',
+    age: '',
+    specialty: '',
+    menu: '',
+    personality: ''
+  });
+
   const BACKEND_URL = 'http://localhost:5001';
   // Kakao Map API 키 - 환경변수에서 읽기
   const KAKAO_MAP_API_KEY = import.meta.env.VITE_KAKAO_API_KEY || import.meta.env.VITE_KAKAO_MAP_API_KEY || '90ae47b29041df889ea6ef2d93c8520e';
   
+  // localStorage에서 기본 정보 불러오기
+  useEffect(() => {
+    const savedData = localStorage.getItem('hostRegisterData');
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData);
+        if (parsedData.basicInfo) {
+          setBasicInfo(parsedData.basicInfo);
+          console.log('✅ 기본 정보 불러옴:', parsedData.basicInfo);
+        }
+      } catch (error) {
+        console.error('❌ localStorage 데이터 파싱 실패:', error);
+      }
+    }
+  }, []);
+
   // API 키 유효성 검사
   useEffect(() => {
     if (!KAKAO_MAP_API_KEY || KAKAO_MAP_API_KEY === '90ae47b29041df889ea6ef2d93c8520e') {
@@ -273,7 +298,7 @@ const RegisterDetail = () => {
       
       const options = {
         center: defaultPosition,
-        level: 50, // 확대 레벨 (1~14, 숫자가 작을수록 확대)
+        level: 14, // 확대 레벨 (1~14, 숫자가 작을수록 확대)
         draggable: true, // 지도 드래그 가능
         scrollwheel: true, // 마우스 휠로 확대/축소 가능
         doubleClickZoom: true, // 더블클릭으로 확대 가능
@@ -1003,28 +1028,40 @@ const RegisterDetail = () => {
       return;
     }
 
+    // 기본 정보 검증
+    if (!basicInfo.introduction || !basicInfo.age || !basicInfo.specialty || !basicInfo.menu || !basicInfo.personality) {
+      alert('기본 정보가 누락되었습니다. 처음부터 다시 입력해주세요.');
+      navigate('/host/register/new');
+      return;
+    }
+
     try {
       console.log('📤 백엔드로 할머니 등록 데이터 전송...');
       
       const hostData = {
-        // PAGE1 데이터 (기본값 설정)
-        hostIntroduction: formData.experiences,
-        age: 70, // 기본값
-        characteristics: '따뜻한 마음으로 손님을 맞이하는 할머니입니다.', // 기본값
-        representativeMenu: '전통 한식', // 기본값
-        personalitySummary: '정겨운 시골 할머니', // 기본값
+        // PAGE1 데이터 (localStorage에서 가져온 데이터)
+        hostIntroduction: basicInfo.introduction,
+        age: parseInt(basicInfo.age) || 70,
+        characteristics: basicInfo.specialty,
+        representativeMenu: basicInfo.menu,
+        personalitySummary: basicInfo.personality,
         
         // PAGE2 데이터
-        address: formData.address + (formData.detailAddress ? ` ${formData.detailAddress}` : ''),
+        address: {
+          zipCode: '', // 우편번호는 현재 수집하지 않음
+          detailAddress: formData.address + (formData.detailAddress ? ` ${formData.detailAddress}` : '')
+        },
         latitude: parseFloat(formData.lat),
         longitude: parseFloat(formData.lng),
-        contact: formData.phone,
+        contact: {
+          phone: formData.phone
+        },
         houseNickname: formData.houseNickname,
-        maxGuests: formData.maxGuests,
-        bedroomCount: formData.bedroomCount,
-        bedCount: formData.bedCount,
+        maxGuests: parseInt(formData.maxGuests),
+        bedroomCount: parseInt(formData.bedroomCount),
+        bedCount: parseInt(formData.bedCount),
         amenities: formData.amenities,
-        housePhotos: formData.photos.map(photo => photo.url),
+        housePhotos: formData.photos.map(photo => photo.url || photo.file?.name || '사진'),
         availableExperiences: formData.experiences,
         accommodationFee: formData.accommodationFee
       };
@@ -1043,7 +1080,10 @@ const RegisterDetail = () => {
       console.log('📨 백엔드 응답:', result);
 
       if (response.ok && result.success) {
-        alert(`✅ 카카오 지오코딩으로 할머니 등록 완료!\n\n📋 등록된 정보:\n• 집 이름: ${formData.houseNickname}\n• 주소: ${formData.address}${formData.detailAddress ? ' ' + formData.detailAddress : ''}\n• 위도/경도: ${formData.lat}, ${formData.lng}\n• 연락처: ${formData.phone}\n• 숙박비: ${formData.accommodationFee}원\n• 최대 인원: ${formData.maxGuests}명\n• 편의시설: ${formData.amenities.length}개\n\n🏠 카카오 지오코딩으로 정확한 위치가 설정되었습니다!`);
+        alert(`✅ 할머니 등록 완료!\n\n📋 등록된 정보:\n• 할머니 소개: ${basicInfo.introduction}\n• 연세: ${basicInfo.age}세\n• 집 이름: ${formData.houseNickname}\n• 주소: ${formData.address}${formData.detailAddress ? ' ' + formData.detailAddress : ''}\n• 위도/경도: ${formData.lat}, ${formData.lng}\n• 연락처: ${formData.phone}\n• 대표 메뉴: ${basicInfo.menu}\n• 숙박비: ${formData.accommodationFee}원\n• 최대 인원: ${formData.maxGuests}명\n• 편의시설: ${formData.amenities.length}개\n\n🏠 카카오 지오코딩으로 정확한 위치가 설정되었습니다!`);
+        
+        // localStorage 정리
+        localStorage.removeItem('hostRegisterData');
         
         // 폼 초기화
         setFormData({
@@ -1062,6 +1102,14 @@ const RegisterDetail = () => {
           accommodationFee: ''
         });
 
+        setBasicInfo({
+          introduction: '',
+          age: '',
+          specialty: '',
+          menu: '',
+          personality: ''
+        });
+
         // Kakao 지도 초기화
         if (markerRef.current) {
           markerRef.current.setMap(null);
@@ -1075,9 +1123,9 @@ const RegisterDetail = () => {
           mapRef.current.setLevel(6);
         }
 
-        // 등록 성공 후 메인 페이지로 이동
+        // 등록 성공 후 호스트 관리 페이지로 이동
         setTimeout(() => {
-          navigate('/');
+          navigate('/host/register');
         }, 2000);
       } else {
         throw new Error(result.message || '등록에 실패했습니다.');
