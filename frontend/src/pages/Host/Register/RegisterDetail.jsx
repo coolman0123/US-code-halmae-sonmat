@@ -43,7 +43,7 @@ const RegisterDetail = () => {
     accommodationFee: ''
   });
 
-  const BACKEND_URL = 'https://us-code-halmae-sonmat.onrender.com';
+  const BACKEND_URL = 'http://localhost:5001';
 
   // Google Maps API 로딩 (지도 표시용)
   const loadGoogleMapsAPI = () => {
@@ -54,19 +54,41 @@ const RegisterDetail = () => {
         return;
       }
 
+      // 기존 스크립트 제거 (중복 방지)
+      const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+      if (existingScript) {
+        existingScript.remove();
+      }
+
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDCFpWL0RLVqqgnRJqVmpjec9pnw7DAHeo&libraries=places&language=ko`;
+      // 원래 API 키로 복원하고 로딩 방식 개선
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDQJbMWl9D5oa4ISEKnxSRnJfW7PaRpc2U&libraries=places&language=ko&callback=initGoogleMaps&loading=async`;
       script.async = true;
       script.defer = true;
+      script.id = 'google-maps-script';
       
-      script.onload = () => {
-        console.log('✅ Google Maps API 로드 완료');
+      // 전역 콜백 함수 설정
+      window.initGoogleMaps = () => {
+        console.log('✅ Google Maps API 로드 완료 (콜백)');
+        delete window.initGoogleMaps; // 콜백 함수 정리
         resolve();
       };
       
       script.onerror = (error) => {
         console.error('❌ Google Maps API 로드 실패:', error);
-        reject(error);
+        delete window.initGoogleMaps;
+        reject(new Error('Google Maps API 로드에 실패했습니다. 네트워크 연결과 API 키를 확인하세요.'));
+      };
+      
+      // 타임아웃 설정 (15초)
+      const timeout = setTimeout(() => {
+        console.error('❌ Google Maps API 로드 타임아웃');
+        delete window.initGoogleMaps;
+        reject(new Error('Google Maps API 로드 시간이 초과되었습니다.'));
+      }, 15000);
+      
+      script.onload = () => {
+        clearTimeout(timeout);
       };
       
       document.head.appendChild(script);
@@ -77,29 +99,81 @@ const RegisterDetail = () => {
   const initializeMap = () => {
     if (!window.google || !window.google.maps) {
       console.error('❌ Google Maps API가 로드되지 않음');
-      return;
+      setMapState(prev => ({ ...prev, error: 'Google Maps API가 로드되지 않았습니다.' }));
+      return false;
     }
 
     if (!mapContainerRef.current) {
       console.error('❌ 지도 컨테이너가 없음');
-      return;
+      setMapState(prev => ({ ...prev, error: '지도 컨테이너를 찾을 수 없습니다.' }));
+      return false;
     }
 
     try {
+      console.log('🗺️ Google Maps 초기화 시작...');
+      
+      // 컨테이너 크기 강제 설정 (중요!)
+      const container = mapContainerRef.current;
+      container.style.width = '100%';
+      container.style.height = '100%';
+      container.style.minHeight = '350px';
+      
+      // 컨테이너가 DOM에 완전히 렌더링될 때까지 대기
+      const containerRect = container.getBoundingClientRect();
+      console.log('📏 지도 컨테이너 크기:', containerRect.width, 'x', containerRect.height);
+      
+      if (containerRect.width === 0 || containerRect.height === 0) {
+        console.warn('⚠️ 지도 컨테이너 크기가 0입니다. 강제로 크기를 설정합니다.');
+        container.style.width = '100%';
+        container.style.height = '350px';
+        container.style.display = 'block';
+      }
+      
       // 서울 시청 좌표로 초기화
       const defaultCenter = { lat: 37.5665, lng: 126.9780 };
       
-      mapRef.current = new window.google.maps.Map(mapContainerRef.current, {
+      const mapOptions = {
         center: defaultCenter,
         zoom: 12,
-        mapTypeId: 'roadmap'
+        mapTypeId: window.google.maps.MapTypeId.ROADMAP,
+        zoomControl: true,
+        mapTypeControl: false, // 일단 간소화
+        scaleControl: false,
+        streetViewControl: false,
+        rotateControl: false,
+        fullscreenControl: false,
+        gestureHandling: 'greedy',
+        backgroundColor: '#f5f5f5'
+      };
+      
+      console.log('🗺️ 지도 인스턴스 생성 중...');
+      mapRef.current = new window.google.maps.Map(mapContainerRef.current, mapOptions);
+
+      // 지도 로드 완료 이벤트 리스너
+      let isInitialized = false;
+      const idleListener = window.google.maps.event.addListenerOnce(mapRef.current, 'idle', () => {
+        if (!isInitialized) {
+          isInitialized = true;
+          console.log('✅ Google Maps 렌더링 완료');
+          setMapState(prev => ({ ...prev, mapInitialized: true, error: null }));
+        }
       });
 
-      console.log('✅ 지도 초기화 완료');
-      setMapState(prev => ({ ...prev, mapInitialized: true }));
+      // 추가 안전장치: 타이머로도 초기화 완료 설정
+      setTimeout(() => {
+        if (!isInitialized && mapRef.current) {
+          isInitialized = true;
+          console.log('✅ Google Maps 렌더링 완료 (타이머)');
+          setMapState(prev => ({ ...prev, mapInitialized: true, error: null }));
+        }
+      }, 2000);
+
+      console.log('✅ Google Maps 인스턴스 생성 완료');
+      return true;
     } catch (error) {
       console.error('❌ 지도 초기화 실패:', error);
-      setMapState(prev => ({ ...prev, error: '지도 초기화에 실패했습니다.' }));
+      setMapState(prev => ({ ...prev, error: `지도 초기화 실패: ${error.message}` }));
+      return false;
     }
   };
 
@@ -135,56 +209,112 @@ const RegisterDetail = () => {
   // 지도에 위치 표시
   const displayLocationOnMap = (lat, lng, address, formattedAddress) => {
     try {
-      if (!mapRef.current) {
-        console.log('⚠️ 지도가 초기화되지 않음 - 지도 표시 건너뛰기');
+      console.log('📍 지도에 마커 표시 시도:', { lat, lng, address });
+
+      // Google Maps API 및 지도 인스턴스 확인
+      if (!window.google || !window.google.maps) {
+        console.log('⚠️ Google Maps API가 로드되지 않음 - 마커 표시 건너뛰기');
         return;
       }
 
-      const position = { lat: parseFloat(lat), lng: parseFloat(lng) };
+      if (!mapRef.current) {
+        console.log('⚠️ 지도가 초기화되지 않음 - 마커 표시 건너뛰기');
+        return;
+      }
 
-      // 지도 중심 이동
+      const position = { 
+        lat: parseFloat(lat), 
+        lng: parseFloat(lng) 
+      };
+
+      // 좌표 유효성 검사
+      if (isNaN(position.lat) || isNaN(position.lng)) {
+        console.error('❌ 잘못된 좌표값:', { lat, lng });
+        return;
+      }
+
+      console.log('✅ 유효한 좌표 확인:', position);
+
+      // 지도 중심 이동 및 줌 설정
       mapRef.current.setCenter(position);
       mapRef.current.setZoom(17);
 
-      // 기존 마커 제거
+      // 기존 마커 및 인포윈도우 제거
       if (markerRef.current) {
         markerRef.current.setMap(null);
+        markerRef.current = null;
       }
       if (infoWindowRef.current) {
         infoWindowRef.current.close();
+        infoWindowRef.current = null;
       }
 
       // 새 마커 생성
-      markerRef.current = new window.google.maps.Marker({
-        position: position,
-        map: mapRef.current,
-        title: address,
-        animation: window.google.maps.Animation.DROP
-      });
+      try {
+        markerRef.current = new window.google.maps.Marker({
+          position: position,
+          map: mapRef.current,
+          title: formattedAddress || address,
+          animation: window.google.maps.Animation.DROP,
+          icon: {
+            url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
+            scaledSize: new window.google.maps.Size(32, 32)
+          }
+        });
 
-      // 인포윈도우 생성
-      infoWindowRef.current = new window.google.maps.InfoWindow({
-        content: `
-          <div style="padding: 12px; max-width: 300px;">
-            <div style="font-weight: 600; color: #2c5530; margin-bottom: 8px;">
+        console.log('✅ 마커 생성 완료:', markerRef.current ? 'Success' : 'Failed');
+        
+        // 마커 위치 확인 (안전하게)
+        setTimeout(() => {
+          if (markerRef.current && markerRef.current.getPosition) {
+            const markerPosition = markerRef.current.getPosition();
+            if (markerPosition) {
+              console.log('📍 마커 최종 위치:', markerPosition.lat(), markerPosition.lng());
+            }
+          }
+        }, 200);
+
+        // 인포윈도우 생성
+        const infoContent = `
+          <div style="padding: 15px; max-width: 300px; font-family: Arial, sans-serif;">
+            <div style="font-weight: 600; color: #2c5530; margin-bottom: 10px; font-size: 14px;">
               📍 검색된 위치
             </div>
-            <div style="font-size: 13px; margin-bottom: 6px;">
-              <strong>주소:</strong> ${formattedAddress || address}
+            <div style="font-size: 13px; margin-bottom: 8px; line-height: 1.4;">
+              <strong style="color: #333;">주소:</strong><br>
+              ${formattedAddress || address}
             </div>
-            <div style="font-size: 12px; color: #666;">
+            <div style="font-size: 12px; color: #666; line-height: 1.3;">
               <strong>좌표:</strong> ${lat.toFixed(6)}, ${lng.toFixed(6)}
             </div>
           </div>
-        `
-      });
+        `;
 
-      // 인포윈도우 자동 열기
-      setTimeout(() => {
-        if (infoWindowRef.current && markerRef.current) {
-          infoWindowRef.current.open(mapRef.current, markerRef.current);
+        infoWindowRef.current = new window.google.maps.InfoWindow({
+          content: infoContent
+        });
+
+        // 마커 클릭 이벤트 추가
+        if (markerRef.current) {
+          window.google.maps.event.addListener(markerRef.current, 'click', () => {
+            if (infoWindowRef.current) {
+              infoWindowRef.current.open(mapRef.current, markerRef.current);
+            }
+          });
         }
-      }, 500);
+
+        // 인포윈도우 자동 열기 (약간의 딜레이)
+        setTimeout(() => {
+          if (infoWindowRef.current && markerRef.current && mapRef.current) {
+            infoWindowRef.current.open(mapRef.current, markerRef.current);
+            console.log('✅ 인포윈도우 열기 완료');
+          }
+        }, 800);
+
+      } catch (markerError) {
+        console.error('❌ 마커 생성 실패:', markerError);
+        return;
+      }
 
       console.log('✅ 지도에 위치 표시 완료');
     } catch (error) {
@@ -225,14 +355,38 @@ const RegisterDetail = () => {
         lng: result.longitude
       }));
 
-      // 지도에 위치 표시 (지도가 초기화된 경우에만)
-      if (mapState.mapInitialized) {
+      // 지도에 위치 표시
+      console.log('🔍 주소 검색 성공, 지도 상태 확인:', { 
+        mapInitialized: mapState.mapInitialized, 
+        hasMapRef: !!mapRef.current,
+        hasGoogleMaps: !!(window.google && window.google.maps)
+      });
+
+      if (mapState.mapInitialized && mapRef.current) {
+        // 지도가 이미 초기화된 경우 바로 마커 표시
         displayLocationOnMap(
           result.latitude, 
           result.longitude, 
           result.address, 
           result.formattedAddress
         );
+      } else if (window.google && window.google.maps && mapContainerRef.current) {
+        // 지도가 아직 초기화되지 않았지만 Google Maps API는 로드된 경우
+        console.log('🔄 지도 재초기화 후 마커 표시 시도');
+        const success = initializeMap();
+        if (success) {
+          // 지도 초기화 완료 후 마커 표시
+          setTimeout(() => {
+            displayLocationOnMap(
+              result.latitude, 
+              result.longitude, 
+              result.address, 
+              result.formattedAddress
+            );
+          }, 1000);
+        }
+      } else {
+        console.log('⚠️ 지도 표시 불가 - Google Maps API 또는 지도 컨테이너 없음');
       }
 
       // 성공 메시지
@@ -301,26 +455,105 @@ const RegisterDetail = () => {
   // 컴포넌트 마운트 시 초기화
   useEffect(() => {
     let mounted = true;
+    let initializationAttempts = 0;
+    const maxAttempts = 3;
+
+    const attemptMapInitialization = async () => {
+      if (!mounted || initializationAttempts >= maxAttempts) return;
+      
+      initializationAttempts++;
+      console.log(`🗺️ 지도 초기화 시도 ${initializationAttempts}/${maxAttempts}`);
+
+      // 더 엄격한 조건 확인
+      const readyChecks = {
+        mounted: mounted,
+        container: !!mapContainerRef.current,
+        googleApi: !!(window.google && window.google.maps),
+        mapClass: !!(window.google && window.google.maps && window.google.maps.Map)
+      };
+      
+      console.log('🔍 준비 상태 체크:', readyChecks);
+
+      if (readyChecks.mounted && readyChecks.container && readyChecks.googleApi && readyChecks.mapClass) {
+        // 컨테이너가 화면에 표시되고 크기가 있는지 확인
+        const containerRect = mapContainerRef.current.getBoundingClientRect();
+        if (containerRect.width > 0 && containerRect.height > 0) {
+          const success = initializeMap();
+          if (success) {
+            console.log('✅ 지도 초기화 성공!');
+            return;
+          }
+        } else {
+          console.log('⚠️ 지도 컨테이너 크기가 아직 설정되지 않음:', containerRect);
+        }
+      }
+
+      // 실패 시 재시도
+      if (initializationAttempts < maxAttempts) {
+        const delay = Math.min(1000 * initializationAttempts, 3000); // 최대 3초
+        console.log(`⚠️ 지도 초기화 실패, ${delay}ms 후 재시도...`);
+        setTimeout(attemptMapInitialization, delay);
+      } else {
+        console.log('❌ 지도 초기화 최대 시도 횟수 초과');
+        if (mounted) {
+          setMapState(prev => ({ 
+            ...prev, 
+            error: '지도 초기화에 실패했습니다. "지도 다시 로드" 버튼을 클릭하거나 주소 검색을 시도해보세요.'
+          }));
+        }
+      }
+    };
 
     const initializeComponent = async () => {
       try {
+        console.log('🚀 컴포넌트 초기화 시작');
         setMapState(prev => ({ ...prev, isLoading: true, error: null }));
         
-        // Google Maps API 로드 (지도 표시용)
-        await loadGoogleMapsAPI();
+        // 백엔드 API는 항상 사용 가능
+        setMapState(prev => ({ ...prev, apiReady: true }));
         
-        if (!mounted) return;
-        
-        // 지도 초기화 (선택적)
-        setTimeout(() => {
+        try {
+          // Google Maps API 로드
+          console.log('🔄 Google Maps API 로드 시작...');
+          await loadGoogleMapsAPI();
+          
+          if (!mounted) return;
+          console.log('✅ Google Maps API 로드 완료');
+          
+          // API 로드 후 추가 확인
+          let apiReadyCount = 0;
+          const checkApiReady = () => {
+            apiReadyCount++;
+            if (window.google && window.google.maps && window.google.maps.Map) {
+              console.log('✅ Google Maps 클래스 사용 가능');
+              // 지도 초기화 시도 (충분한 딜레이)
+              setTimeout(attemptMapInitialization, 800);
+            } else if (apiReadyCount < 10) {
+              console.log(`⏳ Google Maps 클래스 대기 중... (${apiReadyCount}/10)`);
+              setTimeout(checkApiReady, 200);
+            } else {
+              console.error('❌ Google Maps 클래스 로드 실패');
+              setMapState(prev => ({ 
+                ...prev, 
+                error: 'Google Maps API 로드는 완료되었지만 클래스 초기화에 실패했습니다.'
+              }));
+            }
+          };
+          
+          checkApiReady();
+          
+        } catch (mapError) {
+          console.error('❌ Google Maps API 로드 실패:', mapError);
           if (mounted) {
-            initializeMap();
+            setMapState(prev => ({ 
+              ...prev, 
+              error: `Google Maps 로드 실패: ${mapError.message}`
+            }));
           }
-        }, 100);
+        }
         
         setMapState(prev => ({ 
           ...prev, 
-          apiReady: true, 
           isLoading: false 
         }));
         
@@ -332,7 +565,7 @@ const RegisterDetail = () => {
           setMapState(prev => ({ 
             ...prev, 
             isLoading: false, 
-            error: '초기화에 실패했습니다. 지도 없이 계속 진행할 수 있습니다.',
+            error: '컴포넌트 초기화에 실패했습니다. 주소 검색은 여전히 사용할 수 있습니다.',
             apiReady: true  // 백엔드 API는 사용 가능
           }));
         }
@@ -343,6 +576,19 @@ const RegisterDetail = () => {
 
     return () => {
       mounted = false;
+      // 정리 작업
+      if (markerRef.current) {
+        markerRef.current.setMap(null);
+        markerRef.current = null;
+      }
+      if (infoWindowRef.current) {
+        infoWindowRef.current.close();
+        infoWindowRef.current = null;
+      }
+      // Google Maps 콜백 정리
+      if (window.initGoogleMaps) {
+        delete window.initGoogleMaps;
+      }
     };
   }, []);
 
@@ -625,66 +871,125 @@ const RegisterDetail = () => {
               
               {/* 지도 영역 */}
               <div className="map-container">
-                {mapState.mapInitialized ? (
-                  <div className="map-loaded">
-                    <div 
-                      ref={mapContainerRef}
-                      style={{width: '100%', height: '100%'}}
-                    ></div>
-                    {formData.lat && formData.lng && (
-                      <div className="map-info">
-                        📍 위치: {parseFloat(formData.lat).toFixed(6)}, {parseFloat(formData.lng).toFixed(6)}
+                <div className="map-loaded">
+                  <div 
+                    ref={mapContainerRef}
+                    style={{
+                      width: '100%', 
+                      height: '100%', 
+                      minHeight: '350px',
+                      display: 'block',
+                      backgroundColor: '#f5f5f5'
+                    }}
+                  ></div>
+                  
+                  {/* 로딩 오버레이 */}
+                  {mapState.isLoading && (
+                    <div className="map-overlay">
+                      <div className="map-loading-overlay">
+                        <span>🔄 Google Maps 로딩 중...</span>
+                        <p>지도 서비스를 불러오고 있습니다</p>
                       </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="map-placeholder">
-                    <div className="map-loading">
-                      {mapState.isLoading ? (
-                        <>
-                          <span>🔄 Google Maps 로딩 중...</span>
-                          <p>지도 서비스를 불러오고 있습니다</p>
-                        </>
-                      ) : (
-                        <>
-                          <span>🗺️ 지도가 표시될 영역</span>
-                          <p>주소 검색 후 정확한 위치가 표시됩니다</p>
-                          {mapState.error && (
-                            <small style={{color: '#e74c3c', display: 'block', marginTop: '8px'}}>
-                              ⚠️ 지도 표시 실패: {mapState.error}
-                            </small>
-                          )}
-                        </>
-                      )}
                     </div>
-                    
-                    {/* 테스트 버튼 추가 */}
-                    {mapState.apiReady && (
-                      <div style={{marginTop: '15px'}}>
-                        <button 
-                          type="button" 
-                          className="test-search-btn"
-                          onClick={handleTestSearch}
-                          style={{
-                            padding: '8px 16px',
-                            backgroundColor: '#27ae60',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontSize: '13px',
-                            marginRight: '8px'
-                          }}
-                        >
-                          🔍 "선릉로 221" 테스트 검색
-                        </button>
-                        <small style={{color: '#666', fontSize: '12px'}}>
-                          (지오코딩 테스트용)
-                        </small>
+                  )}
+                  
+                  {/* 지도 초기화 실패 시 오버레이 */}
+                  {!mapState.mapInitialized && !mapState.isLoading && (
+                    <div className="map-overlay">
+                      <div className="map-placeholder-overlay">
+                        <span>🗺️ 지도를 초기화하고 있습니다</span>
+                        <p>잠시만 기다려주세요</p>
+                        {mapState.error && (
+                          <small style={{color: '#e74c3c', display: 'block', marginTop: '8px'}}>
+                            ⚠️ {mapState.error}
+                          </small>
+                        )}
+                        
+                        {/* 수동 초기화 및 테스트 버튼 */}
+                        <div style={{marginTop: '15px', display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center'}}>
+                          <div style={{display: 'flex', gap: '8px'}}>
+                            <button 
+                              type="button" 
+                              onClick={async () => {
+                                console.log('🔄 수동 지도 초기화 시도');
+                                setMapState(prev => ({ ...prev, isLoading: true, error: null }));
+                                
+                                try {
+                                  // Google Maps API 재로드 시도
+                                  if (!window.google || !window.google.maps) {
+                                    console.log('🔄 Google Maps API 재로드');
+                                    await loadGoogleMapsAPI();
+                                  }
+                                  
+                                  setTimeout(() => {
+                                    const success = initializeMap();
+                                    setMapState(prev => ({ ...prev, isLoading: false }));
+                                    
+                                    if (success) {
+                                      console.log('✅ 수동 지도 초기화 성공');
+                                    } else {
+                                      console.log('❌ 수동 지도 초기화 실패');
+                                    }
+                                  }, 500);
+                                  
+                                } catch (error) {
+                                  console.error('❌ 수동 초기화 중 오류:', error);
+                                  setMapState(prev => ({ 
+                                    ...prev, 
+                                    isLoading: false, 
+                                    error: `초기화 실패: ${error.message}` 
+                                  }));
+                                }
+                              }}
+                              style={{
+                                padding: '8px 16px',
+                                backgroundColor: '#3498db',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '13px'
+                              }}
+                            >
+                              🗺️ 지도 다시 로드
+                            </button>
+                            
+                            {mapState.apiReady && (
+                              <button 
+                                type="button" 
+                                className="test-search-btn"
+                                onClick={handleTestSearch}
+                                style={{
+                                  padding: '8px 16px',
+                                  backgroundColor: '#27ae60',
+                                  color: 'white',
+                                  border: 'none',
+                                  borderRadius: '4px',
+                                  cursor: 'pointer',
+                                  fontSize: '13px'
+                                }}
+                              >
+                                🔍 테스트 검색
+                              </button>
+                            )}
+                          </div>
+                          
+                          <small style={{color: '#666', fontSize: '12px', textAlign: 'center'}}>
+                            지도 로드에 실패한 경우 위 버튼을 클릭하거나<br/>
+                            주소 검색을 하면 자동으로 재시도됩니다
+                          </small>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                )}
+                    </div>
+                  )}
+                  
+                  {/* 좌표 정보 표시 */}
+                  {formData.lat && formData.lng && (
+                    <div className="map-info">
+                      📍 위치: {parseFloat(formData.lat).toFixed(6)}, {parseFloat(formData.lng).toFixed(6)}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 

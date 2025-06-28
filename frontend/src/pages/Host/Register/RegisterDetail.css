@@ -194,7 +194,10 @@
 .map-loaded {
   width: 100%;
   height: 100%;
+  min-height: 350px;
   position: relative;
+  display: block;
+  overflow: hidden;
 }
 
 #map {
@@ -215,6 +218,71 @@
   backdrop-filter: blur(4px);
   border: 1px solid rgba(0, 0, 0, 0.1);
   z-index: 1000;
+}
+
+.map-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(248, 249, 250, 0.95);
+  z-index: 500;
+  backdrop-filter: blur(2px);
+}
+
+.map-loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  padding: 20px;
+}
+
+.map-loading-overlay span {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c5530;
+  margin-bottom: 4px;
+}
+
+.map-loading-overlay p {
+  font-size: 14px;
+  margin: 0;
+  color: #666;
+  opacity: 0.8;
+}
+
+.map-placeholder-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  max-width: 400px;
+  margin: 20px;
+}
+
+.map-placeholder-overlay span {
+  font-size: 18px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 4px;
+}
+
+.map-placeholder-overlay p {
+  font-size: 14px;
+  margin: 0;
+  color: #6c757d;
+  opacity: 0.8;
 }
 
 /* 폼 요소들 */
