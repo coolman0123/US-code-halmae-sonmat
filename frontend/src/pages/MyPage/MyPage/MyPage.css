@@ -1,136 +1,134 @@
-.my-page {
+.my-page-bg {
+  min-height: 100vh;
+  background: #f7f7f9;
   display: flex;
-  flex-direction: column;
-  height: 100vh;
-  font-family: 'Noto Sans KR', sans-serif;
-  background-color: #fff;
+  align-items: center;
+  justify-content: center;
 }
 
-.my-page-content {
-  flex: none;
-  max-width: 800px;
+.my-page-card {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 6px 32px rgba(0, 0, 0, 0.08);
+  padding: 48px 40px 36px 40px;
+  max-width: 420px;
   width: 100%;
-  margin: 60px auto 0 auto;
-  padding: 0 20px;
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
-.my-page > footer,
-.my-page > Footer {
-  margin-top: auto;
+.centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .profile-section {
-  display: flex;
-  align-items: center;
-  margin-bottom: 40px;
+  flex-direction: column;
+  margin-bottom: 36px;
 }
 
 .profile-icon {
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  margin-right: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
 }
 
 .welcome-message {
-  font-size: 20px;
-  font-weight: 500;
+  font-size: 22px;
+  font-weight: 600;
+  color: #222;
 }
 
 .icon-buttons {
-  display: flex;
-  justify-content: flex-start;
-  gap: 200px;
-  margin-top: 30px;
-  margin-bottom: 30px;
+  width: 100%;
+  justify-content: space-between;
+  gap: 0;
+  margin: 0 0 32px 0;
 }
 
 .icon-button {
-  display: flex;
   flex-direction: column;
   align-items: center;
   cursor: pointer;
+  width: 90px;
+  padding: 18px 0 10px 0;
+  border-radius: 16px;
+  transition: background 0.2s, box-shadow 0.2s;
+  display: flex;
+  background: #fff;
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
-
+.icon-button:hover {
+  background: #f7f7fa;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
 .icon-button img {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   margin-bottom: 8px;
 }
-
 .icon-button p {
   margin: 0;
-  font-size: 16px;
+  font-size: 15px;
   color: #333;
+  font-weight: 500;
+  text-align: center;
 }
 
 .mypage-links {
-  text-align: left;
-  margin-top: 20px;
-  padding-left: 8px;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
 }
-
-.mypage-links p {
+.inquiry-btn {
+  background: #f7f7f9;
+  color: #333;
+  border: none;
+  border-radius: 16px;
+  padding: 12px 0;
+  width: 100%;
   font-size: 16px;
-  color: #555;
-  margin: 40px 0;
+  font-weight: 500;
   cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s;
+}
+.inquiry-btn:hover {
+  background: #e9e9ef;
 }
 
-.mypage-links p:hover {
-  text-decoration: underline;
-}
-
-@media (max-width: 768px) {
-  .my-page-content {
-    padding: 0 24px;
-    margin: 30px auto;
+@media (max-width: 600px) {
+  .my-page-card {
+    padding: 32px 10px 24px 10px;
+    max-width: 98vw;
   }
-
-  .profile-section {
-    margin-bottom: 24px;
+  .profile-icon {
+    width: 60px;
+    height: 60px;
   }
-
-  .icon-buttons {
-    flex-direction: row;
-    justify-content: flex-start; /* 왼쪽 정렬 */
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 24px;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    padding-left: 76px; /* ✅ 프로필 이미지 margin-right 16px + width 60px 맞춰줌 */
-  }
-
-  .icon-button {
-    width: 100px;
-    text-align: center;
-  }
-
-  .icon-button img {
-    width: 35px;
-    height: 35px;
-    margin-bottom: 6px;
-  }
-
-  .icon-button p {
-    font-size: 14px;
-    margin: 0;
-    text-align: center;
-  }
-
-  .mypage-links {
-    padding-left: 0;
-    margin-top: 10px;
-  }
-
-  .mypage-links p {
-    margin: 15px 0;
-  }
-
   .welcome-message {
-    font-size: 18px;
+    font-size: 17px;
+  }
+  .icon-button {
+    width: 70px;
+    padding: 12px 0 8px 0;
+  }
+  .icon-button img {
+    width: 28px;
+    height: 28px;
+  }
+  .icon-button p {
+    font-size: 13px;
+  }
+  .inquiry-btn {
+    font-size: 14px;
+    padding: 10px 0;
   }
 }

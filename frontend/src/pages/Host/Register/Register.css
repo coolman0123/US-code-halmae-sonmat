@@ -227,3 +227,230 @@
   color: white;
   transform: scale(1.1);
 }
+
+.host-count-info {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  text-align: center;
+  border-left: 4px solid #2c5530;
+}
+
+.host-count-info span:first-child {
+  font-weight: 600;
+  color: #2c5530;
+}
+
+.data-source-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  z-index: 2;
+}
+
+.data-source-badge.local {
+  background: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #bbdefb;
+}
+
+.data-source-badge.backend {
+  background: #e8f5e8;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+.delete-button.local-delete {
+  background: #ffcdd2;
+  color: #c62828;
+  border: 1px solid #ef9a9a;
+}
+
+.delete-button.local-delete:hover {
+  background: #f8bbd9;
+  color: #ad2212;
+}
+
+.delete-button.backend-delete {
+  background: #ffecb3;
+  color: #f57f17;
+  border: 1px solid #fff176;
+}
+
+.delete-button.backend-delete:hover {
+  background: #ffe082;
+  color: #f57f17;
+}
+
+.host-details {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.host-address, .host-price {
+  font-size: 12px;
+  color: #666;
+  margin: 2px 0;
+}
+
+.host-coordinates {
+  font-size: 11px;
+  color: #888;
+  margin-top: 4px;
+}
+
+.register-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 30px;
+  padding: 20px;
+}
+
+.refresh-button {
+  padding: 12px 24px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.refresh-button:hover {
+  background: #e9ecef !important;
+  border-color: #adb5bd;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #666;
+}
+
+.loading div:first-child {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* 지도 관련 CSS 추가 */
+.map-container {
+  width: 100%;
+  height: 300px;
+  margin-top: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.map-loaded {
+  width: 100%;
+  height: 100%;
+}
+
+.map-placeholder {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background: #f8f9fa;
+  color: #666;
+}
+
+.map-placeholder span {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.map-placeholder p {
+  font-size: 14px;
+  margin: 0;
+}
+
+.address-input-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.address-input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.address-search-btn {
+  padding: 12px 20px;
+  background: #2c5530;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.3s ease;
+  white-space: nowrap;
+}
+
+.address-search-btn:hover {
+  background: #1e3a21;
+}
+
+.address-search-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.detail-address-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .host-count-info {
+    padding: 12px;
+    font-size: 14px;
+  }
+  
+  .data-source-badge {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+  
+  .register-button-container {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .address-input-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .address-search-btn {
+    width: 100%;
+  }
+  
+  .map-container {
+    height: 250px;
+  }
+}

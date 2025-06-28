@@ -21,18 +21,63 @@ const HostBooking = () => {
     // 저장된 예약 데이터를 날짜별로 처리 (입실 날짜만 표시)
     savedReservations.forEach(reservation => {
       const startDate = new Date(reservation.startDate);
+
       
-      // 입실 날짜만 표시
-      const year = startDate.getFullYear();
-      const month = startDate.getMonth() + 1;
-      const day = startDate.getDate();
-      const dateKey = `${year}-${month}-${day}`;
-      
-      // 같은 날짜에 여러 예약이 있을 수 있으므로 배열로 관리
-      if (!data[dateKey]) {
-        data[dateKey] = [];
+      const response = await fetch('https://us-code-halmae-sonmat.onrender.com/api/trips', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('예약 데이터 조회에 실패했습니다.');
       }
+
+      const result = await response.json();
+      console.log('백엔드에서 불러온 Trip 데이터:', result);
+
+      const data = {};
+
+      if (result.success && result.data && Array.isArray(result.data)) {
+        // Trip 데이터를 날짜별 예약 데이터로 변환
+        result.data.forEach(trip => {
+          if (trip.status === 'cancelled') return; // 취소된 여행은 제외
+          
+          const startDate = new Date(trip.startDate);
+          const endDate = new Date(trip.endDate);
+          
+          // 시작일부터 종료일까지 모든 날짜를 예약 불가로 표시
+          for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+            const year = d.getFullYear();
+            const month = d.getMonth() + 1;
+            const day = d.getDate();
+            const dateKey = `${year}-${month}-${day}`;
+            
+            if (!data[dateKey]) {
+              data[dateKey] = [];
+            }
+            
+            // 현재 참가자가 최대 참가자 수에 도달했는지 확인
+            const isFull = trip.currentParticipants >= trip.maxParticipants;
+            
+            data[dateKey].push({
+              tripId: trip.id,
+              status: isFull ? 'unavailable' : 'available',
+              houseName: trip.title,
+              displayText: isFull ? '완' : '가',
+              participants: `${trip.currentParticipants}/${trip.maxParticipants}`,
+              price: trip.price
+            });
+          }
+        });
+      }
+
+      // 백엔드 데이터가 없거나 적을 때 기본 임시 데이터 추가
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
       
+
       // 해당 숙소의 가격 정보 찾기
       let housePrice = null;
       if (reservation.totalPrice) {
@@ -74,8 +119,9 @@ const HostBooking = () => {
           houseName: '여여',
           displayText: '완',
           price: defaultPrice
+
         });
-      });
+
 
       // 예약 가능한 날짜들 (녹색 - '가')
       const availableDays = [1, 4, 5, 6, 10, 11, 12, 13, 14, 17, 18, 19, 20, 21, 25, 26, 27, 28];
@@ -89,8 +135,8 @@ const HostBooking = () => {
           houseName: '여여',
           displayText: '가',
           price: defaultPrice
+
         });
-      });
 
       // 24일에 여러 숙소 예시 추가
       const day24Key = `${year}-${month + 1}-24`;
@@ -101,19 +147,24 @@ const HostBooking = () => {
         { status: 'unavailable', houseName: '영영', displayText: '완', price: 300000 },
         { status: 'unavailable', houseName: '패밀리', displayText: '완', price: 400000 }
       ];
+
     }
-    
-    return data;
   };
 
   useEffect(() => {
-    setBookingData(generateBookingData());
+    const loadBookingData = async () => {
+      const data = await fetchBookingDataFromAPI();
+      setBookingData(data);
+    };
+    
+    loadBookingData();
   }, [currentDate]);
 
   // 페이지 포커스 시 데이터 새로고침 (예약 추가 후 돌아왔을 때)
   useEffect(() => {
-    const handleFocus = () => {
-      setBookingData(generateBookingData());
+    const handleFocus = async () => {
+      const data = await fetchBookingDataFromAPI();
+      setBookingData(data);
     };
 
     window.addEventListener('focus', handleFocus);
@@ -148,9 +199,11 @@ const HostBooking = () => {
               <div className="house-name">
                 {booking.houseName}
               </div>
+
               {showPrices && (
                 <div className="price-display">
                   {booking.price ? `${booking.price.toLocaleString()}원` : '가격 정보 없음'}
+
                 </div>
               )}
             </div>

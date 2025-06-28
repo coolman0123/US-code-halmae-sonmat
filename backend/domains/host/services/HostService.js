@@ -37,6 +37,26 @@ class HostService {
   async getHostById(id) {
     return await this.hostRepository.findById(id);
   }
+
+  async deleteHost(hostId) {
+    try {
+      // 먼저 호스트가 존재하는지 확인
+      const existingHost = await this.hostRepository.findById(hostId);
+      if (!existingHost) {
+        throw new Error('삭제할 호스트를 찾을 수 없습니다.');
+      }
+
+      console.log('호스트 삭제 중:', existingHost);
+
+      // 호스트 삭제
+      const deletedResult = await this.hostRepository.delete(hostId);
+      
+      return { ...deletedResult, deletedHost: existingHost };
+    } catch (error) {
+      console.error('HostService.deleteHost 오류:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = HostService;

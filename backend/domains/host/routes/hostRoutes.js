@@ -74,6 +74,163 @@ router.get('/', (req, res, next) => hostController.getAllHosts(req, res, next));
 
 /**
  * @swagger
+ * /api/hosts/geocoding:
+ *   get:
+ *     summary: Google Maps Geocoding API Proxy
+ *     description: 주소를 입력받아 위도/경도를 반환하는 프록시 API
+ *     tags: [Host]
+ *     parameters:
+ *       - in: query
+ *         name: address
+ *         required: true
+ *         description: 검색할 주소
+ *         schema:
+ *           type: string
+ *           example: "선릉로 221"
+ *     responses:
+ *       200:
+ *         description: 지오코딩 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     address:
+ *                       type: string
+ *                       example: "선릉로 221"
+ *                     formattedAddress:
+ *                       type: string
+ *                       example: "대한민국 서울특별시 강남구 선릉로 221"
+ *                     latitude:
+ *                       type: number
+ *                       example: 37.5074846
+ *                     longitude:
+ *                       type: number
+ *                       example: 127.0484407
+ *                     placeId:
+ *                       type: string
+ *       400:
+ *         description: 잘못된 요청 또는 주소를 찾을 수 없음
+ *       500:
+ *         description: 서버 오류
+ */
+router.get('/geocoding', (req, res, next) => hostController.geocoding(req, res, next));
+
+/**
+ * @swagger
+ * /api/hosts/{hostId}:
+ *   get:
+ *     summary: 특정 Host 조회
+ *     tags: [Host]
+ *     parameters:
+ *       - in: path
+ *         name: hostId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: 조회할 호스트 ID
+ *     responses:
+ *       200:
+ *         description: 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/Host'
+ *       404:
+ *         description: 호스트를 찾을 수 없음
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   example: "호스트를 찾을 수 없습니다."
+ */
+router.get('/:hostId', (req, res, next) => hostController.getHostById(req, res, next));
+
+/**
+ * @swagger
+ * /api/hosts/{hostId}:
+ *   delete:
+ *     summary: Host 삭제
+ *     description: 지정된 ID의 Host를 삭제합니다.
+ *     tags: [Host]
+ *     parameters:
+ *       - in: path
+ *         name: hostId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: 삭제할 호스트 ID
+ *     responses:
+ *       200:
+ *         description: 호스트가 성공적으로 삭제되었습니다
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "호스트가 성공적으로 삭제되었습니다."
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     deletedHostId:
+ *                       type: string
+ *                       example: "host123"
+ *                     deletedHost:
+ *                       $ref: '#/components/schemas/Host'
+ *       400:
+ *         description: 잘못된 요청 (호스트 ID 누락)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   example: "호스트 ID가 필요합니다."
+ *       404:
+ *         description: 삭제할 호스트를 찾을 수 없음
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   example: "삭제할 호스트를 찾을 수 없습니다."
+ */
+router.delete('/:hostId', (req, res, next) => hostController.deleteHost(req, res, next));
+
+/**
+ * @swagger
  * components:
  *   schemas:
  *     HostRegister:

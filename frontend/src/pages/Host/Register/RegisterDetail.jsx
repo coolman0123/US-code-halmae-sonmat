@@ -1,97 +1,350 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './RegisterDetail.css';
 
 const RegisterDetail = () => {
   const navigate = useNavigate();
+  const mapRef = useRef(null);
+  const markerRef = useRef(null);
+  const infoWindowRef = useRef(null);
+  const mapContainerRef = useRef(null);
+
+  const [mapState, setMapState] = useState({
+    apiReady: false,
+    isLoading: true,
+    isSearching: false,
+    error: null,
+    mapInitialized: false
+  });
+
   const [formData, setFormData] = useState({
+    // 기본 정보
     address: '',
     detailAddress: '',
-    postcode: '',
-    lat: '',
-    lng: '',
+    lat: null,
+    lng: null,
     phone: '',
-    guests: 2,
-    bedrooms: 1,
-    beds: 1,
-    amenities: {
-      wifi: false,
-      tv: false,
-      kitchen: false,
-      washer: false,
-      freeParking: false,
-      paidParking: false,
-      airConditioner: false,
-      workspace: false
-    },
-    photo: null,
-    photos: [], // 관련 사진들 (최대 2장)
-    houseName: '', // 할머니 집 이름
-    workExperience: '', // 체험 가능한 일손
-    price: '' // 숙박비
+    houseNickname: '',
+    
+    // 숙박 정보
+    maxGuests: 1,
+    bedroomCount: 1,
+    bedCount: 1,
+    
+    // 편의시설
+    amenities: [],
+    
+    // 사진
+    photos: [],
+    
+    // 체험 및 요금
+    experiences: '',
+    accommodationFee: ''
   });
 
-  const [mapInfo, setMapInfo] = useState({
-    isLoaded: true, // 테스트를 위해 true로 설정
-    address: '서울 용산구 남산공원길 105',
-    coordinates: { lat: 37.5515, lng: 126.9885 }
-  });
+  const BACKEND_URL = 'https://us-code-halmae-sonmat.onrender.com';
 
-  // 카카오맵 초기화
-  useEffect(() => {
-    const loadKakaoMap = () => {
-      if (window.kakao && window.kakao.maps) {
-        window.kakao.maps.load(() => {
-          if (mapInfo.isLoaded && mapInfo.coordinates) {
-            initializeMap(mapInfo.coordinates.lat, mapInfo.coordinates.lng, mapInfo.address);
-          }
-        });
+  // Google Maps API 로딩 (지도 표시용)
+  const loadGoogleMapsAPI = () => {
+    return new Promise((resolve, reject) => {
+      if (window.google && window.google.maps) {
+        console.log('✅ Google Maps API 이미 로드됨');
+        resolve();
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDCFpWL0RLVqqgnRJqVmpjec9pnw7DAHeo&libraries=places&language=ko`;
+      script.async = true;
+      script.defer = true;
+      
+      script.onload = () => {
+        console.log('✅ Google Maps API 로드 완료');
+        resolve();
+      };
+      
+      script.onerror = (error) => {
+        console.error('❌ Google Maps API 로드 실패:', error);
+        reject(error);
+      };
+      
+      document.head.appendChild(script);
+    });
+  };
+
+  // 지도 초기화 (표시용)
+  const initializeMap = () => {
+    if (!window.google || !window.google.maps) {
+      console.error('❌ Google Maps API가 로드되지 않음');
+      return;
+    }
+
+    if (!mapContainerRef.current) {
+      console.error('❌ 지도 컨테이너가 없음');
+      return;
+    }
+
+    try {
+      // 서울 시청 좌표로 초기화
+      const defaultCenter = { lat: 37.5665, lng: 126.9780 };
+      
+      mapRef.current = new window.google.maps.Map(mapContainerRef.current, {
+        center: defaultCenter,
+        zoom: 12,
+        mapTypeId: 'roadmap'
+      });
+
+      console.log('✅ 지도 초기화 완료');
+      setMapState(prev => ({ ...prev, mapInitialized: true }));
+    } catch (error) {
+      console.error('❌ 지도 초기화 실패:', error);
+      setMapState(prev => ({ ...prev, error: '지도 초기화에 실패했습니다.' }));
+    }
+  };
+
+  // 백엔드 지오코딩 API 호출
+  const searchAddressWithBackend = async (searchQuery) => {
+    try {
+      console.log('🔍 백엔드 지오코딩 요청:', searchQuery);
+      
+      const response = await axios.get(`${BACKEND_URL}/api/hosts/geocoding`, {
+        params: { address: searchQuery }
+      });
+
+      console.log('✅ 백엔드 지오코딩 응답:', response.data);
+
+      if (response.data.success) {
+        return response.data.data;
       } else {
-        console.log('카카오맵 API를 로딩 중입니다...');
-        // 카카오맵 API가 로드될 때까지 대기
-        setTimeout(loadKakaoMap, 100);
+        throw new Error(response.data.message || '지오코딩 실패');
+      }
+    } catch (error) {
+      console.error('❌ 백엔드 지오코딩 실패:', error);
+      
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      } else if (error.message) {
+        throw new Error(error.message);
+      } else {
+        throw new Error('지오코딩 요청 중 오류가 발생했습니다.');
+      }
+    }
+  };
+
+  // 지도에 위치 표시
+  const displayLocationOnMap = (lat, lng, address, formattedAddress) => {
+    try {
+      if (!mapRef.current) {
+        console.log('⚠️ 지도가 초기화되지 않음 - 지도 표시 건너뛰기');
+        return;
+      }
+
+      const position = { lat: parseFloat(lat), lng: parseFloat(lng) };
+
+      // 지도 중심 이동
+      mapRef.current.setCenter(position);
+      mapRef.current.setZoom(17);
+
+      // 기존 마커 제거
+      if (markerRef.current) {
+        markerRef.current.setMap(null);
+      }
+      if (infoWindowRef.current) {
+        infoWindowRef.current.close();
+      }
+
+      // 새 마커 생성
+      markerRef.current = new window.google.maps.Marker({
+        position: position,
+        map: mapRef.current,
+        title: address,
+        animation: window.google.maps.Animation.DROP
+      });
+
+      // 인포윈도우 생성
+      infoWindowRef.current = new window.google.maps.InfoWindow({
+        content: `
+          <div style="padding: 12px; max-width: 300px;">
+            <div style="font-weight: 600; color: #2c5530; margin-bottom: 8px;">
+              📍 검색된 위치
+            </div>
+            <div style="font-size: 13px; margin-bottom: 6px;">
+              <strong>주소:</strong> ${formattedAddress || address}
+            </div>
+            <div style="font-size: 12px; color: #666;">
+              <strong>좌표:</strong> ${lat.toFixed(6)}, ${lng.toFixed(6)}
+            </div>
+          </div>
+        `
+      });
+
+      // 인포윈도우 자동 열기
+      setTimeout(() => {
+        if (infoWindowRef.current && markerRef.current) {
+          infoWindowRef.current.open(mapRef.current, markerRef.current);
+        }
+      }, 500);
+
+      console.log('✅ 지도에 위치 표시 완료');
+    } catch (error) {
+      console.error('❌ 지도 위치 표시 실패:', error);
+      // 지도 표시 실패해도 계속 진행
+    }
+  };
+
+  // 주소 검색 핸들러
+  const handleAddressSearch = async () => {
+    const searchInput = document.querySelector('input[name="address"]');
+    const searchQuery = searchInput.value.trim();
+    
+    // 입력 검증
+    if (!searchQuery) {
+      alert('주소를 입력해주세요.\n\n📍 정확한 입력 예시:\n• 선릉로 221\n• 강남대로 382\n• 테헤란로 14길 6');
+      searchInput.focus();
+      return;
+    }
+
+    // 검색 중 상태
+    setMapState(prev => ({ ...prev, isSearching: true, error: null }));
+    const searchButton = document.querySelector('.address-search-btn');
+    const originalText = searchButton.textContent;
+    searchButton.textContent = '🔍 검색 중...';
+    searchButton.disabled = true;
+
+    try {
+      console.log('📍 주소 검색 요청:', searchQuery);
+      
+      const result = await searchAddressWithBackend(searchQuery);
+
+      // 폼 데이터 업데이트
+      setFormData(prev => ({
+        ...prev,
+        address: result.formattedAddress,
+        lat: result.latitude,
+        lng: result.longitude
+      }));
+
+      // 지도에 위치 표시 (지도가 초기화된 경우에만)
+      if (mapState.mapInitialized) {
+        displayLocationOnMap(
+          result.latitude, 
+          result.longitude, 
+          result.address, 
+          result.formattedAddress
+        );
+      }
+
+      // 성공 메시지
+      alert(`✅ 주소 검색이 완료되었습니다!\n\n🔍 검색어: ${searchQuery}\n📍 찾은 주소: ${result.formattedAddress}\n🌐 위도: ${result.latitude.toFixed(6)}\n🌐 경도: ${result.longitude.toFixed(6)}\n\n${mapState.mapInitialized ? '지도에서 정확한 위치를 확인하세요!' : '(지도 표시 건너뛰기)'}`);
+
+      // 상세주소 입력으로 포커스 이동
+      setTimeout(() => {
+        const detailAddressInput = document.querySelector('input[name="detailAddress"]');
+        if (detailAddressInput) {
+          detailAddressInput.focus();
+        }
+      }, 100);
+
+    } catch (error) {
+      console.error('❌ 주소 검색 실패:', error);
+      
+      // 사용자에게 친화적인 오류 메시지
+      let userMessage = '주소 검색에 실패했습니다.';
+      
+      if (error.message.includes('검색 결과가 없습니다')) {
+        userMessage = `"${searchQuery}"에 대한 검색 결과가 없습니다.\n\n다른 주소로 시도해보세요.\n\n💡 검색 팁:\n• 도로명 주소 사용 (예: 선릉로 221)\n• 상세한 주소 입력\n• 건물명 대신 도로명 사용`;
+      } else if (error.message.includes('API 사용량')) {
+        userMessage = 'API 사용량 한도를 초과했습니다.\n잠시 후 다시 시도해주세요.';
+      } else if (error.message.includes('서버')) {
+        userMessage = '서버 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.';
+      }
+      
+      alert(`❌ ${userMessage}`);
+      setMapState(prev => ({ ...prev, error: error.message }));
+    } finally {
+      // 검색 완료 상태 복원
+      setMapState(prev => ({ ...prev, isSearching: false }));
+      searchButton.textContent = originalText;
+      searchButton.disabled = false;
+    }
+  };
+
+  // 테스트 검색 핸들러
+  const handleTestSearch = async () => {
+    const searchInput = document.querySelector('input[name="address"]');
+    searchInput.value = '선릉로 221';
+    await handleAddressSearch();
+  };
+
+  // API 테스트 핸들러
+  const handleAPITest = async () => {
+    try {
+      console.log('🧪 백엔드 API 테스트 시작');
+      const result = await searchAddressWithBackend('선릉로 221');
+      console.log('✅ API 테스트 성공:', result);
+      alert(`✅ API 테스트 성공!\n\n주소: ${result.formattedAddress}\n위도: ${result.latitude}\n경도: ${result.longitude}`);
+    } catch (error) {
+      console.error('❌ API 테스트 실패:', error);
+      alert(`❌ API 테스트 실패: ${error.message}`);
+    }
+  };
+
+  // Enter 키 검색
+  const handleAddressKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddressSearch();
+    }
+  };
+
+  // 컴포넌트 마운트 시 초기화
+  useEffect(() => {
+    let mounted = true;
+
+    const initializeComponent = async () => {
+      try {
+        setMapState(prev => ({ ...prev, isLoading: true, error: null }));
+        
+        // Google Maps API 로드 (지도 표시용)
+        await loadGoogleMapsAPI();
+        
+        if (!mounted) return;
+        
+        // 지도 초기화 (선택적)
+        setTimeout(() => {
+          if (mounted) {
+            initializeMap();
+          }
+        }, 100);
+        
+        setMapState(prev => ({ 
+          ...prev, 
+          apiReady: true, 
+          isLoading: false 
+        }));
+        
+        console.log('✅ 컴포넌트 초기화 완료');
+        
+      } catch (error) {
+        console.error('❌ 컴포넌트 초기화 실패:', error);
+        if (mounted) {
+          setMapState(prev => ({ 
+            ...prev, 
+            isLoading: false, 
+            error: '초기화에 실패했습니다. 지도 없이 계속 진행할 수 있습니다.',
+            apiReady: true  // 백엔드 API는 사용 가능
+          }));
+        }
       }
     };
 
-    loadKakaoMap();
-  }, [mapInfo.isLoaded]);
+    initializeComponent();
 
-  // 컴포넌트 마운트 시 localStorage에서 기본 정보 불러오기
-  useEffect(() => {
-    const savedData = localStorage.getItem('hostRegisterData');
-    if (savedData) {
-      const parsedData = JSON.parse(savedData);
-      console.log('저장된 기본 정보 불러오기:', parsedData);
-    }
+    return () => {
+      mounted = false;
+    };
   }, []);
-
-  const initializeMap = (lat, lng, address) => {
-    try {
-      const container = document.getElementById('map');
-      if (container && window.kakao && window.kakao.maps) {
-        const options = {
-          center: new window.kakao.maps.LatLng(lat, lng),
-          level: 3
-        };
-        const map = new window.kakao.maps.Map(container, options);
-        
-        // 마커 표시
-        const markerPosition = new window.kakao.maps.LatLng(lat, lng);
-        const marker = new window.kakao.maps.Marker({
-          position: markerPosition
-        });
-        marker.setMap(map);
-
-        // 인포윈도우 표시
-        const infowindow = new window.kakao.maps.InfoWindow({
-          content: `<div style="padding:5px;font-size:12px;width:200px;">${address}</div>`
-        });
-        infowindow.open(map, marker);
-      }
-    } catch (error) {
-      console.error('지도 초기화 실패:', error);
-    }
-  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -104,13 +357,12 @@ const RegisterDetail = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // 파일을 Base64 URL로 변환하여 저장
       const reader = new FileReader();
       reader.onload = (e) => {
         setFormData(prev => ({
           ...prev,
-          photo: e.target.result, // Base64 URL 저장
-          photoFile: file // 파일 객체도 별도 저장 (필요시)
+          photo: e.target.result,
+          photoFile: file
         }));
       };
       reader.readAsDataURL(file);
@@ -120,13 +372,11 @@ const RegisterDetail = () => {
   const handlePhotosChange = (e) => {
     const files = Array.from(e.target.files);
     
-    // 최대 2장까지만 선택 가능
     if (files.length > 2) {
       alert('최대 2장까지만 업로드할 수 있습니다.');
       return;
     }
 
-    // 기존 사진과 합쳐서 2장을 넘지 않도록 확인
     if (formData.photos.length + files.length > 2) {
       alert('최대 2장까지만 업로드할 수 있습니다.');
       return;
@@ -180,47 +430,20 @@ const RegisterDetail = () => {
   const handleAmenityToggle = (amenity) => {
     setFormData(prev => ({
       ...prev,
-      amenities: {
-        ...prev.amenities,
-        [amenity]: !prev.amenities[amenity]
-      }
+      amenities: prev.amenities.includes(amenity)
+        ? prev.amenities.filter(item => item !== amenity)
+        : [...prev.amenities, amenity]
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    try {
-      // localStorage에서 기본 정보 가져오기
-      const savedData = localStorage.getItem('hostRegisterData');
-      let basicInfo = {};
-      
-      if (savedData) {
-        const parsedData = JSON.parse(savedData);
-        basicInfo = parsedData.basicInfo || {};
-      }
-
-      // 완전한 할매 정보 생성
-      const completeHostData = {
-        id: Date.now().toString(), // 임시 ID
-        name: basicInfo.introduction || '새로운 할머니',
-        houseName: formData.houseName,
-        age: basicInfo.age,
-        specialty: basicInfo.specialty,
-        menu: basicInfo.menu,
-        personality: basicInfo.personality,
-        address: formData.address,
-        phone: formData.phone,
-        guests: formData.guests,
-        bedrooms: formData.bedrooms,
-        beds: formData.beds,
-        amenities: formData.amenities,
-        workExperience: formData.workExperience,
-        price: formData.price,
-        photo: formData.photo,
-        photos: formData.photos,
-        createdAt: new Date().toISOString()
-      };
+    // 필수 필드 검증
+    if (!formData.address || !formData.lat || !formData.lng) {
+      alert('주소 검색을 먼저 완료해주세요.');
+      return;
+    }
 
       // 기존 할매 목록 가져오기
       const existingHosts = JSON.parse(localStorage.getItem('hostsList') || '[]');
@@ -247,110 +470,100 @@ const RegisterDetail = () => {
     } catch (error) {
       console.error('할매 등록 실패:', error);
       alert('할매 등록에 실패했습니다. 다시 시도해주세요.');
+
     }
-  };
 
-  const updateMap = (lat, lng, address) => {
-    console.log('지도 업데이트:', { lat, lng, address });
-    
-    // 지도 정보 상태 업데이트
-    setMapInfo({
-      isLoaded: true,
-      address: address,
-      coordinates: { lat: parseFloat(lat), lng: parseFloat(lng) }
-    });
-
-    // 실제 지도 API 연동
-    try {
-      if (window.kakao && window.kakao.maps) {
-        window.kakao.maps.load(() => {
-          const container = document.getElementById('map');
-          if (container) {
-            const options = {
-              center: new window.kakao.maps.LatLng(lat, lng),
-              level: 3
-            };
-            const map = new window.kakao.maps.Map(container, options);
-            
-            // 마커 표시
-            const markerPosition = new window.kakao.maps.LatLng(lat, lng);
-            const marker = new window.kakao.maps.Marker({
-              position: markerPosition
-            });
-            marker.setMap(map);
-
-            // 인포윈도우 표시
-            const infowindow = new window.kakao.maps.InfoWindow({
-              content: `<div style="padding:5px;font-size:12px;width:200px;">${address}</div>`
-            });
-            infowindow.open(map, marker);
-          }
-        });
-      }
-    } catch (error) {
-      console.error('지도 업데이트 실패:', error);
-    }
-  };
-
-  const handleAddressSearch = () => {
-    console.log('주소 검색 버튼 클릭됨');
-    
-    // 다음 주소 API가 로드되었는지 확인
-    if (!window.daum || !window.daum.Postcode) {
-      console.error('다음 주소 API가 로드되지 않음');
-      alert('주소 검색 서비스를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+    if (!formData.houseNickname) {
+      alert('할머니 집 이름을 입력해주세요.');
       return;
     }
 
-    console.log('다음 주소 API 호출 시작');
+    if (!formData.experiences) {
+      alert('체험 가능한 일손을 입력해주세요.');
+      return;
+    }
 
-    // 다음 주소 검색 API 사용
-    new window.daum.Postcode({
-      oncomplete: function(data) {
-        console.log('주소 검색 완료:', data);
+    if (!formData.accommodationFee) {
+      alert('숙박비를 입력해주세요.');
+      return;
+    }
+
+    try {
+      console.log('📤 백엔드로 할머니 등록 데이터 전송...');
+      
+              const hostData = {
+          houseNickname: formData.houseNickname,
+          hostIntroduction: formData.experiences,
+          address: {
+            detailAddress: formData.address + (formData.detailAddress ? ` ${formData.detailAddress}` : '')
+          },
+          latitude: parseFloat(formData.lat),
+          longitude: parseFloat(formData.lng),
+          contact: {
+            phone: formData.phone
+          },
+          maxGuests: formData.maxGuests,
+          bedroomCount: formData.bedroomCount,
+          bedCount: formData.bedCount,
+          amenities: formData.amenities, // 이미 배열 형태
+          availableExperiences: formData.experiences,
+          accommodationFee: parseFloat(formData.accommodationFee),
+          housePhotos: formData.photos.map(photo => photo.url)
+        };
+
+      console.log('📤 전송할 데이터:', hostData);
+
+      const response = await fetch('https://us-code-halmae-sonmat.onrender.com/api/hosts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(hostData)
+      });
+
+      const result = await response.json();
+      console.log('📨 백엔드 응답:', result);
+
+      if (response.ok && result.success) {
+        alert(`✅ 할머니 등록이 완료되었습니다!\n\n📋 등록된 정보:\n• 집 이름: ${formData.houseNickname}\n• 주소: ${formData.address}\n• 위도/경도: ${formData.lat}, ${formData.lng}\n• 연락처: ${formData.phone}\n• 숙박비: ${formData.accommodationFee}원`);
         
-        // 각 주소의 노출 규칙에 따라 주소를 조합한다
-        let addr = ''; // 주소 변수
-
-        //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다
-        if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
-          addr = data.roadAddress;
-        } else { // 사용자가 지번 주소를 선택했을 경우(J)
-          addr = data.jibunAddress;
-        }
-
-        // 기본 주소만 사용 (참고항목 제외)
-        const fullAddress = addr;
-        console.log('주소 정보:', {
-          address: fullAddress,
-          postcode: data.zonecode,
-          lat: data.y,
-          lng: data.x
+        // 폼 초기화
+        setFormData({
+          address: '',
+          detailAddress: '',
+          lat: null,
+          lng: null,
+          phone: '',
+          maxGuests: 1,
+          bedroomCount: 1,
+          bedCount: 1,
+          amenities: [],
+          photos: [],
+          houseNickname: '',
+          experiences: '',
+          accommodationFee: ''
         });
 
-        // 주소 정보를 해당 필드에 넣는다
-        setFormData(prev => ({
-          ...prev,
-          address: fullAddress,
-          postcode: data.zonecode,
-          // 지도 표시용 좌표 정보도 저장
-          lat: data.y, // 위도
-          lng: data.x  // 경도
-        }));
-
-        // 지도 업데이트
-        updateMap(data.y, data.x, fullAddress);
-
-        // 상세주소 입력 필드에 포커스를 준다
-        const detailAddressInput = document.querySelector('input[name="detailAddress"]');
-        if (detailAddressInput) {
-          detailAddressInput.focus();
+        // 지도 초기화
+        if (markerRef.current) {
+          markerRef.current.setMap(null);
         }
-      },
-      onclose: function(state) {
-        console.log('주소 검색창 닫힘:', state);
+        if (infoWindowRef.current) {
+          infoWindowRef.current.close();
+        }
+        if (mapRef.current) {
+          mapRef.current.setCenter({ lat: 37.5665, lng: 126.9780 });
+          mapRef.current.setZoom(11);
+        }
+
+        navigate('/host/register');
+      } else {
+        throw new Error(result.message || '등록에 실패했습니다.');
       }
-    }).open();
+    } catch (error) {
+      console.error('❌ 할머니 등록 실패:', error);
+      alert(`❌ 등록에 실패했습니다.\n오류: ${error.message}\n\n다시 시도해주세요.`);
+    }
   };
 
   return (
@@ -361,55 +574,138 @@ const RegisterDetail = () => {
             
             {/* 주소 입력 섹션 */}
             <div className="section">
-              <h3 className="section-title">주 소</h3>
+              <h3 className="section-title">📍 주 소</h3>
+              
+              {/* API 상태 표시 */}
+              <div className="api-status">
+                {mapState.apiReady ? (
+                  <span className="status-ready">✅ Google Maps API 준비 완료</span>
+                ) : (
+                  <span className="status-loading">🔄 Google Maps API 로딩 중...</span>
+                )}
+                
+                {/* 개발용 테스트 버튼 */}
+                {mapState.apiReady && (
+                  <button 
+                    type="button" 
+                    className="test-api-btn"
+                    onClick={handleAPITest}
+                    style={{marginLeft: '10px', fontSize: '12px', padding: '4px 8px'}}
+                  >
+                    API 테스트
+                  </button>
+                )}
+              </div>
+
+              {mapState.error && (
+                <div className="error-message">
+                  ⚠️ {mapState.error}
+                </div>
+              )}
+
               <div className="address-group">
                 <div className="address-input-row">
-                  <input
-                    type="text"
-                    name="postcode"
-                    value={formData.postcode}
-                    className="postcode-input"
-                    placeholder="우편번호"
-                    readOnly
-                  />
                   <input
                     type="text"
                     name="address"
                     value={formData.address}
                     onChange={handleInputChange}
-                    className="address-input"
-                    placeholder="주소를 검색하세요"
-                    readOnly
+                    onKeyPress={handleAddressKeyPress}
+                    className="address-input full-width"
+                    placeholder="정확한 도로명 주소를 입력하세요 (예: 선릉로 221)"
                     required
                   />
                   <button 
                     type="button" 
                     className="address-search-btn"
                     onClick={handleAddressSearch}
+                    disabled={mapState.isSearching || !mapState.apiReady}
                   >
-                    주소 검색
+                    {mapState.isSearching ? '🔍 검색 중...' : '주소 검색'}
                   </button>
                 </div>
+                
+                {/* 검색 도움말 */}
+                <div className="address-help">
+                  💡 <strong>검색 팁:</strong> 도로명 + 번지를 정확히 입력하세요
+                  <br />
+                  <small>
+                    ✅ 좋은 예시: 선릉로 221, 강남대로 382, 테헤란로 14길 6
+                    <br />
+                    ❌ 피할 예시: 강남역, OO빌딩, 대략적인 지명
+                  </small>
+                </div>
+
                 <input
                   type="text"
                   name="detailAddress"
                   value={formData.detailAddress}
                   onChange={handleInputChange}
                   className="detail-address-input"
-                  placeholder="상세주소를 입력하세요 (선택사항)"
+                  placeholder="상세주소를 입력하세요 (예: 101동 1502호, 2층 등)"
                 />
               </div>
               
               {/* 지도 영역 */}
               <div className="map-container">
-                {mapInfo.isLoaded ? (
+                {mapState.mapInitialized ? (
                   <div className="map-loaded">
-                    <div id="map" style={{width: '100%', height: '100%'}}></div>
+                    <div 
+                      ref={mapContainerRef}
+                      style={{width: '100%', height: '100%'}}
+                    ></div>
+                    {formData.lat && formData.lng && (
+                      <div className="map-info">
+                        📍 위치: {parseFloat(formData.lat).toFixed(6)}, {parseFloat(formData.lng).toFixed(6)}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="map-placeholder">
-                    <span>지도가 표시될 영역</span>
-                    <p>주소 검색 후 위치가 표시됩니다</p>
+                    <div className="map-loading">
+                      {mapState.isLoading ? (
+                        <>
+                          <span>🔄 Google Maps 로딩 중...</span>
+                          <p>지도 서비스를 불러오고 있습니다</p>
+                        </>
+                      ) : (
+                        <>
+                          <span>🗺️ 지도가 표시될 영역</span>
+                          <p>주소 검색 후 정확한 위치가 표시됩니다</p>
+                          {mapState.error && (
+                            <small style={{color: '#e74c3c', display: 'block', marginTop: '8px'}}>
+                              ⚠️ 지도 표시 실패: {mapState.error}
+                            </small>
+                          )}
+                        </>
+                      )}
+                    </div>
+                    
+                    {/* 테스트 버튼 추가 */}
+                    {mapState.apiReady && (
+                      <div style={{marginTop: '15px'}}>
+                        <button 
+                          type="button" 
+                          className="test-search-btn"
+                          onClick={handleTestSearch}
+                          style={{
+                            padding: '8px 16px',
+                            backgroundColor: '#27ae60',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '13px',
+                            marginRight: '8px'
+                          }}
+                        >
+                          🔍 "선릉로 221" 테스트 검색
+                        </button>
+                        <small style={{color: '#666', fontSize: '12px'}}>
+                          (지오코딩 테스트용)
+                        </small>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -441,15 +737,15 @@ const RegisterDetail = () => {
                     <button 
                       type="button" 
                       className="counter-btn"
-                      onClick={() => handleCountChange('guests', false)}
+                      onClick={() => handleCountChange('maxGuests', false)}
                     >
                       −
                     </button>
-                    <span className="counter-value">{formData.guests}</span>
+                    <span className="counter-value">{formData.maxGuests}</span>
                     <button 
                       type="button" 
                       className="counter-btn"
-                      onClick={() => handleCountChange('guests', true)}
+                      onClick={() => handleCountChange('maxGuests', true)}
                     >
                       +
                     </button>
@@ -462,15 +758,15 @@ const RegisterDetail = () => {
                     <button 
                       type="button" 
                       className="counter-btn"
-                      onClick={() => handleCountChange('bedrooms', false)}
+                      onClick={() => handleCountChange('bedroomCount', false)}
                     >
                       −
                     </button>
-                    <span className="counter-value">{formData.bedrooms}</span>
+                    <span className="counter-value">{formData.bedroomCount}</span>
                     <button 
                       type="button" 
                       className="counter-btn"
-                      onClick={() => handleCountChange('bedrooms', true)}
+                      onClick={() => handleCountChange('bedroomCount', true)}
                     >
                       +
                     </button>
@@ -483,15 +779,15 @@ const RegisterDetail = () => {
                     <button 
                       type="button" 
                       className="counter-btn"
-                      onClick={() => handleCountChange('beds', false)}
+                      onClick={() => handleCountChange('bedCount', false)}
                     >
                       −
                     </button>
-                    <span className="counter-value">{formData.beds}</span>
+                    <span className="counter-value">{formData.bedCount}</span>
                     <button 
                       type="button" 
                       className="counter-btn"
-                      onClick={() => handleCountChange('beds', true)}
+                      onClick={() => handleCountChange('bedCount', true)}
                     >
                       +
                     </button>
@@ -507,7 +803,7 @@ const RegisterDetail = () => {
               <div className="amenities-section">
                 <div className="amenities-grid">
                   <div 
-                    className={`amenity-item ${formData.amenities.wifi ? 'selected' : ''}`}
+                    className={`amenity-item ${formData.amenities.includes('wifi') ? 'selected' : ''}`}
                     onClick={() => handleAmenityToggle('wifi')}
                   >
                     <div className="amenity-icon">📶</div>
@@ -515,7 +811,7 @@ const RegisterDetail = () => {
                   </div>
 
                   <div 
-                    className={`amenity-item ${formData.amenities.tv ? 'selected' : ''}`}
+                    className={`amenity-item ${formData.amenities.includes('tv') ? 'selected' : ''}`}
                     onClick={() => handleAmenityToggle('tv')}
                   >
                     <div className="amenity-icon">📺</div>
@@ -523,7 +819,7 @@ const RegisterDetail = () => {
                   </div>
 
                   <div 
-                    className={`amenity-item ${formData.amenities.kitchen ? 'selected' : ''}`}
+                    className={`amenity-item ${formData.amenities.includes('kitchen') ? 'selected' : ''}`}
                     onClick={() => handleAmenityToggle('kitchen')}
                   >
                     <div className="amenity-icon">🍳</div>
@@ -531,7 +827,7 @@ const RegisterDetail = () => {
                   </div>
 
                   <div 
-                    className={`amenity-item ${formData.amenities.washer ? 'selected' : ''}`}
+                    className={`amenity-item ${formData.amenities.includes('washer') ? 'selected' : ''}`}
                     onClick={() => handleAmenityToggle('washer')}
                   >
                     <div className="amenity-icon">🔄</div>
@@ -539,7 +835,7 @@ const RegisterDetail = () => {
                   </div>
 
                   <div 
-                    className={`amenity-item ${formData.amenities.freeParking ? 'selected' : ''}`}
+                    className={`amenity-item ${formData.amenities.includes('freeParking') ? 'selected' : ''}`}
                     onClick={() => handleAmenityToggle('freeParking')}
                   >
                     <div className="amenity-icon">🚗</div>
@@ -547,7 +843,7 @@ const RegisterDetail = () => {
                   </div>
 
                   <div 
-                    className={`amenity-item ${formData.amenities.paidParking ? 'selected' : ''}`}
+                    className={`amenity-item ${formData.amenities.includes('paidParking') ? 'selected' : ''}`}
                     onClick={() => handleAmenityToggle('paidParking')}
                   >
                     <div className="amenity-icon">😊</div>
@@ -555,7 +851,7 @@ const RegisterDetail = () => {
                   </div>
 
                   <div 
-                    className={`amenity-item ${formData.amenities.airConditioner ? 'selected' : ''}`}
+                    className={`amenity-item ${formData.amenities.includes('airConditioner') ? 'selected' : ''}`}
                     onClick={() => handleAmenityToggle('airConditioner')}
                   >
                     <div className="amenity-icon">❄️</div>
@@ -563,7 +859,7 @@ const RegisterDetail = () => {
                   </div>
 
                   <div 
-                    className={`amenity-item ${formData.amenities.workspace ? 'selected' : ''}`}
+                    className={`amenity-item ${formData.amenities.includes('workspace') ? 'selected' : ''}`}
                     onClick={() => handleAmenityToggle('workspace')}
                   >
                     <div className="amenity-icon">💼</div>
@@ -666,8 +962,8 @@ const RegisterDetail = () => {
             <div className="section">
               <h3 className="section-title">할머니 집 이름을 지어주세요</h3>
               <textarea
-                name="houseName"
-                value={formData.houseName}
+                name="houseNickname"
+                value={formData.houseNickname}
                 onChange={handleInputChange}
                 className="textarea-input"
                 placeholder="입력하세요.."
@@ -678,8 +974,8 @@ const RegisterDetail = () => {
             <div className="section">
               <h3 className="section-title">체험 가능한 일손을 작성해주세요</h3>
               <textarea
-                name="workExperience"
-                value={formData.workExperience}
+                name="experiences"
+                value={formData.experiences}
                 onChange={handleInputChange}
                 className="textarea-input"
                 placeholder="입력하세요.."
@@ -690,8 +986,8 @@ const RegisterDetail = () => {
             <div className="section">
               <h3 className="section-title">숙박비를 설정하세요</h3>
               <textarea
-                name="price"
-                value={formData.price}
+                name="accommodationFee"
+                value={formData.accommodationFee}
                 onChange={handleInputChange}
                 className="textarea-input"
                 placeholder="입력하세요.."

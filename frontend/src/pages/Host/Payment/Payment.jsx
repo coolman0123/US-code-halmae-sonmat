@@ -8,10 +8,125 @@ const HostPayment = () => {
   const [currentDate, setCurrentDate] = useState(new Date(2025, 5, 1)); // 2025년 6월로 시작
   const [paymentData, setPaymentData] = useState({});
 
-  // 특정 날짜의 결제 상세내역을 가져오는 함수 (PaymentDetail.jsx와 동일한 데이터)
-  const getPaymentDetailsForDate = (dateString) => {
-    // 실제로는 API에서 해당 날짜의 상세 결제 내역을 가져와야 함
-    // 현재는 모든 날짜에 동일한 데이터를 반환 (실제 구현시 날짜별로 다른 데이터 반환)
+  // 백엔드에서 결제 데이터 가져오기 (Trip API 활용)
+  const fetchPaymentDataFromAPI = async () => {
+    try {
+      console.log('백엔드에서 결제 데이터 조회 중...');
+      
+      const response = await fetch('https://us-code-halmae-sonmat.onrender.com/api/trips', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('결제 데이터 조회에 실패했습니다.');
+      }
+
+      const result = await response.json();
+      console.log('백엔드에서 불러온 Trip 데이터 (결제용):', result);
+
+      const data = {};
+
+      if (result.success && result.data && Array.isArray(result.data)) {
+        // Trip 데이터를 날짜별 결제 데이터로 변환
+        result.data.forEach(trip => {
+          if (trip.status === 'cancelled' || trip.currentParticipants === 0) return; // 취소된 여행이나 참가자 없는 여행 제외
+          
+          const startDate = new Date(trip.startDate);
+          const endDate = new Date(trip.endDate);
+          
+          // 시작일부터 종료일까지 모든 날짜에 결제 정보 표시
+          for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+            const year = d.getFullYear();
+            const month = d.getMonth() + 1;
+            const day = d.getDate();
+            const dateKey = `${year}-${month}-${day}`;
+            
+            // 해당 날짜의 총 결제 금액 계산 (참가자 수 × 가격)
+            const dailyPayment = trip.currentParticipants * trip.price;
+            
+            if (data[dateKey]) {
+              data[dateKey] += dailyPayment;
+            } else {
+              data[dateKey] = dailyPayment;
+            }
+          }
+        });
+      }
+
+      // 백엔드 데이터가 없거나 적을 때 기본 임시 데이터 추가
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      
+      if (Object.keys(data).length === 0 && year === 2025 && month === 5) {
+        // 2025년 6월 고정 결제 데이터
+        const paymentDays = [2, 3, 4, 5, 6, 7, 8, 9, 10, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30];
+        
+        paymentDays.forEach(day => {
+          const dateKey = `${year}-${month + 1}-${day}`;
+          // 임시 결제 금액 (250,000 ~ 680,000원 사이 랜덤)
+          data[dateKey] = Math.floor(Math.random() * 430000) + 250000;
+        });
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('결제 데이터 조회 실패:', error);
+      
+      // 에러 시 기본 임시 데이터 반환
+      const data = {};
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      
+      if (year === 2025 && month === 5) {
+        const paymentDays = [2, 3, 4, 5, 6, 7, 8, 9, 10];
+        paymentDays.forEach(day => {
+          const dateKey = `${year}-${month + 1}-${day}`;
+          data[dateKey] = Math.floor(Math.random() * 200000) + 100000;
+        });
+      }
+      
+      return data;
+    }
+  };
+
+  // 특정 날짜의 결제 상세내역을 가져오는 함수
+  const getPaymentDetailsForDate = async (dateString) => {
+    try {
+      const response = await fetch('https://us-code-halmae-sonmat.onrender.com/api/trips', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+          const targetDate = new Date(dateString);
+          const matchingTrips = result.data.filter(trip => {
+            const startDate = new Date(trip.startDate);
+            const endDate = new Date(trip.endDate);
+            return targetDate >= startDate && targetDate <= endDate && trip.currentParticipants > 0;
+          });
+
+          return matchingTrips.map(trip => ({
+            id: trip.id,
+            title: trip.title,
+            dateRange: `이용일자 ${trip.startDate} - ${trip.endDate}`,
+            description: `참가자 ${trip.currentParticipants}명`,
+            amount: trip.currentParticipants * trip.price
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('결제 상세 조회 실패:', error);
+    }
+
+    // 에러 시 기본 데이터 반환
     return [
       {
         id: 1,
@@ -19,66 +134,17 @@ const HostPayment = () => {
         dateRange: '이용일자 2025.06.29 - 2025.06.30',
         description: '김현진 님 예약',
         amount: 250000
-      },
-      {
-        id: 2,
-        title: '여여',
-        dateRange: '이용일자 2025.06.29 - 2025.06.30',
-        description: '김현진 님 예약',
-        amount: 340000
-      },
-      {
-        id: 3,
-        title: '여여',
-        dateRange: '이용일자 2025.06.29 - 2025.06.30',
-        description: '김현진 님 예약',
-        amount: 340000
-      },
-      {
-        id: 4,
-        title: '여여',
-        dateRange: '이용일자 2025.06.29 - 2025.06.30',
-        description: '김현진 님 예약',
-        amount: 340000
       }
     ];
   };
 
-  // 임시 결제 데이터 (실제 API에서 가져올 데이터)
-  const generatePaymentData = () => {
-    const data = {};
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    
-    // 2025년 6월 고정 결제 데이터
-    if (year === 2025 && month === 5) { // 6월 (0-based index)
-      // 결제가 있는 날짜들 (기존과 동일)
-      const paymentDays = [2, 3, 4, 5, 6, 7, 8, 9, 10, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30];
-      
-      paymentDays.forEach(day => {
-        const dateKey = `${year}-${month + 1}-${day}`;
-        const paymentDetails = getPaymentDetailsForDate(dateKey);
-        // 실제 상세내역의 합계를 계산
-        const totalAmount = paymentDetails.reduce((sum, item) => sum + item.amount, 0);
-        data[dateKey] = totalAmount;
-      });
-    } else {
-      // 다른 월에는 랜덤 데이터
-      for (let day = 1; day <= 30; day++) {
-        if (Math.random() > 0.4) { // 60% 확률로 결제 발생
-          const dateKey = `${year}-${month + 1}-${day}`;
-          const paymentDetails = getPaymentDetailsForDate(dateKey);
-          const totalAmount = paymentDetails.reduce((sum, item) => sum + item.amount, 0);
-          data[dateKey] = totalAmount;
-        }
-      }
-    }
-    
-    return data;
-  };
-
   useEffect(() => {
-    setPaymentData(generatePaymentData());
+    const loadPaymentData = async () => {
+      const data = await fetchPaymentDataFromAPI();
+      setPaymentData(data);
+    };
+    
+    loadPaymentData();
   }, [currentDate]);
 
   const formatCurrency = (amount) => {
