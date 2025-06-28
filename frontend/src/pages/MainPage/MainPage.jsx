@@ -1,18 +1,17 @@
-'use client';
-import React, { useEffect, useRef } from 'react';
-import { animate, stagger } from 'motion';
-import { splitText } from 'motion-plus';
-import './MainPage.css';
+"use client";
+import React, { useEffect, useRef } from "react";
+import { animate, stagger } from "motion";
+import { splitText } from "motion-plus";
+import "./MainPage.css";
 
 // 이미지 import
-import topImage from '../../assets/images/홈_상단사진.png';
-import countryHouseImage from '../../assets/images/홈_정겨운시골집.png';
-import landscapeImage from '../../assets/images/홈_전경사진.png';
-import tableImage from '../../assets/images/홈_따뜻한밥상.png';
-import experienceImage from '../../assets/images/홈_특별한체험.png';
-import warmthImage from '../../assets/images/홈_삶의온기.png';
-import houseImage from '../../assets/images/홈_집사진.jpg';
-import grandmaLogo from '../../assets/images/할머니로고.png';
+import countryHouseImage from "../../assets/images/홈_정겨운시골집.png";
+import landscapeImage from "../../assets/images/홈_전경사진.png";
+import tableImage from "../../assets/images/홈_따뜻한밥상.png";
+import experienceImage from "../../assets/images/홈_특별한체험.png";
+import warmthImage from "../../assets/images/홈_삶의온기.png";
+import houseImage from "../../assets/images/홈_집사진.jpg";
+import grandmaLogo from "../../assets/images/할머니로고.png";
 
 const MainPage = () => {
   const animateRef = useRef(null);
@@ -20,10 +19,10 @@ const MainPage = () => {
   useEffect(() => {
     if (!animateRef.current) return;
 
-    animateRef.current.style.visibility = 'visible';
+    animateRef.current.style.visibility = "visible";
 
     const targets = animateRef.current.querySelectorAll(
-      'h1.main-title, p.main-subtitle, p.intro-text, .detailed-description p, .detailed-description .signature'
+      "h1.main-title, p.main-subtitle, p.intro-text, .detailed-description p, .detailed-description .signature"
     );
 
     targets.forEach((el) => {
@@ -34,39 +33,39 @@ const MainPage = () => {
         {
           duration: 1.2,
           delay: stagger(0.04),
-          easing: 'ease-out',
+          easing: "ease-out",
         }
       );
     });
   }, []);
 
   return (
-    <div className='main-page'>
+    <div className="main-page">
       {/* Hero Section - 메인 이미지 */}
-      <section className='hero-section'>
+      {/* <section className='hero-section'>
         <div className='hero-image'>
           <img src={topImage} alt='할머니의 손맛' />
         </div>
-      </section>
+      </section> */}
 
       {/* Title Section - 할매의 손맛 */}
       <section
-        className='title-section'
+        className="title-section"
         ref={animateRef}
-        style={{ visibility: 'hidden' }}
+        style={{ visibility: "hidden" }}
       >
-        <div className='container'>
-          <div className='title-icon'>
-            <img src={grandmaLogo} alt='할머니로고' />
+        <div className="container">
+          <div className="title-icon">
+            <img src={grandmaLogo} alt="할머니로고" />
           </div>
-          <h1 className='main-title'>할매의 손맛</h1>
-          <p className='main-subtitle'>홈스테이, 따뜻한밥상, 농촌체험</p>
+          <h1 className="main-title">할매의 손맛</h1>
+          <p className="main-subtitle">홈스테이, 따뜻한밥상, 농촌체험</p>
 
-          <p className='intro-text'>
+          <p className="intro-text">
             시골 할매 품에서, 따뜻한 밥 한 끼와 진짜 쉼을 드립니다.
           </p>
 
-          <div className='detailed-description'>
+          <div className="detailed-description">
             <p>잠시 멈추어도 괜찮습니다.</p>
             <p>복잡한 도시와 바쁜 일상에서 벗어나</p>
             <p>시골 할매의 따뜻한 손길이 머무는 작은 집에서</p>
@@ -94,57 +93,57 @@ const MainPage = () => {
             <p>그런 쉼이 필 수 있기를,</p>
             <p>할매가 정성으로 맞이합니다.</p>
 
-            <p className='signature'>할매의 맛 올림</p>
+            <p className="signature">할매의 맛 올림</p>
           </div>
         </div>
       </section>
 
       {/* Country Life Section - 큰 회색 박스와 침실 이미지 */}
-      <section className='country-life-section'>
-        <div className='container'>
-          <div className='content-row'>
-            <div className='gray-box'>
-              <p className='box-text'>
-                바쁜 세상 속 쉼표, 고요한{' '}
-                <span className='highlight'>시골의 하루</span>
+      <section className="country-life-section">
+        <div className="container">
+          <div className="content-row">
+            <div className="gray-box">
+              <p className="box-text">
+                바쁜 세상 속 쉼표, 고요한{" "}
+                <span className="highlight">시골의 하루</span>
               </p>
             </div>
-            <div className='image-content'>
-              <img src={houseImage} alt='시골집 침실' />
+            <div className="image-content">
+              <img src={houseImage} alt="시골집 침실" />
             </div>
           </div>
 
-          <div className='description-section'>
-            <p className='description-title'>
+          <div className="description-section">
+            <p className="description-title">
               한 끼의 밥과 따스한 온기로 채우는 여행
             </p>
 
-            <div className='description-details'>
+            <div className="description-details">
               <p>갓 지은 밥과 푸근한 인사로 차려지는 할머니 밥상.</p>
               <p>한 숟갈마다 전해지는 정성과 이야기,</p>
               <p>할머니 손맛이 머무는 식탁에서</p>
               <p>마음까지 포근해지는 여행을 시작해보세요.</p>
             </div>
 
-            <div className='bottom-line'></div>
+            <div className="bottom-line"></div>
           </div>
         </div>
       </section>
 
       {/* Landscape Section - 전경 이미지 */}
-      <section className='landscape-section'>
-        <div className='landscape-container'>
-          <img src={landscapeImage} alt='전경' />
-          <div className='landscape-overlay'>
-            <p className='overlay-text-1'>
+      <section className="landscape-section">
+        <div className="landscape-container">
+          <img src={landscapeImage} alt="전경" />
+          <div className="landscape-overlay">
+            <p className="overlay-text-1">
               오시는 분들과 함께 소박한 밥 한 끼, 따뜻한 이야기를 나누고
               싶습니다.
             </p>
-            <p className='overlay-text-2'>
+            <p className="overlay-text-2">
               단순히 머물다 가는 숙소가 아닌, 정이 오가고 마음이 쉬어가는 곳이
               되고자 합니다.
             </p>
-            <p className='overlay-text-3'>
+            <p className="overlay-text-3">
               할매의 손맛에 오셔서, 시골집의 온기와 함께 잊지 못할 추억을 만들어
               보시는 건 어떨까요..!
             </p>
@@ -153,14 +152,14 @@ const MainPage = () => {
       </section>
 
       {/* Small Gray Box Section - 전경 이미지 바로 아래 */}
-      <section className='small-gray-box-section'>
-        <div className='container'>
-          <div className='content-row-right'>
-            <div className='gray-box-small'>
-              <p className='box-text'>
+      <section className="small-gray-box-section">
+        <div className="container">
+          <div className="content-row-right">
+            <div className="gray-box-small">
+              <p className="box-text">
                 손끝에 남는 흙냄새처럼,
                 <br />
-                <span className='highlight'>오래 기억될 하루</span>
+                <span className="highlight">오래 기억될 하루</span>
               </p>
             </div>
           </div>
@@ -168,24 +167,24 @@ const MainPage = () => {
       </section>
 
       {/* Experience Cards Section - 3개 카드 */}
-      <section className='experience-cards-section'>
-        <div className='container'>
-          <div className='cards-grid'>
-            <div className='experience-card'>
-              <div className='card-image'>
-                <img src={countryHouseImage} alt='정겨운 시골집' />
+      <section className="experience-cards-section">
+        <div className="container">
+          <div className="cards-grid">
+            <div className="experience-card">
+              <div className="card-image">
+                <img src={countryHouseImage} alt="정겨운 시골집" />
               </div>
-              <div className='card-content'>
+              <div className="card-content">
                 <h3>정겨운 시골집</h3>
                 <p>정겨운 할머니의 포근한 공간</p>
               </div>
             </div>
 
-            <div className='experience-card'>
-              <div className='card-image'>
-                <img src={tableImage} alt='따뜻한 밥상' />
+            <div className="experience-card">
+              <div className="card-image">
+                <img src={tableImage} alt="따뜻한 밥상" />
               </div>
-              <div className='card-content'>
+              <div className="card-content">
                 <h3>따뜻한 밥상</h3>
                 <p>
                   할머니의 정성이 담긴 따뜻한 밥상에서 보내는 오순도순 소중한
@@ -194,11 +193,11 @@ const MainPage = () => {
               </div>
             </div>
 
-            <div className='experience-card'>
-              <div className='card-image'>
-                <img src={experienceImage} alt='특별한 체험' />
+            <div className="experience-card">
+              <div className="card-image">
+                <img src={experienceImage} alt="특별한 체험" />
               </div>
-              <div className='card-content'>
+              <div className="card-content">
                 <h3>특별한 체험</h3>
                 <p>할머니의 삶 속에 들어가 보아요</p>
               </div>
@@ -208,19 +207,19 @@ const MainPage = () => {
       </section>
 
       {/* Final Image Section - 삶의 온기 이미지 */}
-      <section className='final-image-section'>
-        <div className='container'>
-          <div className='content-row-left'>
-            <div className='gray-box-small'>
-              <p className='box-text'>
-                정이 흐르는 시골집에서 다시 만나는{' '}
-                <span className='highlight'>삶의 온기</span>
+      <section className="final-image-section">
+        <div className="container">
+          <div className="content-row-left">
+            <div className="gray-box-small">
+              <p className="box-text">
+                정이 흐르는 시골집에서 다시 만나는{" "}
+                <span className="highlight">삶의 온기</span>
               </p>
             </div>
           </div>
         </div>
-        <div className='final-image'>
-          <img src={warmthImage} alt='삶의 온기' />
+        <div className="final-image">
+          <img src={warmthImage} alt="삶의 온기" />
         </div>
       </section>
     </div>
