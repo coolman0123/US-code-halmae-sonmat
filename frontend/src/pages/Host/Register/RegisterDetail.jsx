@@ -231,6 +231,11 @@ const RegisterDetail = () => {
       // localStorage에 저장
       localStorage.setItem('hostsList', JSON.stringify(existingHosts));
       
+      // Stories 페이지 실시간 업데이트를 위한 커스텀 이벤트 발생
+      window.dispatchEvent(new CustomEvent('hostRegistered', { 
+        detail: { host: completeHostData } 
+      }));
+      
       console.log('할매 등록 완료:', completeHostData);
       alert('할매 등록이 완료되었습니다!');
       

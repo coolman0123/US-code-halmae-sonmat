@@ -26,6 +26,7 @@ import Notification from './pages/MyPage/Notification/Notification';
 
 // Auth Pages
 import Login from './pages/Auth/Login/Login';
+import AdminLogin from './pages/Auth/AdminLogin/AdminLogin';
 import SignUp from './pages/Auth/SignUp/SignUp';
 import Logout from './pages/Auth/Logout/Logout';
 
@@ -56,6 +57,7 @@ const Layout = ({ children }) => {
   // 인증 페이지에서는 Header, Footer 숨기기
   const hideHeaderFooter = [
     '/auth/login',
+    '/auth/admin-login',
     '/auth/signup',
     '/host/login',
   ].includes(location.pathname);
@@ -137,6 +139,7 @@ function App() {
 
           {/* Auth Routes */}
           <Route path='/auth/login' element={<Login />} />
+          <Route path='/auth/admin-login' element={<AdminLogin />} />
           <Route path='/auth/signup' element={<SignUp />} />
           <Route path='/auth/logout' element={<Logout />} />
 

@@ -7,6 +7,7 @@ const HostBooking = () => {
   const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date(2025, 5, 1)); // 2025년 6월로 시작
   const [bookingData, setBookingData] = useState({});
+  const [showPrices, setShowPrices] = useState(false); // 가격 표시 옵션 추가
 
   // 예약 데이터 생성 (localStorage 반영)
   const generateBookingData = () => {
@@ -14,6 +15,8 @@ const HostBooking = () => {
     
     // localStorage에서 저장된 예약 데이터 가져오기
     const savedReservations = JSON.parse(localStorage.getItem('reservations') || '[]');
+    // localStorage에서 할매 정보 가져오기 (가격 정보를 위해)
+    const hostsList = JSON.parse(localStorage.getItem('hostsList') || '[]');
     
     // 저장된 예약 데이터를 날짜별로 처리 (입실 날짜만 표시)
     savedReservations.forEach(reservation => {
@@ -30,10 +33,24 @@ const HostBooking = () => {
         data[dateKey] = [];
       }
       
+      // 해당 숙소의 가격 정보 찾기
+      let housePrice = null;
+      if (reservation.totalPrice) {
+        // 예약 데이터에 가격이 있으면 사용
+        housePrice = reservation.totalPrice;
+      } else {
+        // 할매 정보에서 가격 찾기
+        const hostInfo = hostsList.find(host => host.houseName === reservation.houseName);
+        if (hostInfo && hostInfo.price) {
+          housePrice = parseInt(hostInfo.price);
+        }
+      }
+      
       data[dateKey].push({
         status: reservation.status, // 'available' 또는 'unavailable'
         houseName: reservation.houseName,
-        displayText: reservation.status === 'available' ? '가' : '완'
+        displayText: reservation.status === 'available' ? '가' : '완',
+        price: housePrice // 가격 정보 추가
       });
     });
     
@@ -42,6 +59,9 @@ const HostBooking = () => {
     const month = currentDate.getMonth();
     
     if (savedReservations.length === 0 && year === 2025 && month === 5) {
+      // 할매 정보에서 가격 가져오기 (기본 데이터용)
+      const defaultPrice = hostsList.length > 0 && hostsList[0].price ? parseInt(hostsList[0].price) : 340000;
+      
       // 예약 불가능한 날짜들 (빨강색 - '완')
       const unavailableDays = [2, 3, 7, 8, 9, 15, 16, 22, 23, 29, 30];
       unavailableDays.forEach(day => {
@@ -52,7 +72,8 @@ const HostBooking = () => {
         data[dateKey].push({
           status: 'unavailable',
           houseName: '여여',
-          displayText: '완'
+          displayText: '완',
+          price: defaultPrice
         });
       });
 
@@ -66,18 +87,19 @@ const HostBooking = () => {
         data[dateKey].push({
           status: 'available',
           houseName: '여여',
-          displayText: '가'
+          displayText: '가',
+          price: defaultPrice
         });
       });
 
       // 24일에 여러 숙소 예시 추가
       const day24Key = `${year}-${month + 1}-24`;
       data[day24Key] = [
-        { status: 'available', houseName: '여여', displayText: '가' },
-        { status: 'unavailable', houseName: '모모', displayText: '완' },
-        { status: 'available', houseName: '소소', displayText: '가' },
-        { status: 'unavailable', houseName: '영영', displayText: '완' },
-        { status: 'unavailable', houseName: '패밀리', displayText: '완' }
+        { status: 'available', houseName: '여여', displayText: '가', price: defaultPrice },
+        { status: 'unavailable', houseName: '모모', displayText: '완', price: 280000 },
+        { status: 'available', houseName: '소소', displayText: '가', price: 280000 },
+        { status: 'unavailable', houseName: '영영', displayText: '완', price: 300000 },
+        { status: 'unavailable', houseName: '패밀리', displayText: '완', price: 400000 }
       ];
     }
     
@@ -109,6 +131,10 @@ const HostBooking = () => {
     navigate('/host/booking/add');
   };
 
+  const handleCheckboxChange = (e) => {
+    setShowPrices(e.target.checked);
+  };
+
   // 날짜별 컨텐츠 렌더링 함수 (예약 상태 표시)
   const renderDateContent = (date, data, isCurrentMonth) => {
     if (data && isCurrentMonth && Array.isArray(data)) {
@@ -122,6 +148,11 @@ const HostBooking = () => {
               <div className="house-name">
                 {booking.houseName}
               </div>
+              {showPrices && (
+                <div className="price-display">
+                  {booking.price ? `${booking.price.toLocaleString()}원` : '가격 정보 없음'}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -135,12 +166,25 @@ const HostBooking = () => {
       <div className="booking-container">
         <h1 className="booking-title">예약 관리</h1>
         
-        <button 
-          className="add-reservation-button"
-          onClick={handleAddReservation}
-        >
-          예약 추가
-        </button>
+        <div className="booking-controls">
+          <div className="calendar-header">
+            <label>
+              <input
+                type="checkbox"
+                checked={showPrices}
+                onChange={handleCheckboxChange}
+              />
+              날짜별 요금보기
+            </label>
+          </div>
+          
+          <button 
+            className="add-reservation-button"
+            onClick={handleAddReservation}
+          >
+            예약 추가
+          </button>
+        </div>
 
         {/* 캘린더 컴포넌트 사용 */}
         <Calendar 
