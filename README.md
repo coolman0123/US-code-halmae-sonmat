@@ -22,12 +22,14 @@
 - **Vite** - 빠른 개발 환경 및 빌드 도구
 - **CSS3** - 스타일링
 - **Firebase** - 인증 및 실시간 데이터베이스
+- **Kakao Maps API** - 지도 표시 및 지오코딩
 
 ### Backend
 - **Node.js** - 서버 런타임
 - **Express.js** - 웹 프레임워크
 - **Firebase Admin SDK** - 백엔드 인증 및 데이터베이스 관리
 - **Swagger** - API 문서화
+- **Kakao REST API** - 지오코딩
 
 ## 📁 프로젝트 구조
 
@@ -120,3 +122,111 @@ http://localhost:3000/api-docs
 ---
 
 docs_v2.0
+
+## 🔧 기술 스택
+
+### 프론트엔드
+- React 18
+- Vite
+- React Router
+- **Kakao Maps API** (지도 표시 및 지오코딩)
+
+### 백엔드
+- Node.js
+- Express.js
+- Firebase Firestore
+- **Kakao REST API** (지오코딩)
+
+## 🚀 시작하기
+
+### 환경 변수 설정
+
+#### 프론트엔드 (frontend/.env)
+```bash
+# Kakao Maps JavaScript API 키
+VITE_KAKAO_MAP_API_KEY=your_kakao_javascript_api_key_here
+```
+
+#### 백엔드 (.env)
+```bash
+# Kakao REST API 키
+KAKAO_REST_API_KEY=your_kakao_rest_api_key_here
+```
+
+### Kakao API 키 발급 방법
+
+1. **[Kakao Developers](https://developers.kakao.com/)** 접속
+2. **내 애플리케이션 > 애플리케이션 추가하기**
+3. **앱 설정 > 앱 키**에서 다음 키들 복사:
+   - **JavaScript 키**: 프론트엔드 지도 표시용
+   - **REST API 키**: 백엔드 지오코딩용
+4. **플랫폼 설정 > Web 플랫폼 추가**
+5. **사이트 도메인 등록** (localhost:3000, localhost:5001 등)
+6. **제품 설정**:
+   - **Kakao Map** 활성화
+   - **Local (주소 검색)** 활성화
+
+### 실행 방법
+
+#### 백엔드 실행
+```bash
+cd backend
+npm install
+KAKAO_REST_API_KEY=your_api_key npm start
+```
+
+#### 프론트엔드 실행
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+## 📍 지오코딩 시스템
+
+### 이중 안전망 구조
+1. **1차**: 프론트엔드에서 Kakao Maps JavaScript API로 직접 지오코딩
+2. **2차**: 실패 시 백엔드 Kakao REST API로 폴백
+
+### 지원 주소 형식
+- ✅ **도로명 주소**: 선릉로 221, 강남대로 382
+- ✅ **지번 주소**: 서울시 강남구 역삼동 123-45
+- ✅ **건물명**: 코엑스, 롯데월드타워
+
+### API 엔드포인트
+```
+GET /api/hosts/geocoding?address=선릉로 221
+```
+
+## 🏠 호스트 등록 기능
+
+- 카카오 지오코딩으로 정확한 위치 설정
+- 실시간 지도 마커 표시
+- 주소 자동 완성 및 검증
+- 숙박 정보 및 편의시설 등록
+- 사진 업로드 (최대 2장)
+
+## 📁 프로젝트 구조
+
+```
+grandma_hand/
+├── frontend/          # React 프론트엔드
+│   ├── src/
+│   │   ├── pages/Host/Register/   # 호스트 등록 페이지
+│   │   └── ...
+├── backend/           # Node.js 백엔드
+│   ├── domains/host/  # 호스트 관련 API
+│   └── ...
+└── README.md
+```
+
+## 🔍 주요 변경사항
+
+- ❌ **Google Maps API 완전 제거**
+- ✅ **Kakao Maps/Local API로 전환**
+- ✅ **이중 안전망 지오코딩 시스템**
+- ✅ **한국 주소에 최적화된 검색**
+
+## 📞 문의
+
+문제가 발생하거나 궁금한 점이 있으시면 GitHub Issues를 통해 문의해주세요.

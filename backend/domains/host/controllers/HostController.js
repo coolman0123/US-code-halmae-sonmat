@@ -178,7 +178,7 @@ class HostController {
   }
 
   /**
-   * Google Maps Geocoding API Proxy
+   * Kakao Maps Geocoding API Proxy
    * @param {string} address - 지오코딩할 주소
    */
   async geocoding(req, res, next) {
@@ -193,51 +193,53 @@ class HostController {
       }
 
       // API 키 검증
-      if (!process.env.GOOGLE_MAPS_API_KEY) {
-        console.error('❌ GOOGLE_MAPS_API_KEY가 설정되지 않음');
+      if (!process.env.KAKAO_REST_API_KEY) {
+        console.error('❌ KAKAO_REST_API_KEY가 설정되지 않음');
         return res.status(500).json({
           success: false,
-          message: 'Google Maps API 키가 설정되지 않았습니다.'
+          message: 'Kakao REST API 키가 설정되지 않았습니다.'
         });
       }
       
-      console.log('🔍 지오코딩 요청:', address);
-      console.log('🔑 API 키 상태: 설정됨');
+      console.log('🔍 카카오 지오코딩 요청:', address);
+      console.log('🔑 Kakao API 키 상태: 설정됨');
       
-      // Google Geocoding API 호출
-      const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+      // Kakao Local Search API 호출
+      const response = await axios.get('https://dapi.kakao.com/v2/local/search/address.json', {
         params: {
-          address: address,
-          key: process.env.GOOGLE_MAPS_API_KEY,
-          language: 'ko',
-          region: 'KR',
-          components: 'country:KR'
+          query: address
+        },
+        headers: {
+          'Authorization': `KakaoAK ${process.env.KAKAO_REST_API_KEY}`
         },
         timeout: 10000 // 10초 타임아웃
       });
 
       const { data } = response;
       
-      console.log('📍 Google API 응답 상태:', data.status);
-      console.log('📍 결과 개수:', data.results?.length || 0);
+      console.log('📍 Kakao API 응답:', {
+        총_결과_수: data.meta?.total_count || 0,
+        현재_페이지_결과_수: data.documents?.length || 0
+      });
       
-      if (data.status === 'OK' && data.results && data.results.length > 0) {
-        const result = data.results[0];
-        const location = result.geometry.location;
+      if (data.documents && data.documents.length > 0) {
+        const result = data.documents[0];
         
         const geocodingResult = {
           address: address,
-          formattedAddress: result.formatted_address,
-          latitude: location.lat,
-          longitude: location.lng,
-          placeId: result.place_id
+          formattedAddress: result.address_name,
+          roadAddress: result.road_address_name || result.address_name,
+          latitude: parseFloat(result.y),
+          longitude: parseFloat(result.x),
+          addressType: result.address_type
         };
 
-        console.log('✅ 지오코딩 성공:', {
+        console.log('✅ 카카오 지오코딩 성공:', {
           input: address,
-          formatted: result.formatted_address,
-          lat: location.lat,
-          lng: location.lng
+          formatted: result.address_name,
+          road: result.road_address_name,
+          lat: result.y,
+          lng: result.x
         });
         
         res.json({
@@ -245,70 +247,53 @@ class HostController {
           data: geocodingResult
         });
       } else {
-        let errorMessage = '주소를 찾을 수 없습니다.';
-        let statusCode = 400;
-        
-        switch (data.status) {
-          case 'ZERO_RESULTS':
-            errorMessage = '검색 결과가 없습니다. 다른 주소로 시도해보세요.';
-            statusCode = 404;
-            break;
-          case 'OVER_QUERY_LIMIT':
-            errorMessage = 'API 사용량 한도를 초과했습니다. 잠시 후 다시 시도해주세요.';
-            statusCode = 429;
-            break;
-          case 'REQUEST_DENIED':
-            errorMessage = 'API 요청이 거부되었습니다. API 키를 확인해주세요.';
-            statusCode = 403;
-            break;
-          case 'INVALID_REQUEST':
-            errorMessage = '잘못된 요청입니다. 주소 형식을 확인해주세요.';
-            statusCode = 400;
-            break;
-          case 'UNKNOWN_ERROR':
-            errorMessage = '서버 일시적 오류입니다. 잠시 후 다시 시도해주세요.';
-            statusCode = 500;
-            break;
-          default:
-            errorMessage = `알 수 없는 오류가 발생했습니다. (${data.status})`;
-            statusCode = 500;
-        }
-        
-        console.log('❌ 지오코딩 실패:', {
-          status: data.status,
-          message: errorMessage,
-          input: address
+        console.log('❌ 카카오 지오코딩 결과 없음:', {
+          input: address,
+          total_count: data.meta?.total_count
         });
         
-        res.status(statusCode).json({
+        res.status(404).json({
           success: false,
-          message: errorMessage,
-          status: data.status,
+          message: `검색 결과가 없습니다. "${address}"에 대한 정확한 주소를 확인해주세요.`,
           input: address
         });
       }
     } catch (error) {
-      console.error('❌ 지오코딩 API 네트워크 오류:', {
+      console.error('❌ 카카오 지오코딩 API 오류:', {
         message: error.message,
         code: error.code,
-        response: error.response?.status,
+        status: error.response?.status,
         data: error.response?.data
       });
       
       // 네트워크 오류에 따른 사용자 친화적 메시지
-      let userMessage = '지오코딩 요청 처리 중 오류가 발생했습니다.';
+      let userMessage = '카카오 지오코딩 요청 처리 중 오류가 발생했습니다.';
+      let statusCode = 500;
       
-      if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+      if (error.response?.status === 400) {
+        userMessage = '잘못된 요청입니다. 주소 형식을 확인해주세요.';
+        statusCode = 400;
+      } else if (error.response?.status === 401) {
+        userMessage = 'Kakao API 키가 유효하지 않습니다.';
+        statusCode = 401;
+      } else if (error.response?.status === 403) {
+        userMessage = 'Kakao API 접근이 거부되었습니다. API 키를 확인해주세요.';
+        statusCode = 403;
+      } else if (error.response?.status === 429) {
+        userMessage = 'API 사용량 한도를 초과했습니다. 잠시 후 다시 시도해주세요.';
+        statusCode = 429;
+      } else if (error.response?.status >= 500) {
+        userMessage = 'Kakao 서버에 일시적 문제가 있습니다. 잠시 후 다시 시도해주세요.';
+        statusCode = 500;
+      } else if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
         userMessage = '네트워크 연결을 확인해주세요.';
+        statusCode = 503;
       } else if (error.code === 'ETIMEDOUT') {
         userMessage = '요청 시간이 초과되었습니다. 다시 시도해주세요.';
-      } else if (error.response?.status === 403) {
-        userMessage = 'API 키가 유효하지 않습니다.';
-      } else if (error.response?.status >= 500) {
-        userMessage = 'Google 서버에 일시적 문제가 있습니다. 잠시 후 다시 시도해주세요.';
+        statusCode = 408;
       }
       
-      res.status(500).json({
+      res.status(statusCode).json({
         success: false,
         message: userMessage,
         error: process.env.NODE_ENV === 'development' ? error.message : undefined
