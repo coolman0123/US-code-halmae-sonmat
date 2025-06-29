@@ -120,6 +120,24 @@ const Login = () => {
           <div className="server-status ok">✅ 서버 연결 정상</div>
         )}
 
+        {/* 테스트 계정 안내 */}
+        <div className="test-account-info">
+          <h3>🧪 테스트 계정으로 로그인</h3>
+          <div className="test-accounts">
+            <div className="test-account">
+              <strong>일반 사용자:</strong>
+              <span className="test-email">user@naver.com</span>
+              <span className="test-password">(비밀번호: 0000)</span>
+            </div>
+            <div className="test-account">
+              <strong>관리자:</strong>
+              <span className="test-email">admin@test.com</span>
+              <span className="test-password">(비밀번호: 0000)</span>
+            </div>
+          </div>
+          <p className="test-note">💡 위 계정 정보를 복사해서 사용하세요!</p>
+        </div>
+
         {/* 로그인 폼 */}
         <form className="login-form" onSubmit={handleSubmit}>
           {error && <div className="error-message">{error}</div>}
@@ -128,7 +146,7 @@ const Login = () => {
             <input
               type="email"
               name="email"
-              placeholder="이메일"
+              placeholder="이메일 (예: user@naver.com)"
               value={formData.email}
               onChange={handleInputChange}
               required
@@ -140,7 +158,7 @@ const Login = () => {
             <input
               type="password"
               name="password"
-              placeholder="비밀번호 입력 (선택사항)"
+              placeholder="비밀번호 (예: 0000)"
               value={formData.password}
               onChange={handleInputChange}
               disabled={isLoading}

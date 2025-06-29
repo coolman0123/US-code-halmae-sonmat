@@ -137,6 +137,64 @@
   border-left: 4px solid #d63031;
 }
 
+/* 관리자 계정 정보 */
+.admin-account-info {
+  background-color: #fff3cd;
+  border: 2px solid #ffeaa7;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.admin-account-info h3 {
+  margin: 0 0 15px 0;
+  color: #856404;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.admin-account {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.admin-credential {
+  background-color: white;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ffeaa7;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.credential-label {
+  color: #856404;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.credential-value {
+  color: #d63384;
+  font-weight: 700;
+  font-family: monospace;
+  background-color: #f8f9fa;
+  padding: 4px 8px;
+  border-radius: 3px;
+  user-select: all;
+  cursor: pointer;
+}
+
+.admin-note {
+  margin: 0;
+  color: #856404;
+  font-size: 13px;
+  font-weight: 500;
+}
+
 /* 하단 링크들 */
 .host-login-links {
   display: flex;

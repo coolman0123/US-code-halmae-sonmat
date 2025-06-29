@@ -152,6 +152,71 @@
   border-left: 4px solid #dc3545;
 }
 
+/* 테스트 계정 정보 */
+.test-account-info {
+  background-color: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.test-account-info h3 {
+  margin: 0 0 15px 0;
+  color: #495057;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.test-accounts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.test-account {
+  background-color: white;
+  padding: 12px;
+  border-radius: 5px;
+  border: 1px solid #dee2e6;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.test-account strong {
+  color: #343a40;
+  font-size: 14px;
+}
+
+.test-email {
+  color: #007bff;
+  font-weight: 600;
+  font-family: monospace;
+  background-color: #f8f9fa;
+  padding: 2px 6px;
+  border-radius: 3px;
+  display: inline-block;
+  margin: 2px 0;
+  user-select: all;
+  cursor: pointer;
+}
+
+.test-password {
+  color: #6c757d;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.test-note {
+  margin: 0;
+  color: #6c757d;
+  font-size: 13px;
+  font-weight: 500;
+}
+
 /* 하단 링크들 */
 .login-links {
   display: flex;

@@ -66,6 +66,22 @@ const HostLogin = () => {
           </Link>
         </div>
 
+        {/* 관리자 계정 안내 */}
+        <div className="admin-account-info">
+          <h3>🔑 관리자 로그인 정보</h3>
+          <div className="admin-account">
+            <div className="admin-credential">
+              <span className="credential-label">아이디:</span>
+              <span className="credential-value">admin</span>
+            </div>
+            <div className="admin-credential">
+              <span className="credential-label">비밀번호:</span>
+              <span className="credential-value">0000</span>
+            </div>
+          </div>
+          <p className="admin-note">💡 위 정보를 입력하여 관리자 페이지에 접속하세요</p>
+        </div>
+
         {/* 로그인 폼 */}
         <form className="host-login-form" onSubmit={handleSubmit}>
           {error && <div className="host-error-message">{error}</div>}
@@ -74,7 +90,7 @@ const HostLogin = () => {
             <input
               type="text"
               name="id"
-              placeholder="관리자 아이디"
+              placeholder="관리자 아이디 (admin)"
               value={formData.id}
               onChange={handleInputChange}
               required
@@ -86,7 +102,7 @@ const HostLogin = () => {
             <input
               type="password"
               name="password"
-              placeholder="비밀번호 입력"
+              placeholder="비밀번호 (0000)"
               value={formData.password}
               onChange={handleInputChange}
               required
