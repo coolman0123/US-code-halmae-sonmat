@@ -113,7 +113,7 @@ const AdminLogin = () => {
 
         {/* 관리자 정보 안내 */}
         <div className="admin-info">
-          <p className="info-text">ID:user, PW:0000</p>
+          <p className="info-text">관리자 전용 로그인입니다.</p>
           <p className="info-text">사용 가능한 아이디: admin, manager, host 등</p>
         </div>
 

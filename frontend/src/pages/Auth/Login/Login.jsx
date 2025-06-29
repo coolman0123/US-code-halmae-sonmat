@@ -43,12 +43,7 @@ const Login = () => {
     e.preventDefault();
     setError('');
 
-    // 서버 상태 먼저 확인
-    if (serverStatus === 'error') {
-      setError('서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.');
-      return;
-    }
-
+  
     // 입력 유효성 검사 (이메일만 필수)
     if (!formData.email) {
       setError('이메일을 입력해주세요.');
