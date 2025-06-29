@@ -78,7 +78,7 @@ const BookNow = () => {
     checkIn: new Date(2025, 6, 1),
     checkOut: new Date(2025, 6, 2)
   });
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 5, 1));
+  const [currentDate, setCurrentDate] = useState(new Date(2025, 6, 1));
   const [hostData, setHostData] = useState(null);
   const navigate = useNavigate();
 
