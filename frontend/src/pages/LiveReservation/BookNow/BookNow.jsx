@@ -68,13 +68,15 @@ const BookNow = () => {
   const [guests, setGuests] = useState({ adult: 2, child: 0, infant: 0 });
   const [totalPrice, setTotalPrice] = useState(0);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewRooms, setPreviewRooms] = useState([]);
   const [selectedDates, setSelectedDates] = useState({
-    checkIn: new Date(2025, 5, 24), // 2025-06-24 (기본값)
-    checkOut: new Date(2025, 5, 25)  // 2025-06-25 (기본값)
+    checkIn: new Date(2025, 6, 1), // 2025-06-24 (기본값)
+    checkOut: new Date(2025, 6, 2)  // 2025-06-25 (기본값)
   });
   const [tempSelectedDates, setTempSelectedDates] = useState({
-    checkIn: new Date(2025, 5, 24),
-    checkOut: new Date(2025, 5, 25)
+    checkIn: new Date(2025, 6, 1),
+    checkOut: new Date(2025, 6, 2)
   });
   const [currentDate, setCurrentDate] = useState(new Date(2025, 5, 1));
   const [hostData, setHostData] = useState(null);
@@ -94,6 +96,8 @@ const BookNow = () => {
     setSelectedRoom(room);
     setTotalPrice(price);
   };
+
+  
 
   const handleGuestChange = (type, value) => {
     setGuests((prev) => ({ ...prev, [type]: Math.max(0, value) }));
