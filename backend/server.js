@@ -39,7 +39,7 @@ app.use('/api/hosts', hostRoutes);
 
 app.use('/api/trips', tripRoutes);
 app.use('/api/reviews', reviewRoutes);
-app.use('/api/payments', paymentRoutes);
+//app.use('/api/payments', paymentRoutes);
 
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));

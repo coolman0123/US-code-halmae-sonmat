@@ -68,6 +68,8 @@ const BookNow = () => {
   const [guests, setGuests] = useState({ adult: 2, child: 0, infant: 0 });
   const [totalPrice, setTotalPrice] = useState(0);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewRooms, setPreviewRooms] = useState([]); 
   const [selectedDates, setSelectedDates] = useState({
     checkIn: new Date(2025, 5, 24), // 2025-06-24 (기본값)
     checkOut: new Date(2025, 5, 25)  // 2025-06-25 (기본값)
