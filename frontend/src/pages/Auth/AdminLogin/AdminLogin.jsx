@@ -75,22 +75,22 @@ const AdminLogin = () => {
           <h2 className="admin-subtitle">관리자 로그인</h2>
         </div>
 
-        <div className="test-account-info">
-          <h3>🧪 테스트 계정으로 로그인</h3>
-          <div className="test-accounts">
-            <div className="test-account">
-              <strong>일반 사용자:</strong>
-              <span className="test-email">user@naver.com</span>
-              <span className="test-password">(비밀번호: 0000)</span>
+          <div className="test-account-info">
+            <h3>🧪 테스트 계정으로 로그인</h3>
+            <div className="test-accounts">
+              <div className="test-account">
+                <strong>일반 사용자:</strong>
+                <span className="test-email">user@naver.com</span>
+                <span className="test-password">(비밀번호: 0000)</span>
+              </div>
+              <div className="test-account">
+                <strong>관리자:</strong>
+                <span className="test-email">admin</span>
+                <span className="test-password">(비밀번호: 0000)</span>
+              </div>
             </div>
-            <div className="test-account">
-              <strong>관리자:</strong>
-              <span className="test-email">admin</span>
-              <span className="test-password">(비밀번호: 0000)</span>
-            </div>
+            <p className="test-note">💡 위 계정 정보를 복사해서 사용하세요!</p>
           </div>
-          <p className="test-note">💡 위 계정 정보를 복사해서 사용하세요!</p>
-        </div>
 
         {/* 관리자 로그인 폼 */}
         <form className="admin-login-form" onSubmit={handleSubmit}>
